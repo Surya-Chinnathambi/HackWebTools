@@ -71,7 +71,7 @@ export const HeroSection = () => {
             </Button>
             <Button variant="outline" asChild>
               <a 
-                href="https://github.com/aw-junaid/Hacking-Tools" 
+                href="https://github.com/Surya-Chinnathambi/HackWebTools" 
                 target="_blank" 
                 rel="noopener noreferrer"
               >
