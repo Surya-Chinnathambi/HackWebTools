@@ -9,7 +9,7 @@ export const mockPayloads: Payload[] = [
     category: "Cross-Site Scripting (XSS)",
     categoryId: "xss",
     description: "A simple XSS payload to demonstrate alert box execution",
-    path: "XSS-Payloads/basic-alert.txt",
+    path: "public/assets/payloads/xss.txt",
     severity: "medium",
     tags: ["xss", "basic", "javascript"]
   },
@@ -31,7 +31,7 @@ export const mockPayloads: Payload[] = [
     category: "Directory Traversal",
     categoryId: "traversal",
     description: "Basic path traversal to access system files",
-    path: "Directory-Traversal-Payloads/etc-passwd.txt",
+    path: "public/assets/payloads/allAttacks.txt",
     severity: "high",
     tags: ["lfi", "traversal", "unix"]
   },
@@ -42,7 +42,7 @@ export const mockPayloads: Payload[] = [
     category: "Command Injection",
     categoryId: "command",
     description: "Simple command injection with command chaining",
-    path: "Command-Injection/basic.txt",
+    path: "public/assets/payloads/allSqi.txt",
     severity: "critical",
     tags: ["command", "injection", "rce"]
   },
@@ -53,7 +53,7 @@ export const mockPayloads: Payload[] = [
     category: "Cross-Site Request Forgery (CSRF)",
     categoryId: "csrf",
     description: "Hidden image tag to trigger actions without user consent",
-    path: "CSRF-Payloads/image-trigger.txt",
+    path: "public/assets/payloads/cgi-bin.txt",
     severity: "medium",
     tags: ["csrf", "bypass"]
   },
