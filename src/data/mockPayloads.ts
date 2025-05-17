@@ -64,7 +64,7 @@ export const mockPayloads: Payload[] = [
     category: "Path Traversal",
     categoryId: "traversal",
     description: "Common paths used in path traversal attacks to access sensitive files",
-    path: "Path-Traversal/heapdump.txt",
+    path: "public/assets/payloads/fuzz.txt",
     severity: "critical",
     tags: ["path-traversal", "heapdump", "sensitive-files"]
   },
@@ -75,7 +75,7 @@ export const mockPayloads: Payload[] = [
     category: "RCE",
     categoryId: "rce",
     description: "Remote Code Execution payload for Spring4Shell vulnerability",
-    path: "RCE-Payloads/spring4shell.txt",
+    path: "public/assets/payloads/api.txt",
     severity: "critical",
     tags: ["rce", "spring", "java", "vulnerability"]
   },
@@ -86,7 +86,7 @@ export const mockPayloads: Payload[] = [
     category: "Bypass",
     categoryId: "bypass",
     description: "Methods to bypass CloudFlare protection",
-    path: "Bypass-Payloads/cloudflare.txt",
+    path: "public/assets/payloads/allSqi.txt",
     severity: "medium",
     tags: ["bypass", "cloudflare", "security"]
   }
