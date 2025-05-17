@@ -20,7 +20,7 @@ export const mockPayloads: Payload[] = [
     category: "SQL Injection",
     categoryId: "sql",
     description: "Authentication bypass payload using OR condition",
-    path: "SQL-Injection-Payloads/auth-bypass.txt",
+    path: "public/assets/payloads/sql.txt",
     severity: "high",
     tags: ["sql", "authentication", "bypass"]
   },
