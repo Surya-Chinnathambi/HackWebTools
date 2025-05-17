@@ -18,7 +18,7 @@ const Footer = () => {
               rel="noopener noreferrer" 
               className="hover:underline text-primary transition-colors"
             >
-              aw-junaid/Hacking-Tools repository
+              Surya-Chinnathambi repository
             </a>
           </p>
         </div>
@@ -49,7 +49,7 @@ const Footer = () => {
           </Link>
           
           <a
-            href="https://github.com/aw-junaid/Hacking-Tools"
+            href="https://github.com/Surya-Chinnathambi/HackWebTools"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1"
