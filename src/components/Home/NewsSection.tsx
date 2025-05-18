@@ -1,8 +1,13 @@
-"use client";
-
-import { useEffect } from "react";
-import { Shield, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Shield, ChevronRight, ExternalLink, RefreshCcw } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -20,50 +25,64 @@ interface NewsItem {
 }
 
 const fetchNews = async (): Promise<NewsItem[]> => {
-  const apiKey = "ffa6fcb926d54294a8a8f3d8fda4afb80";
-  const response = await fetch(
-    `https://newsapi.org/v2/everything?q=cybersecurity+OR+hacking+OR+"data+breach"+OR+"cyber+attack"&sortBy=publishedAt&language=en&pageSize=6&apiKey=${apiKey}`
-  );
+  try {
+    const apiKey = "ffa6fcb926d54294a8a8f3d8fda4afb80";
 
-  if (!response.ok) {
-    throw new Error(`News API responded with status: ${response.status}`);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const fromDate = yesterday.toISOString().split("T")[0];
+    const toDate = today.toISOString().split("T")[0];
+
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=cybersecurity+OR+hacking+OR+"data+breach"+OR+"cyber+attack"&from=${fromDate}&to=${toDate}&sortBy=publishedAt&language=en&pageSize=6&apiKey=${apiKey}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`News API responded with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.status === "error") {
+      throw new Error(data.message || "Error fetching news");
+    }
+
+    return data.articles.slice(0, 3).map((article: any) => ({
+      title: article.title || "Untitled Article",
+      url: article.url || "#",
+      urlToImage: article.urlToImage,
+      publishedAt: article.publishedAt || new Date().toISOString(),
+      source: {
+        name: article.source?.name || "Unknown Source",
+      },
+      description: article.description || "No description available",
+    }));
+  } catch (error) {
+    console.error("Error fetching cybersecurity news:", error);
+    toast({
+      title: "Could not load news",
+      description: "Failed to fetch the latest cybersecurity news",
+      variant: "destructive",
+    });
+    return [];
   }
-
-  const data = await response.json();
-
-  if (data.status === "error") {
-    throw new Error(data.message || "Error fetching news");
-  }
-
-  return data.articles.slice(0, 3).map((article: any) => ({
-    title: article.title || "Untitled Article",
-    url: article.url || "#",
-    urlToImage: article.urlToImage,
-    publishedAt: article.publishedAt || new Date().toISOString(),
-    source: {
-      name: article.source?.name || "Unknown Source"
-    },
-    description: article.description || "No description available"
-  }));
 };
 
 export const NewsSection = () => {
-  const { data: newsItems, isLoading, error } = useQuery({
+  const {
+    data: newsItems,
+    isLoading: newsLoading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["securityNews"],
     queryFn: fetchNews,
-    staleTime: 1000 * 60 * 15,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: true,
     retry: 1,
   });
-
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Could not load news",
-        description: "Failed to fetch the latest cybersecurity news",
-        variant: "destructive",
-      });
-    }
-  }, [error]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -97,17 +116,28 @@ export const NewsSection = () => {
   return (
     <section className="container px-4 md:px-6 py-8">
       <motion.div
-        className="mb-10"
+        className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
         initial={{ y: 20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-bold tracking-tight flex items-center">
-          <Shield className="mr-2 h-5 w-5 text-primary" />
-          Latest Cybersecurity News
-        </h2>
-        <p className="text-muted-foreground">Stay updated with real-time cybersecurity news and alerts</p>
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight flex items-center">
+            <Shield className="mr-2 h-5 w-5 text-primary" />
+            Latest Cybersecurity News
+          </h2>
+          <p className="text-muted-foreground">
+            Stay updated with real-time cybersecurity news and alerts
+          </p>
+        </div>
+        <button
+          onClick={() => refetch()}
+          className="inline-flex items-center text-sm text-primary hover:underline"
+        >
+          <RefreshCcw className="mr-1 h-4 w-4 animate-spin-on-hover" />
+          Refresh
+        </button>
       </motion.div>
 
       <motion.div
@@ -117,7 +147,7 @@ export const NewsSection = () => {
         whileInView="visible"
         viewport={{ once: true }}
       >
-        {isLoading ? (
+        {newsLoading ? (
           Array(3)
             .fill(0)
             .map((_, i) => (
@@ -140,8 +170,12 @@ export const NewsSection = () => {
             ))
         ) : error ? (
           <div className="col-span-3 text-center py-8">
-            <p className="text-muted-foreground">Could not load cybersecurity news</p>
-            <p className="text-sm text-muted-foreground mt-2">Please try refreshing the page</p>
+            <p className="text-muted-foreground">
+              Could not load cybersecurity news
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Please try refreshing the page
+            </p>
           </div>
         ) : newsItems && newsItems.length > 0 ? (
           newsItems.map((item, i) => (
@@ -160,13 +194,17 @@ export const NewsSection = () => {
                   </div>
                 )}
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
+                  <CardTitle className="text-lg line-clamp-2">
+                    {item.title}
+                  </CardTitle>
                   <CardDescription>
                     {item.source.name} • {formatDate(item.publishedAt)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <p className="text-sm text-muted-foreground line-clamp-3">{item.description}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {item.description}
+                  </p>
                 </CardContent>
                 <CardFooter>
                   <a
@@ -184,8 +222,12 @@ export const NewsSection = () => {
           ))
         ) : (
           <div className="col-span-3 text-center py-8">
-            <p className="text-muted-foreground">No cybersecurity news articles available at the moment</p>
-            <p className="text-sm text-muted-foreground mt-2">Please check back later</p>
+            <p className="text-muted-foreground">
+              No cybersecurity news articles available at the moment
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Please check back later
+            </p>
           </div>
         )}
       </motion.div>
