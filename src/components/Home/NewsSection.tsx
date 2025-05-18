@@ -1,16 +1,8 @@
-import { useState, useEffect } from "react";
-import { Shield, ChevronRight, ExternalLink, RefreshCcw } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { Shield, ExternalLink } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 
 interface NewsItem {
@@ -26,69 +18,55 @@ interface NewsItem {
 
 const fetchNews = async (): Promise<NewsItem[]> => {
   try {
-    const apiKey = "ffa6fcb926d54294a8a8f3d8fda4afb80";
-
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-
-    const fromDate = yesterday.toISOString().split("T")[0];
-    const toDate = today.toISOString().split("T")[0];
-
+    const apiKey = "pub_877526c4ca76752993ece665c15fe30d2dead";
     const response = await fetch(
-      `https://newsapi.org/v2/everything?q=cybersecurity+OR+hacking+OR+"data+breach"+OR+"cyber+attack"&from=${fromDate}&to=${toDate}&sortBy=publishedAt&language=en&pageSize=6&apiKey=${apiKey}`
+      `https://newsdata.io/api/1/news?apikey=${apiKey}&q=cybersecurity&language=en&category=technology`
     );
 
     if (!response.ok) {
-      throw new Error(`News API responded with status: ${response.status}`);
+      throw new Error(`NewsData.io API responded with status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    if (data.status === "error") {
+    if (data.status !== "success") {
       throw new Error(data.message || "Error fetching news");
     }
 
-    return data.articles.slice(0, 3).map((article: any) => ({
+    return data.results.slice(0, 3).map((article: any) => ({
       title: article.title || "Untitled Article",
-      url: article.url || "#",
-      urlToImage: article.urlToImage,
-      publishedAt: article.publishedAt || new Date().toISOString(),
+      url: article.link || "#",
+      urlToImage: article.image_url,
+      publishedAt: article.pubDate || new Date().toISOString(),
       source: {
-        name: article.source?.name || "Unknown Source",
+        name: article.source_id || "Unknown Source"
       },
-      description: article.description || "No description available",
+      description: article.description || "No description available"
     }));
   } catch (error) {
     console.error("Error fetching cybersecurity news:", error);
     toast({
       title: "Could not load news",
       description: "Failed to fetch the latest cybersecurity news",
-      variant: "destructive",
+      variant: "destructive"
     });
     return [];
   }
 };
 
 export const NewsSection = () => {
-  const {
-    data: newsItems,
-    isLoading: newsLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["securityNews"],
+  const { data: newsItems, isLoading: newsLoading, error } = useQuery({
+    queryKey: ['securityNews'],
     queryFn: fetchNews,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: true,
-    retry: 1,
+    staleTime: 1000 * 60 * 15,
+    retry: 1
   });
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
@@ -99,9 +77,9 @@ export const NewsSection = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
+        delayChildren: 0.3
+      }
+    }
   };
 
   const itemVariants = {
@@ -109,35 +87,24 @@ export const NewsSection = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
-    },
+      transition: { type: "spring", stiffness: 100 }
+    }
   };
 
   return (
     <section className="container px-4 md:px-6 py-8">
       <motion.div
-        className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+        className="mb-10"
         initial={{ y: 20, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center">
-            <Shield className="mr-2 h-5 w-5 text-primary" />
-            Latest Cybersecurity News
-          </h2>
-          <p className="text-muted-foreground">
-            Stay updated with real-time cybersecurity news and alerts
-          </p>
-        </div>
-        <button
-          onClick={() => refetch()}
-          className="inline-flex items-center text-sm text-primary hover:underline"
-        >
-          <RefreshCcw className="mr-1 h-4 w-4 animate-spin-on-hover" />
-          Refresh
-        </button>
+        <h2 className="text-2xl font-bold tracking-tight flex items-center">
+          <Shield className="mr-2 h-5 w-5 text-primary" />
+          Latest Cybersecurity News
+        </h2>
+        <p className="text-muted-foreground">Stay updated with real-time cybersecurity news and alerts</p>
       </motion.div>
 
       <motion.div
@@ -148,34 +115,28 @@ export const NewsSection = () => {
         viewport={{ once: true }}
       >
         {newsLoading ? (
-          Array(3)
-            .fill(0)
-            .map((_, i) => (
-              <motion.div key={i} variants={itemVariants}>
-                <Card className="overflow-hidden h-full">
-                  <CardHeader className="pb-0">
-                    <Skeleton className="h-4 w-3/4 mb-2" />
-                    <Skeleton className="h-3 w-1/3" />
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <Skeleton className="h-32 w-full mb-4" />
-                    <Skeleton className="h-3 w-full mb-2" />
-                    <Skeleton className="h-3 w-4/5" />
-                  </CardContent>
-                  <CardFooter>
-                    <Skeleton className="h-8 w-32" />
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))
+          Array(3).fill(0).map((_, i) => (
+            <motion.div key={i} variants={itemVariants}>
+              <Card className="overflow-hidden h-full">
+                <CardHeader className="pb-0">
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/3" />
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <Skeleton className="h-32 w-full mb-4" />
+                  <Skeleton className="h-3 w-full mb-2" />
+                  <Skeleton className="h-3 w-4/5" />
+                </CardContent>
+                <CardFooter>
+                  <Skeleton className="h-8 w-32" />
+                </CardFooter>
+              </Card>
+            </motion.div>
+          ))
         ) : error ? (
           <div className="col-span-3 text-center py-8">
-            <p className="text-muted-foreground">
-              Could not load cybersecurity news
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Please try refreshing the page
-            </p>
+            <p className="text-muted-foreground">Could not load cybersecurity news</p>
+            <p className="text-sm text-muted-foreground mt-2">Please try refreshing the page</p>
           </div>
         ) : newsItems && newsItems.length > 0 ? (
           newsItems.map((item, i) => (
@@ -188,23 +149,19 @@ export const NewsSection = () => {
                       alt={item.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
+                        (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   </div>
                 )}
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg line-clamp-2">
-                    {item.title}
-                  </CardTitle>
+                  <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
                   <CardDescription>
                     {item.source.name} • {formatDate(item.publishedAt)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {item.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground line-clamp-3">{item.description}</p>
                 </CardContent>
                 <CardFooter>
                   <a
@@ -222,12 +179,8 @@ export const NewsSection = () => {
           ))
         ) : (
           <div className="col-span-3 text-center py-8">
-            <p className="text-muted-foreground">
-              No cybersecurity news articles available at the moment
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Please check back later
-            </p>
+            <p className="text-muted-foreground">No cybersecurity news articles available at the moment</p>
+            <p className="text-sm text-muted-foreground mt-2">Please check back later</p>
           </div>
         )}
       </motion.div>
