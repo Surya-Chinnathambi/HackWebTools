@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Optional: Spin on hover */
+.animate-spin-on-hover:hover {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
