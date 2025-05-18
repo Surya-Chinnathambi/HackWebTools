@@ -131,7 +131,7 @@ const Header = () => {
                 XSS
               </Link>
               <a 
-                href="https://github.com/aw-junaid/Hacking-Tools" 
+                href="https://github.com/Surya-Chinnathambi/HackWebTools"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-base font-medium flex items-center gap-2 transition-colors hover:text-primary"
