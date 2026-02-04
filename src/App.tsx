@@ -14,6 +14,22 @@ import ToolDetail from "./pages/ToolDetail";
 import Payloads from "./pages/Payloads";
 import PayloadCategories from "./pages/PayloadCategories";
 import XSS from "./pages/XSS";
+import EncoderDecoder from "./pages/EncoderDecoder";
+import ReverseShellGenerator from "./pages/ReverseShellGenerator";
+import CommandGenerator from "./pages/CommandGenerator";
+import PayloadHistory from "./pages/PayloadHistory";
+import XSSTester from "./pages/XSSTester";
+import ReportGenerator from "./pages/ReportGenerator";
+import ExploitDB from "./pages/ExploitDB";
+import WordlistGenerator from "./pages/WordlistGenerator";
+import APISecurityTester from "./pages/APISecurityTester";
+import PortScanner from "./pages/PortScanner";
+import HashCracker from "./pages/HashCracker";
+import OWASPLab from "./pages/OWASPLab";
+import AdvancedVulnScanner from "./pages/AdvancedVulnScanner";
+import ThreatIntelligence from "./pages/ThreatIntelligence";
+import Dashboard from "./pages/Dashboard";
+import LearningHub from "./pages/LearningHub";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,8 +51,9 @@ const App = () => (
           <div className="flex-1 container mx-auto px-4 md:px-6 py-8">
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route 
-                path="/tools" 
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/tools"
                 element={
                   <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
                     <Sidebar className="hidden md:block" />
@@ -44,10 +61,10 @@ const App = () => (
                       <Tools />
                     </main>
                   </div>
-                } 
+                }
               />
-              <Route 
-                path="/tools/:toolId" 
+              <Route
+                path="/tools/:toolId"
                 element={
                   <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
                     <Sidebar className="hidden md:block" />
@@ -55,11 +72,26 @@ const App = () => (
                       <ToolDetail />
                     </main>
                   </div>
-                } 
+                }
               />
               <Route path="/payloads" element={<Payloads />} />
               <Route path="/payload-categories" element={<PayloadCategories />} />
+              <Route path="/payload-history" element={<PayloadHistory />} />
               <Route path="/xss" element={<XSS />} />
+              <Route path="/encoder-decoder" element={<EncoderDecoder />} />
+              <Route path="/reverse-shell" element={<ReverseShellGenerator />} />
+              <Route path="/command-generator" element={<CommandGenerator />} />
+              <Route path="/xss-tester" element={<XSSTester />} />
+              <Route path="/report-generator" element={<ReportGenerator />} />
+              <Route path="/exploit-db" element={<ExploitDB />} />
+              <Route path="/wordlist-generator" element={<WordlistGenerator />} />
+              <Route path="/api-security-tester" element={<APISecurityTester />} />
+              <Route path="/port-scanner" element={<PortScanner />} />
+              <Route path="/hash-cracker" element={<HashCracker />} />
+              <Route path="/owasp-lab" element={<OWASPLab />} />
+              <Route path="/advanced-vuln-scanner" element={<AdvancedVulnScanner />} />
+              <Route path="/threat-intelligence" element={<ThreatIntelligence />} />
+              <Route path="/learning-hub" element={<LearningHub />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowRight, Github, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,79 +14,93 @@ interface ToolCardProps {
   githubUrl?: string;
 }
 
-const ToolCard = ({ 
-  id, 
-  name, 
-  description, 
-  category, 
-  tags = [], 
+const ToolCard = ({
+  id,
+  name,
+  description,
+  category,
+  tags = [],
   className,
   githubUrl
 }: ToolCardProps) => {
   return (
-    <Link
-      to={`/tools/${id}`}
+    <div
       className={cn(
-        "group relative flex flex-col justify-between rounded-lg border border-border p-5 transition-all hover:shadow-md hover:border-primary/50",
-        "hover:-translate-y-1 duration-300 backdrop-blur-sm hover:bg-card/80",
+        "group relative flex flex-col justify-between rounded-xl border-2 border-border bg-card p-6 transition-all duration-300",
+        "hover:shadow-2xl hover:shadow-red-600/10 hover:border-red-600/50 hover:-translate-y-2",
+        "backdrop-blur-sm bg-gradient-to-br from-card to-card/50",
+        "before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-br before:from-red-600/0 before:to-orange-600/0",
+        "hover:before:from-red-600/5 hover:before:to-orange-600/5 before:transition-all before:duration-300",
         className
       )}
     >
-      <div>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-2 w-2 rounded-full bg-red-600 animate-pulse"></div>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{category}</span>
+            </div>
+            <h3 className="font-bold text-xl group-hover:text-red-600 transition-colors duration-300 mb-2">
               {name}
-              <span className="absolute inset-0 z-10" aria-hidden="true" />
             </h3>
-            <p className="text-xs text-muted-foreground mb-2">{category}</p>
           </div>
-          <ExternalLink className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground transform group-hover:translate-x-1 group-hover:-translate-y-1 duration-300" />
+          <div className="p-2 rounded-lg bg-red-600/10 group-hover:bg-red-600 group-hover:text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-12">
+            <BookOpen className="h-5 w-5 text-red-600 group-hover:text-white transition-colors" />
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
           {description}
         </p>
       </div>
 
-      <div className="mt-4">
+      <div className="relative z-10 space-y-3">
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {tags.slice(0, 3).map((tag) => (
+          <div className="flex flex-wrap gap-2">
+            {tags.slice(0, 4).map((tag) => (
               <Badge
                 key={tag}
-                variant="outline"
-                className="text-xs font-semibold transition-colors group-hover:border-primary/30"
+                variant="secondary"
+                className="text-xs font-medium transition-all group-hover:bg-red-600/10 group-hover:text-red-600 group-hover:border-red-600/30"
               >
                 {tag}
               </Badge>
             ))}
-            {tags.length > 3 && (
-              <Badge 
-                variant="outline"
-                className="text-xs font-semibold transition-colors text-muted-foreground"
+            {tags.length > 4 && (
+              <Badge
+                variant="secondary"
+                className="text-xs font-medium text-muted-foreground"
               >
-                +{tags.length - 3}
+                +{tags.length - 4}
               </Badge>
             )}
           </div>
         )}
 
-        {githubUrl && (
-          <div className="flex justify-end">
-            <a 
+        <div className="flex items-center justify-between pt-3 border-t">
+          <Link
+            to={`/tools/${id}`}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:gap-3 transition-all group/link"
+          >
+            View Details
+            <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+          </Link>
+
+          {githubUrl && (
+            <a
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 transition-all hover:gap-2 duration-300"
+              className="p-2 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-600/10 transition-all"
               onClick={(e) => e.stopPropagation()}
+              title="View on GitHub"
             >
-              <span>GitHub</span>
-              <ExternalLink className="h-3 w-3" />
+              <Github className="h-4 w-4" />
             </a>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

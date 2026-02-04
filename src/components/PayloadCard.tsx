@@ -1,13 +1,13 @@
-
 import { useState } from "react";
 import { Payload } from "@/types/payload";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Download, File } from "lucide-react";
+import { Copy, Check, Download, File, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import CodeBlock from "@/components/CodeBlock";
+import { usePayloadHistory } from "@/hooks/usePayloadHistory";
 
 const getSeverityColor = (severity: string) => {
   switch (severity) {
@@ -32,25 +32,28 @@ interface PayloadCardProps {
 const PayloadCard = ({ payload, index }: PayloadCardProps) => {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const { addToHistory, toggleFavorite, isFavorite } = usePayloadHistory();
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(payload.content);
     setCopied(true);
+    addToHistory(payload);
     toast({ description: "Payload copied to clipboard" });
-    
+
     setTimeout(() => {
       setCopied(false);
     }, 2000);
   };
-  
+
   const downloadPayload = () => {
     setDownloading(true);
-    
+    addToHistory(payload);
+
     try {
       // Create a blob with the payload content
       const blob = new Blob([payload.content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
-      
+
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a');
       link.href = url;
@@ -58,19 +61,28 @@ const PayloadCard = ({ payload, index }: PayloadCardProps) => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       URL.revokeObjectURL(url);
       toast({ description: "Payload downloaded successfully" });
     } catch (error) {
       console.error('Download failed:', error);
-      toast({ 
+      toast({
         title: "Download failed",
-        description: "Could not download the payload file", 
-        variant: "destructive" 
+        description: "Could not download the payload file",
+        variant: "destructive"
       });
     } finally {
       setDownloading(false);
     }
+  };
+
+  const handleFavoriteToggle = () => {
+    toggleFavorite(payload.id);
+    toast({
+      description: isFavorite(payload.id)
+        ? "Removed from favorites"
+        : "Added to favorites"
+    });
   };
 
   return (
@@ -86,23 +98,38 @@ const PayloadCard = ({ payload, index }: PayloadCardProps) => {
               <File className="h-4 w-4 text-muted-foreground" />
               <CardTitle className="text-lg font-bold line-clamp-1">{payload.name}</CardTitle>
             </div>
-            <Badge className={`${getSeverityColor(payload.severity)} capitalize`}>
-              {payload.severity}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 w-8 p-0"
+                onClick={handleFavoriteToggle}
+              >
+                <Star
+                  className={`h-4 w-4 ${isFavorite(payload.id)
+                      ? "fill-yellow-500 text-yellow-500"
+                      : "text-muted-foreground"
+                    }`}
+                />
+              </Button>
+              <Badge className={`${getSeverityColor(payload.severity)} capitalize`}>
+                {payload.severity}
+              </Badge>
+            </div>
           </div>
           <CardDescription className="line-clamp-2">{payload.description}</CardDescription>
         </CardHeader>
-        
+
         <CardContent className="pb-0">
           <div className="max-h-[200px] overflow-y-auto scrollbar-hide mb-4">
-            <CodeBlock 
-              code={payload.content} 
-              showLineNumbers 
-              language="plaintext" 
-              className="text-xs" 
+            <CodeBlock
+              code={payload.content}
+              showLineNumbers
+              language="plaintext"
+              className="text-xs"
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2 mt-2">
             {payload.tags.map(tag => (
               <Badge key={tag} variant="secondary" className="text-xs">
@@ -111,7 +138,7 @@ const PayloadCard = ({ payload, index }: PayloadCardProps) => {
             ))}
           </div>
         </CardContent>
-        
+
         <CardFooter className="pt-4 flex justify-between">
           <Badge variant="outline">{payload.category}</Badge>
           <div className="flex gap-2">
