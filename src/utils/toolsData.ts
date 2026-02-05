@@ -120,9 +120,69 @@ export const toolsCategories: ToolCategory[] = [
           {
             title: "Launch Maltego",
             code: "maltego"
+          },
+          {
+            title: "Create new graph",
+            code: "File > New > Graph"
+          },
+          {
+            title: "Add domain entity",
+            code: "Drag 'Domain' from entity palette onto graph"
+          },
+          {
+            title: "Run transform on entity",
+            code: "Right-click entity > Run Transform > Select transform"
+          },
+          {
+            title: "To DNS from Domain",
+            code: "Right-click Domain > Run Transform > To DNS Name"
+          },
+          {
+            title: "To IP Address from DNS",
+            code: "Right-click DNS Name > Run Transform > To IP Address"
+          },
+          {
+            title: "Email addresses from domain",
+            code: "Right-click Domain > Run Transform > Email addresses from domain"
+          },
+          {
+            title: "Run all transforms",
+            code: "Right-click entity > Run All Transforms"
+          },
+          {
+            title: "Person to phone numbers",
+            code: "Right-click Person > Run Transform > Phone Numbers"
+          },
+          {
+            title: "Social media discovery",
+            code: "Right-click Person > Run Transform > Facebook/Twitter/LinkedIn profiles"
+          },
+          {
+            title: "Company to employees",
+            code: "Right-click Company > Run Transform > Employees"
+          },
+          {
+            title: "Whois information",
+            code: "Right-click Domain > Run Transform > Whois Information"
+          },
+          {
+            title: "Create machine (automation)",
+            code: "Select entities > Machines > Create Machine"
+          },
+          {
+            title: "Export graph to image",
+            code: "File > Export > Graph to Image"
+          },
+          {
+            title: "Import CSV data",
+            code: "Import > CSV File > Map columns to entities"
+          },
+          {
+            title: "Use TDS (Transform Distribution Server)",
+            code: "Transform Hub > Install Transforms from TDS"
           }
         ],
-        documentation: "Maltego is a visual link analysis tool that is used for gathering and connecting information for investigative tasks. It allows you to mine data from various public sources and visualize this information in a graph format, showing the connections between pieces of information from different sources.",
+        documentation: "Maltego is an industry-standard interactive data mining and link analysis application developed by Paterva (now part of Maltego Technologies). Used extensively by security professionals, investigators, and analysts worldwide, it excels at demonstrating complexity and relationships in data gathered from diverse sources. The platform transforms OSINT into actionable intelligence through visual graph-based analysis.\n\nCore Concepts:\n• Entities: Data objects (Person, Domain, Email, IP, Phone, etc.)\n• Transforms: Data gathering operations on entities\n• Graph: Visual representation of relationships\n• Machines: Automated transform workflows\n• TDS: Transform Distribution Server (API integration)\n• Canari: Transform development framework\n• Collaboration: Team sharing and investigation\n\nEditions:\n• Community Edition (CE): Free, limited transforms\n• Classic: Desktop version with more transforms\n• XL: Advanced features, more API integrations\n• Enterprise: Team collaboration, case management\n• CTAS: Cyber Threat Analysis Suite\n• Maltego Carbon: High-performance version\n\nEntity Types (100+):\n• Infrastructure:\n  • Domain, DNS Name, IP Address, Netblock\n  • AS (Autonomous System), MX Record\n  • URL, Website, Banner\n• People:\n  • Person, Alias, Email Address\n  • Phone Number, Document\n• Social Media:\n  • Facebook, Twitter, LinkedIn profiles\n  • Instagram, YouTube channels\n• Location:\n  • Physical Address, GPS Coordinates\n  • Country, City\n• Organizations:\n  • Company, Organization\n• Custom: Create your own entity types\n\nTransforms:\n• Definition: Operations that discover relationships\n• Execution: Right-click entity > Run Transform\n• Types:\n  • Local: Run on your machine\n  • Remote: API-based (require keys)\n  • Custom: Developed with Canari/TRX\n• Categories:\n  • DNS: Resolution, reverse lookup\n  • WHOIS: Domain registration data\n  • Search: Google, Bing, social media\n  • Geolocation: IP to location\n  • Social: Profile discovery\n  • Infrastructure: Network mapping\n\nBuilt-in Transform Sets:\n• Paterva CTAS: Cyber threat transforms\n• VirusTotal Public API: Threat intelligence\n• PassiveTotal: Domain/IP enrichment\n• Have I Been Pwned: Breach checking\n• Shodan: Internet-wide scanning data\n• Farsight DNSDB: DNS intelligence\n• AlienVault OTX: Open threat exchange\n• CaseFile: Offline investigation tool\n\nTransform Hub:\n• Centralized transform marketplace\n• Install/Manage transforms\n• Free and commercial transforms\n• Configuration: API keys, settings\n• Updates: Automatic transform updates\n• Browse categories:\n  • Threat Intelligence\n  • Social Media\n  • Infrastructure\n  • Dark Web\n  • Financial\n\nGraph Operations:\n• Layout Algorithms:\n  • Hierarchical: Tree structure\n  • Circular: Ring arrangement\n  • Organic: Natural clustering\n  • Grid: Structured layout\n  • Block: Group-based\n• Selection: Entities and links\n• Filtering: Hide/show by type\n• Grouping: Organize entities\n• Annotations: Add notes\n• Properties: View/edit entity data\n\nMachines (Automation):\n• Purpose: Automated multi-step investigations\n• Creation: Record transform sequences\n• Execution: One-click complex workflows\n• Use Cases:\n  • Company footprint discovery\n  • Person investigation\n  • Domain infrastructure mapping\n  • Email verification\n• Built-in Machines:\n  • Company Stalker: Full company recon\n  • Footprint L1/L2/L3: Progressive depth\n  • Person Search: Multi-source lookup\n• Custom: Build your own machines\n\nData Management:\n• Import:\n  • CSV: Bulk entity import\n  • Excel: Spreadsheet data\n  • XML: Maltego graph format\n  • JSON: API responses\n• Export:\n  • Images: PNG, JPEG\n  • PDF: Reports\n  • CSV: Entity lists\n  • GraphML: Graph format\n  • XLSX: Excel spreadsheet\n• Copy/Paste: Between graphs\n\nCollaboration (Enterprise):\n• Shared Graphs: Team investigation\n• Real-time Updates: Live collaboration\n• Case Management: Organize projects\n• Access Control: User permissions\n• Audit Trail: Activity logging\n• Version Control: Graph history\n\nVisualization Features:\n• Entity Icons: Visual identification\n• Link Labels: Relationship types\n• Color Coding: Category distinction\n• Size Scaling: Importance weighting\n• Bookmarks: Save graph states\n• Detail View: Entity properties panel\n• Overview Pane: Navigation\n• Property Editor: Modify data\n\nInvestigation Workflows:\n• Domain Investigation:\n  1. Add domain entity\n  2. DNS records\n  3. WHOIS data\n  4. IP addresses\n  5. Related domains\n  6. Hosting infrastructure\n• Person Investigation:\n  1. Add person entity\n  2. Email addresses\n  3. Social media profiles\n  4. Phone numbers\n  5. Associated persons\n  6. Organizations\n• Company Research:\n  1. Add company entity\n  2. Employees (LinkedIn)\n  3. Infrastructure (domains/IPs)\n  4. Social media presence\n  5. Related companies\n  6. Contact information\n\nAdvanced Features:\n• Scripting: Python automation\n• API: RESTful integration\n• Custom Entities: Define new types\n• Transform Development: Canari framework\n• Database Integration: SQL queries\n• Network Graphing: Visual analytics\n• Timeline View: Temporal analysis\n• Geo-mapping: Location visualization\n\nTransform Development:\n• Canari Framework: Python-based\n• TRX (Transform Exchange): Simple API\n• Local Transforms: Run on machine\n• Remote Transforms: API integration\n• Input: Entity type and properties\n• Output: New entities and relationships\n• Testing: Maltego IDE\n\nAPI Integration:\n• Common APIs:\n  • Shodan: Device discovery\n  • VirusTotal: Threat intelligence\n  • PassiveTotal: DNS/IP data\n  • Have I Been Pwned: Breach data\n  • FullContact: People/company data\n  • Clearbit: Business intelligence\n  • Hunter.io: Email discovery\n• Authentication: API keys\n• Rate Limits: Service-dependent\n• Cost: Free tiers available\n\nUse Cases:\n• Penetration Testing: Reconnaissance phase\n• Threat Intelligence: Adversary mapping\n• Fraud Investigation: Connection discovery\n• Law Enforcement: Criminal investigations\n• Cyber Investigations: Incident analysis\n• Due Diligence: Background checks\n• Brand Protection: Impersonation detection\n• Risk Assessment: Third-party analysis\n• Dark Web Monitoring: Threat tracking\n\nOSINT Sources:\n• Search Engines: Google, Bing, Baidu\n• Social Media: Facebook, Twitter, LinkedIn\n• DNS: Resolution, reverse lookup\n• WHOIS: Domain registration\n• Certificate Transparency: SSL certificates\n• Shodan: Internet-wide scanning\n• Breach Databases: Leaked credentials\n• Public Records: Government databases\n• Dark Web: Tor sites, forums\n\nBest Practices:\n• Start Simple: Single entity, basic transforms\n• Progressive Depth: Layer by layer\n• API Keys: Configure for better results\n• Save Often: Graphs can be complex\n• Use Machines: Automate common tasks\n• Organize: Use groups and bookmarks\n• Document: Annotate findings\n• Validate: Verify discovered data\n• Legal Awareness: Stay within bounds\n• Data Protection: Handle PII securely\n\nPerformance Tips:\n• Limit Transform Results: Set reasonable limits\n• Progressive Expansion: Don't run all at once\n• Archive Old Graphs: Reduce memory use\n• Selective Transforms: Choose relevant ones\n• Use Filters: Hide unnecessary entities\n• Memory: Increase Java heap size\n• Updates: Keep transforms current\n\nLimitations:\n• API Dependent: Best results need keys\n• Data Quality: Varies by source\n• Rate Limits: Service restrictions\n• Public Data: Limited to OSINT\n• Cost: Premium features require license\n• Learning Curve: Complex for beginners\n• Graph Complexity: Can become unwieldy\n\nCommon Pitfalls:\n• No API Keys: Missing critical data\n• Transform Overload: Running too many\n• Not Validating: Trusting all results\n• Poor Organization: Chaotic graphs\n• Ignoring Privacy: PII exposure\n• No Documentation: Lost context\n• Scope Creep: Unauthorized targets\n\nIntegration:\n• CaseFile: Offline analysis\n• Metasploit: Import targets\n• Recon-ng: Complementary framework\n• TheHarvester: Feed entity data\n• Spiderfoot: Compare results\n• SIEM: Threat intelligence feed\n• Custom Tools: API integration\n\nReporting:\n• Screenshots: Export images\n• PDF Reports: Professional output\n• Executive Summary: High-level findings\n• Technical Details: Entity properties\n• Relationship Diagrams: Key connections\n• Timeline: Temporal analysis\n• Recommendations: Actionable advice\n\nReal-World Applications:\n• APT Investigation: Map threat actor infrastructure\n• Phishing Analysis: Trace campaign origins\n• Fraud Detection: Uncover criminal networks\n• IP Theft: Identify data leakers\n• M&A Due Diligence: Company background\n• Insider Threats: Connection analysis\n• Supply Chain Security: Third-party risks\n• Brand Monitoring: Impersonation detection\n\nLegal and Ethical:\n• Authorization: Permission for investigations\n• Public Data: OSINT only\n• Privacy: Handle PII responsibly\n• Jurisdiction: Follow local laws\n• Documentation: Record data sources\n• Responsible Use: Ethical purposes\n• Data Retention: Secure storage/disposal\n• Compliance: GDPR, CCPA awareness",
         githubUrl: "https://github.com/paterva/maltego-trx",
         tags: ["OSINT", "visualization", "reconnaissance", "forensics"],
         additionalInfo: "Maltego is developed by Paterva and is available in both free Community Edition and commercial versions. It's widely used by security researchers, private investigators, and law enforcement agencies."
@@ -137,19 +197,67 @@ export const toolsCategories: ToolCategory[] = [
         usage: "TheHarvester is used to gather open source intelligence (OSINT) on a company or domain by extracting information from various public sources",
         examples: [
           {
-            title: "Basic scan of a domain",
-            code: "theharvester -d example.com -l 100 -b all"
+            title: "Basic domain scan (all sources)",
+            code: "theharvester -d example.com -l 500 -b all"
           },
           {
-            title: "Search using specific data source",
-            code: "theharvester -d example.com -b linkedin"
+            title: "Google search for emails and hosts",
+            code: "theharvester -d example.com -l 200 -b google"
           },
           {
-            title: "Save results to XML file",
-            code: "theharvester -d example.com -b all -f results.xml"
+            title: "LinkedIn employee enumeration",
+            code: "theharvester -d example.com -l 100 -b linkedin"
+          },
+          {
+            title: "Search multiple sources",
+            code: "theharvester -d example.com -b google,bing,yahoo,duckduckgo"
+          },
+          {
+            title: "SHODAN integration (requires API key)",
+            code: "theharvester -d example.com -b shodan"
+          },
+          {
+            title: "DNS brute force with wordlist",
+            code: "theharvester -d example.com -b dnsdumpster -c"
+          },
+          {
+            title: "Save results to JSON",
+            code: "theharvester -d example.com -b all -f results.json"
+          },
+          {
+            title: "Save results to HTML report",
+            code: "theharvester -d example.com -b all -f results.html"
+          },
+          {
+            title: "Search with virtual host verification",
+            code: "theharvester -d example.com -v -b google"
+          },
+          {
+            title: "Port scanning discovered hosts",
+            code: "theharvester -d example.com -b all -p"
+          },
+          {
+            title: "Search with screenshots",
+            code: "theharvester -d example.com -b all -s"
+          },
+          {
+            title: "Twitter username search",
+            code: "theharvester -d example.com -b twitter"
+          },
+          {
+            title: "Certificate transparency search",
+            code: "theharvester -d example.com -b certspotter,crtsh"
+          },
+          {
+            title: "Subdomain takeover detection",
+            code: "theharvester -d example.com -b all -t"
+          },
+          {
+            title: "DNS records with TLD expansion",
+            code: "theharvester -d example.com -b all -n"
           }
         ],
-        documentation: "TheHarvester is designed to help security professionals during the early stages of a penetration test to gather email addresses, subdomains, hosts, employee names, open ports, and banners from different public sources like search engines, PGP key servers, and SHODAN.",
+        documentation: "TheHarvester is a powerful OSINT (Open Source Intelligence) tool created by Christian Martorella and maintained by Laramies. Used in the reconnaissance phase of penetration testing, it aggregates publicly available information about targets from multiple sources, making it essential for security assessments and threat intelligence.\n\nSupported Data Sources:\n• Search Engines: Google, Bing, Yahoo, DuckDuckGo, Baidu\n• Social Media: LinkedIn, Twitter\n• Certificate Transparency: CrtSh, Certspotter\n• DNS Services: DNSDumpster, ThreatCrowd\n• Search APIs: Shodan, Censys, SecurityTrails\n• PGP Servers: Key servers for email addresses\n• Threat Intelligence: VirusTotal, ThreatMiner\n• Other: Hunter.io, GitHub, Netcraft\n\nInformation Gathered:\n• Email Addresses: Employees, contacts, distribution lists\n• Subdomains: Complete subdomain enumeration\n• Virtual Hosts: Vhosts sharing same IP\n• IP Addresses: Associated IPs and ranges\n• URLs: Discovered pages and endpoints\n• Names: Employee and personnel names\n• Open Ports: Port scan results (with -p)\n• Banners: Service identification\n• ASN: Autonomous System Numbers\n\nCore Functionality:\n• Passive Reconnaissance: No direct target interaction\n• Multiple Sources: Aggregate from 20+ sources\n• API Integration: Leverage commercial APIs\n• DNS Operations: Resolution and brute forcing\n• Port Scanning: Basic port enumeration\n• Virtual Host Discovery: Identify shared hosting\n• Screenshot Capture: Visual reconnaissance\n• Export Formats: JSON, XML, HTML, CSV\n\nSearch Engines Module:\n• Google: Most comprehensive results\n• Bing: Microsoft search index\n• Yahoo: Alternative results\n• DuckDuckGo: Privacy-focused search\n• Baidu: Chinese search engine\n• Technique: Dorking and scraping\n• Rate Limits: Automatic throttling\n• User-Agent Rotation: Avoid blocking\n\nSocial Media Intelligence:\n• LinkedIn:\n  • Employee enumeration\n  • Job titles and roles\n  • Company structure\n  • Skills and technologies\n  • Rate limits apply\n• Twitter:\n  • Public mentions\n  • Associated accounts\n  • Brand monitoring\n\nCertificate Transparency:\n• CrtSh: Certificate search\n• Certspotter: CT log monitor\n• Benefits:\n  • Historical subdomains\n  • Wildcard certificates\n  • Infrastructure discovery\n  • No rate limits\n  • Passive technique\n\nDNS Enumeration:\n• DNSDumpster: Visual DNS mapper\n• ThreatCrowd: Community threat data\n• DNS Brute Force: -c flag with wordlist\n• Records: A, AAAA, MX, NS, TXT\n• Zone Transfers: Automatic detection\n• Wildcard Detection: Identify wildcards\n\nShodan Integration:\n• Requirements: API key required\n• Information: Open ports, services, banners\n• Coverage: Internet-wide scanning data\n• Historical Data: Previous scans\n• Vulnerabilities: Known CVEs\n• Industrial: ICS/SCADA detection\n• Cost: Credits per query\n\nAdvanced Features:\n• Virtual Host Verification (-v):\n  • Confirm vhost responds\n  • HTTP request validation\n  • Eliminate false positives\n• Port Scanning (-p):\n  • Scan discovered hosts\n  • Common ports (80, 443, 22, etc.)\n  • Service detection\n• Screenshots (-s):\n  • Capture web pages\n  • Visual intelligence\n  • Requires dependencies\n• Takeover Detection (-t):\n  • Subdomain takeover checks\n  • Dangling DNS records\n  • Cloud service detection\n\nOutput Formats:\n• JSON: Machine-readable, API-friendly\n• XML: Structured data export\n• HTML: Human-readable report\n• CSV: Spreadsheet compatible\n• Console: Real-time display\n• Integration: Import to other tools\n\nAPI Key Configuration:\n• File Location: ~/.theHarvester/api-keys.yaml\n• Supported APIs:\n  • Shodan: shodan_key\n  • Censys: censys_id, censys_secret\n  • SecurityTrails: securitytrails_key\n  • Hunter: hunter_key\n  • VirusTotal: virustotal_key\n• Free Tiers: Most APIs offer limited free access\n• Rate Limits: Vary by service\n\nDNS Brute Force:\n• Wordlists: Built-in subdomains list\n• Custom Lists: Use your own wordlist\n• Technique: Resolve with DNS queries\n• Speed: Parallel resolution\n• Verification: Confirm valid responses\n• Common Subdomains: www, mail, ftp, admin, etc.\n\nBest Practices:\n• Legal Authorization: Only scan authorized targets\n• Multiple Sources: Use -b all for coverage\n• API Keys: Configure for better results\n• Rate Limiting: Don't overwhelm sources\n• Results Validation: Verify discoveries\n• Export Results: Save for documentation\n• Combine Tools: Use with other OSINT tools\n• Regular Updates: Keep tool current\n• Privacy: Be aware of source TOS\n\nCommon Use Cases:\n• Penetration Testing: Initial reconnaissance\n• Bug Bounty: Scope discovery\n• Threat Intelligence: Infrastructure mapping\n• Brand Monitoring: Digital footprint\n• Merger & Acquisition: Due diligence\n• OSINT Investigations: Background research\n• Asset Discovery: Shadow IT identification\n• Security Audits: External exposure assessment\n\nIntegration:\n• Maltego: Import for visualization\n• Recon-ng: Complementary framework\n• Amass: Subdomain enumeration\n• Spiderfoot: OSINT automation\n• Metasploit: Feed target information\n• Nmap: Port scan discovered hosts\n• Custom Scripts: Parse JSON output\n\nLimitations:\n• Passive Only: No active scanning (by default)\n• API Dependent: Best results need keys\n• Rate Limits: Source-imposed restrictions\n• Outdated Data: Cached/historical info\n• False Positives: Requires verification\n• Public Data: Only publicly available info\n• Legal: Respect TOS of sources\n\nCommon Pitfalls:\n• No API Keys: Missing premium results\n• Rate Limiting: Getting blocked\n• Outdated Info: Not verifying results\n• Too Aggressive: Overloading sources\n• No Documentation: Not saving results\n• Single Source: Limited data\n• TOS Violations: Ignoring service terms\n\nPerformance Tips:\n• Limit Results: Use -l for large targets\n• Specific Sources: Target relevant sources\n• API Keys: Significantly improve results\n• Parallel Processing: Built-in concurrency\n• Caching: Results stored during run\n• Network: Good connection required\n\nReal-World Applications:\n• External Perimeter Mapping: Identify all assets\n• Email Address Collection: Phishing simulations\n• Subdomain Discovery: Find hidden services\n• Technology Stack: Identify infrastructure\n• Personnel Intelligence: Social engineering prep\n• Supply Chain Analysis: Third-party exposure\n• Competitive Intelligence: Market research\n• Compliance: External exposure audit\n\nPrivacy and Ethics:\n• Public Information: Uses publicly available data\n• No Hacking: Pure OSINT, no exploitation\n• Authorization: Get permission for testing\n• Responsible Use: Don't abuse sources\n• Data Handling: Secure sensitive findings\n• Legal Compliance: Follow local laws\n• Source TOS: Respect service terms",
         githubUrl: "https://github.com/laramies/theHarvester",
         tags: ["OSINT", "email", "subdomain", "reconnaissance"]
       },
@@ -167,15 +275,59 @@ export const toolsCategories: ToolCategory[] = [
             code: "recon-ng"
           },
           {
-            title: "Add domain to workspace",
-            code: "recon-ng\nworkspaces add example\ndb insert domains example.com"
+            title: "Create new workspace",
+            code: "workspaces create CompanyName"
           },
           {
-            title: "Run module",
-            code: "recon-ng\nmodules load recon/domains-hosts/google_site_web\nrun"
+            title: "Add domain to database",
+            code: "db insert domains example.com"
+          },
+          {
+            title: "Search for modules",
+            code: "modules search domains"
+          },
+          {
+            title: "Install module from marketplace",
+            code: "marketplace install recon/domains-hosts/hackertarget"
+          },
+          {
+            title: "Load and run Google site search",
+            code: "modules load recon/domains-hosts/google_site_web\noptions set SOURCE example.com\nrun"
+          },
+          {
+            title: "Subdomain brute force",
+            code: "modules load recon/domains-hosts/brute_hosts\nrun"
+          },
+          {
+            title: "Email harvesting",
+            code: "modules load recon/domains-contacts/hunter_io\nrun"
+          },
+          {
+            title: "Reverse IP lookup",
+            code: "modules load recon/hosts-hosts/reverse_resolve\nrun"
+          },
+          {
+            title: "Shodan host lookup",
+            code: "modules load recon/hosts-ports/shodan_ip\nkeys add shodan_api YOUR_API_KEY\nrun"
+          },
+          {
+            title: "Show database contents",
+            code: "show hosts\nshow contacts\nshow credentials"
+          },
+          {
+            title: "Export results to CSV",
+            code: "modules load reporting/csv\nrun"
+          },
+          {
+            title: "Generate HTML report",
+            code: "modules load reporting/html\noptions set FILENAME report.html\nrun"
+          },
+          {
+            title: "Run script/automation",
+            code: "recon-ng -w workspace_name -r script.resource"
           }
         ],
-        documentation: "Recon-ng is a full-featured reconnaissance framework designed with a modular approach and streamlined workflow in mind. Recon-ng has a look and feel similar to the Metasploit Framework, reducing the learning curve for leveraging the framework.",
+        documentation: "Recon-ng is a powerful reconnaissance framework created by Tim Tomes (LaNMaSteR53). Designed with a Metasploit-like interface, it provides a modular approach to OSINT gathering with a consistent workflow. Written in Python, it features an extensive marketplace of modules, database integration, and comprehensive reporting capabilities.\n\nCore Architecture:\n• Workspaces: Isolated project environments\n• Modules: Plugin-based functionality (100+)\n• Database: SQLite backend for data storage\n• Marketplace: Centralized module repository\n• API Keys: Secure credential management\n• Reporting: Multiple output formats\n• Scripting: Resource file automation\n\nWorkspace Management:\n• Create: workspaces create <name>\n• List: workspaces list\n• Select: workspaces select <name>\n• Delete: workspaces delete <name>\n• Isolation: Separate database per workspace\n• Naming: Organize by target/client\n• Snapshots: Database backups\n\nDatabase Tables:\n• Domains: Target domains\n• Hosts: Discovered IP addresses\n• Contacts: Email addresses, names\n• Credentials: Username/password pairs\n• Leaks: Data breach information\n• Ports: Open ports and services\n• Profiles: Social media accounts\n• Repositories: Code repositories\n• Vulnerabilities: Known vulnerabilities\n\nModule Categories:\n• Recon: Information gathering\n  • domains-*: Domain reconnaissance\n  • hosts-*: Host discovery\n  • contacts-*: Contact information\n  • companies-*: Company research\n• Discovery: Active scanning\n• Exploitation: Limited exploit modules\n• Import: Data import from other tools\n• Reporting: Export and visualization\n\nModule Naming Convention:\n• Format: category/input-output/module_name\n• Input: Data type consumed (domains, hosts)\n• Output: Data type produced (hosts, contacts)\n• Examples:\n  • recon/domains-hosts/: Domain to host mapping\n  • recon/hosts-ports/: Host to port scanning\n  • recon/contacts-profiles/: Contact to social profiles\n\nMarketplace:\n• Browse: marketplace search\n• Info: marketplace info <module>\n• Install: marketplace install <module>\n• Remove: marketplace remove <module>\n• Refresh: marketplace refresh\n• Updates: Check for module updates\n• Dependencies: Auto-install requirements\n\nPopular Modules:\n• recon/domains-hosts/hackertarget: Free subdomain lookup\n• recon/domains-hosts/google_site_web: Google dorking\n• recon/domains-contacts/hunter_io: Email enumeration\n• recon/domains-contacts/whois_pocs: WHOIS contacts\n• recon/hosts-hosts/resolve: DNS resolution\n• recon/hosts-ports/shodan_ip: Shodan integration\n• recon/contacts-profiles/fullcontact: Social profiles\n• discovery/info_disclosure/interesting_files: File discovery\n\nAPI Key Management:\n• Add: keys add <service> <key>\n• List: keys list\n• Remove: keys remove <service>\n• Services: Shodan, Hunter.io, FullContact, etc.\n• Storage: Encrypted in database\n• Free Tiers: Many services offer free keys\n• Required: Some modules need API keys\n\nSupported APIs:\n• Shodan: Internet-wide scanning data\n• Hunter.io: Email address discovery\n• Have I Been Pwned: Breach checking\n• FullContact: People and company data\n• Censys: Certificate and host data\n• SecurityTrails: DNS history\n• VirusTotal: Threat intelligence\n• GitHub: Code repository search\n• Twitter: Social media intelligence\n\nModule Workflow:\n1. Load: modules load <path>\n2. Info: info (show module details)\n3. Options: options list\n4. Set: options set <name> <value>\n5. Run: run\n6. Results: Automatically stored in DB\n\nOptions Configuration:\n• SOURCE: Input data (e.g., domain)\n• MODULE options: Module-specific settings\n• Global options: Apply to all modules\n• Required: Must set before running\n• Defaults: Some have default values\n• Validation: Auto-check before run\n\nDatabase Operations:\n• Insert: db insert <table> <value>\n• Query: db query <SQL>\n• Schema: db schema\n• Export: show <table>\n• Delete: db delete <table> <rowid>\n• Backup: Workspace snapshots\n\nQuery Commands:\n• show domains: List all domains\n• show hosts: List discovered hosts\n• show contacts: Email addresses\n• show credentials: Found credentials\n• show ports: Open ports\n• show profiles: Social media profiles\n• show companies: Company information\n• show vulnerabilities: Known vulns\n\nReporting Modules:\n• reporting/csv: CSV export\n• reporting/html: HTML report\n• reporting/json: JSON format\n• reporting/list: Plain text lists\n• reporting/xlsx: Excel spreadsheet\n• reporting/xml: XML format\n• Custom: Build your own reporter\n\nResource Scripts (.resource):\n• Automation: Batch module execution\n• Format: One command per line\n• Comments: # for comments\n• Execution: recon-ng -r script.resource\n• Use Cases: Repeatable workflows\n• Example:\n  workspaces create target\n  db insert domains example.com\n  modules load recon/domains-hosts/hackertarget\n  run\n\nAdvanced Features:\n• Snapshots: Workspace state saving\n• Global Options: Set once, use everywhere\n• Module Chaining: Output becomes input\n• Custom Modules: Write your own\n• Verbosity: Control output detail\n• Proxy Support: Route through proxy\n• Dashboard: Web-based interface\n\nCustom Module Development:\n• Language: Python\n• Base Class: Inherit from module class\n• Methods: module_pre(), module_run()\n• Meta: Define inputs/outputs\n• Options: Declare required options\n• Location: ~/.recon-ng/modules/custom/\n• Documentation: Inline docstrings\n\nBest Practices:\n• Workspaces: One per target/client\n• API Keys: Configure for better results\n• Module Selection: Choose relevant modules\n• Validate Results: Verify discoveries\n• Documentation: Export reports regularly\n• Database Queries: Leverage SQL power\n• Resource Scripts: Automate common tasks\n• Updates: Keep modules current\n• Scope: Stay within authorization\n\nCommon Workflows:\n• Initial Recon:\n  1. Create workspace\n  2. Add seed domains\n  3. Run subdomain enumeration\n  4. Resolve hosts\n  5. Port scan\n  6. Generate report\n• Email Harvesting:\n  1. Insert domain\n  2. Run contact modules\n  3. Breach checking\n  4. Profile discovery\n  5. Export contacts\n• Credential Hunting:\n  1. Enumerate emails\n  2. Check breaches (HIBP)\n  3. Query paste sites\n  4. Correlate credentials\n\nIntegration:\n• Maltego: Export for visualization\n• Metasploit: Import hosts/services\n• TheHarvester: Complementary OSINT\n• Spiderfoot: Compare results\n• SIEM: Feed threat intelligence\n• Custom Scripts: Parse JSON exports\n\nLimitations:\n• API Dependent: Best results need keys\n• Rate Limits: Source restrictions\n• Module Quality: Varies by author\n• Maintenance: Some modules outdated\n• Active Scanning: Limited compared to Nmap\n• GUI: Command-line only (web dashboard experimental)\n\nCommon Pitfalls:\n• No API Keys: Missing functionality\n• Wrong Workspace: Data in wrong place\n• Module Errors: Missing dependencies\n• Database: Forgetting to check results\n• Source Verification: Not validating data\n• Scope Creep: Scanning unauthorized targets\n\nReal-World Applications:\n• Penetration Testing: Recon phase\n• Red Team: Target profiling\n• Bug Bounty: Asset discovery\n• Threat Intelligence: Infrastructure mapping\n• OSINT Investigations: Background research\n• Due Diligence: M&A research\n• Brand Monitoring: Digital footprint\n• Security Assessments: External exposure\n\nTroubleshooting:\n• Module Errors: Check dependencies\n• API Issues: Verify key validity\n• No Results: Check SOURCE option\n• Database: Verify data insertion\n• Updates: marketplace refresh\n• Logs: Enable debug mode\n\nLegal and Ethical:\n• Authorization: Permission required\n• Public Data: Uses OSINT only\n• Scope: Stay within boundaries\n• API TOS: Respect service terms\n• Data Handling: Secure storage\n• Responsible Use: Ethical purposes only\n• Compliance: Follow local laws",
         githubUrl: "https://github.com/lanmaster53/recon-ng",
         tags: ["reconnaissance", "OSINT", "framework", "modular"]
       }
@@ -271,19 +423,67 @@ export const toolsCategories: ToolCategory[] = [
         usage: "OpenVAS is used for network vulnerability scanning and management. It can identify security issues in systems and applications across networks.",
         examples: [
           {
-            title: "Start OpenVAS",
-            code: "sudo gvm-start"
+            title: "Setup and start OpenVAS/GVM",
+            code: "sudo gvm-setup\nsudo gvm-start"
           },
           {
-            title: "Access web interface",
+            title: "Check setup status",
+            code: "sudo gvm-check-setup"
+          },
+          {
+            title: "Access Greenbone Security Assistant (web UI)",
             code: "firefox https://localhost:9392"
           },
           {
-            title: "Create a new task",
-            code: "gvm-cli --gmp-username admin --gmp-password admin socket --xml \"<create_task><name>Scan</name><target id='target_id'/></create_task>\""
+            title: "Create new target",
+            code: "Configuration > Targets > New Target > Enter IP range"
+          },
+          {
+            title: "Create scanning task with default config",
+            code: "Scans > Tasks > New Task > Select target and scan config"
+          },
+          {
+            title: "Run immediate scan",
+            code: "Scans > Tasks > Select task > Start"
+          },
+          {
+            title: "Schedule scan",
+            code: "Configuration > Schedules > New Schedule > Set time/recurrence"
+          },
+          {
+            title: "View scan results",
+            code: "Scans > Results > Filter by severity"
+          },
+          {
+            title: "Generate PDF report",
+            code: "Scans > Reports > Select report > PDF"
+          },
+          {
+            title: "Create custom scan config",
+            code: "Configuration > Scan Configs > New Config > Select NVTs"
+          },
+          {
+            title: "Update NVT feed",
+            code: "sudo greenbone-nvt-sync\nsudo systemctl restart ospd-openvas"
+          },
+          {
+            title: "CLI: List tasks",
+            code: "gvm-cli socket --gmp-username admin --gmp-password admin --xml '<get_tasks/>'"
+          },
+          {
+            title: "CLI: Start scan",
+            code: "gvm-cli socket --gmp-username admin --gmp-password admin --xml '<start_task task_id=\"task-id\"/>'"
+          },
+          {
+            title: "Create port list",
+            code: "Configuration > Port Lists > New Port List > Define ports"
+          },
+          {
+            title: "Create credential",
+            code: "Configuration > Credentials > New Credential > SSH/SMB credentials"
           }
         ],
-        documentation: "OpenVAS (Open Vulnerability Assessment System) is a comprehensive vulnerability scanning and management solution. It consists of several services and tools that work together to perform scans, analyze vulnerabilities, and present results in a structured format.",
+        documentation: "OpenVAS (Open Vulnerability Assessment System) is a full-featured vulnerability scanner now part of the Greenbone Vulnerability Management (GVM) framework. Originally a fork of Nessus, it's maintained by Greenbone Networks and provides enterprise-grade vulnerability assessment capabilities completely free and open source. With over 100,000 Network Vulnerability Tests (NVTs), it rivals commercial solutions.\n\nGVM Architecture:\n• GSA: Greenbone Security Assistant (web interface)\n• GVM Daemon (gvmd): Core management service\n• OSP Scanner (ospd-openvas): Actual vulnerability tests\n• PostgreSQL: Database backend\n• Redis: NVT cache\n• Notus Scanner: Advisory-based detection\n• GMP: Greenbone Management Protocol (API)\n\nCore Components:\n• OpenVAS Scanner: Executes NVTs\n• Vulnerability Tests: 100,000+ NVTs\n• Feed: Regularly updated tests (daily)\n• Manager: Task orchestration\n• CLI Tools: gvm-cli, gvm-tools\n• Python API: gvm-py library\n• Documentation: Comprehensive guides\n\nFeatures:\n• Comprehensive Coverage: CVE database integration\n• Authenticated Scanning: SSH, SMB credentials\n• Unauthenticated Scanning: Network-based tests\n• Port Scanning: Built-in port scanner\n• Service Detection: Identify versions\n• Web Application Testing: OWASP tests\n• Policy Compliance: CIS benchmarks\n• Report Generation: Multiple formats\n• Scheduling: Automated scans\n• Ticketing: Issue tracking integration\n\nNetwork Vulnerability Tests (NVTs):\n• Categories:\n  • Product Detection\n  • Default Accounts\n  • Malware Detection\n  • Denial of Service\n  • FTP, SSH, HTTP, SMB tests\n  • Database vulnerabilities\n  • Web application flaws\n• NASL: Custom test language\n• Families: Organized by service/protocol\n• Tags: Metadata (CVE, CVSS, solution)\n• Updates: Daily feed synchronization\n\nScan Configurations:\n• Full and Fast: Comprehensive coverage\n• Full and Very Deep: Maximum thoroughness\n• System Discovery: Host/service detection\n• Base: Lightweight scan\n• Discovery: Network mapping\n• Host Discovery: Live host detection\n• Custom: Select specific NVT families\n• Policy Scans: Compliance checking\n\nAuthenticated Scanning:\n• SSH: Linux/Unix systems\n  • Password authentication\n  • Key-based authentication\n  • Sudo/su privileges\n• SMB: Windows systems\n  • Domain credentials\n  • Local accounts\n  • Administrator required\n• SNMP: Network devices\n• ESXi: VMware infrastructure\n• Benefits:\n  • Patch level detection\n  • Local security checks\n  • Installed software audit\n  • Configuration review\n\nTarget Configuration:\n• Hosts: Single IP, range, CIDR\n• Exclude Hosts: Avoid critical systems\n• Port Lists: Define scan ports\n  • All IANA TCP\n  • All TCP and Nmap top 100 UDP\n  • Custom ranges\n• Alive Test: ICMP, TCP-ACK, TCP-SYN, ARP\n• Credentials: Attach for auth scanning\n• SSH Key: For key-based auth\n\nScanning Process:\n1. Target Definition: Set IP ranges\n2. Credential Setup: Auth scanning\n3. Scan Config: Choose test suite\n4. Task Creation: Combine settings\n5. Execution: Run scan\n6. Results Analysis: Review findings\n7. Reporting: Generate reports\n8. Remediation: Fix vulnerabilities\n9. Rescanning: Verify fixes\n\nVulnerability Severity:\n• Critical: CVSS 9.0-10.0\n• High: CVSS 7.0-8.9\n• Medium: CVSS 4.0-6.9\n• Low: CVSS 0.1-3.9\n• Log: Information only\n• False Positive: Mark as FP\n• CVSS: v2, v3 support\n• NVD: National Vulnerability Database\n\nResults Management:\n• Filtering:\n  • By severity\n  • By host\n  • By NVT\n  • By CVE\n• Sorting: Multiple criteria\n• Overrides: Custom severity\n• Notes: Add annotations\n• Tickets: Create for remediation\n• Delta Reports: Compare scans\n• Trending: Vulnerability trends\n\nReporting:\n• Formats:\n  • PDF: Executive/detailed\n  • XML: Machine-readable\n  • HTML: Web view\n  • CSV: Spreadsheet\n  • TXT: Plain text\n  • LaTeX: Publication\n  • ITG: IT-Grundschutz\n• Report Types:\n  • Full: Complete findings\n  • Executive: High-level summary\n  • Anonymous: No host info\n  • Topology: Network diagram\n• Customization: Templates, filters\n\nScheduling:\n• One-Time: Run once at specific time\n• Recurring:\n  • Daily\n  • Weekly\n  • Monthly\n  • Custom interval\n• Time Zone: Configure timezone\n• Alerts: Notification on completion\n• Auto-Delete: Cleanup old results\n\nAlerts and Notifications:\n• Email: SMTP notifications\n• Syslog: Log server integration\n• SNMP Trap: Network monitoring\n• HTTP GET: Webhook calls\n• Sourcefire Connector: IDS integration\n• verinice Connector: Risk management\n• Conditions: Trigger rules\n• Filters: What to report\n\nCompliance Scanning:\n• CIS Benchmarks: Center for Internet Security\n• PCI DSS: Payment Card Industry\n• HIPAA: Healthcare\n• SOX: Sarbanes-Oxley\n• ISO 27001: Information security\n• NIST: National Institute standards\n• IT-Grundschutz: German standard\n• Custom Policies: Define your own\n\nPerformance Tuning:\n• Max Concurrent NVTs: Parallel tests\n• Max Concurrent Hosts: Simultaneous targets\n• Network Timeout: Adjust for slow networks\n• Scanner Preferences:\n  • Check PCI-DSS requirements\n  • Report host details\n  • Log failed NVTs\n  • Port range\n• Resource Allocation: CPU, memory\n• Feed Optimization: Regular updates\n\nFeed Management:\n• Community Feed: Free, daily updates\n• Enterprise Feed: Commercial, hourly\n• Synchronization:\n  • greenbone-nvt-sync: NVTs\n  • greenbone-feed-sync: All feeds\n• Verification: Check feed version\n• Manual Update: Force sync\n• Automation: Cron jobs\n\nCLI Tools (gvm-cli):\n• Authentication: Username/password\n• Protocol: GMP (XML-based)\n• Commands:\n  • get_tasks: List tasks\n  • start_task: Begin scan\n  • get_results: Retrieve findings\n  • create_target: Define target\n• Scripts: gvm-script (Python)\n• Automation: CI/CD integration\n• Authentication: Socket, TLS\n\nAPI Integration (gvm-py):\n• Python Library: gvm-py\n• Connection: TLS, Unix socket\n• Methods: All GMP operations\n• Use Cases:\n  • Custom automation\n  • Integration with SIEM\n  • Ticketing system sync\n  • Custom reporting\n• Documentation: Comprehensive\n\nBest Practices:\n• Regular Updates: Daily feed sync\n• Authenticated Scans: Better accuracy\n• Scan Scheduling: Off-hours\n• Exclude Critical: Avoid production issues\n• Delta Scans: Track changes\n• False Positives: Mark and document\n• Remediation: Prioritize by CVSS\n• Rescan: Verify fixes\n• Documentation: Maintain records\n• Baselines: Establish normal state\n\nWorkflows:\n• Initial Assessment:\n  1. Discovery scan\n  2. Full scan\n  3. Review critical/high\n  4. Authenticated scan\n  5. Compliance check\n• Continuous Monitoring:\n  1. Schedule weekly scans\n  2. Alert on new criticals\n  3. Track remediation\n  4. Quarterly full scans\n• Patch Verification:\n  1. Baseline scan\n  2. Apply patches\n  3. Rescan\n  4. Delta report\n\nIntegration:\n• SIEM: Splunk, ELK, ArcSight\n• Ticketing: Jira, ServiceNow\n• GRC: Governance, Risk, Compliance tools\n• Nmap: Port scanning\n• Metasploit: Exploit verification\n• Ansible: Automation\n• Jenkins: CI/CD pipeline\n• Docker: Containerized deployment\n\nLimitations:\n• Setup Complexity: Initial configuration\n• Resource Intensive: CPU, memory, disk\n• False Positives: Require validation\n• Credentialed Access: Requires privileges\n• Network Impact: Bandwidth usage\n• Windows: Some tests require local admin\n• Web Apps: Not as deep as dedicated scanners\n\nReal-World Applications:\n• Vulnerability Management: Continuous assessment\n• Compliance Audits: Regulatory requirements\n• Penetration Testing: Recon phase\n• Patch Management: Validate updates\n• Security Audits: Internal assessments\n• Risk Assessment: Identify exposures\n• Asset Management: Inventory systems\n• Incident Response: Post-breach analysis\n\nLegal and Ethical:\n• Authorization: Written permission\n• Scope: Define boundaries\n• Timing: Minimize disruption\n• DoS: Some tests can crash services\n• Compliance: Follow regulations\n• Documentation: Audit trail\n• Data Protection: Handle results securely",
         tags: ["vulnerability", "scanner", "management", "network"],
         additionalInfo: "OpenVAS is part of the Greenbone Vulnerability Management (GVM) solution. It includes a regularly updated feed of vulnerability tests and can be integrated with other security tools."
       },
@@ -301,12 +501,56 @@ export const toolsCategories: ToolCategory[] = [
             code: "wapiti -u http://example.com/"
           },
           {
-            title: "Specific module scan",
-            code: "wapiti -u http://example.com/ -m sql,xss"
+            title: "Scan with authentication",
+            code: "wapiti -u http://example.com/ --auth-user admin --auth-password secret"
+          },
+          {
+            title: "Specific vulnerability modules",
+            code: "wapiti -u http://example.com/ -m sql,xss,file"
+          },
+          {
+            title: "Exclude modules",
+            code: "wapiti -u http://example.com/ --skip exec,ssrf"
+          },
+          {
+            title: "Set scope (stay within subdomain)",
+            code: "wapiti -u http://example.com/ --scope domain"
+          },
+          {
+            title: "Custom HTTP headers",
+            code: "wapiti -u http://example.com/ -H 'X-Custom-Header: value'"
+          },
+          {
+            title: "POST data testing",
+            code: "wapiti -u http://example.com/login -d 'username=admin&password=test'"
           },
           {
             title: "Generate HTML report",
-            code: "wapiti -u http://example.com/ -f html -o report"
+            code: "wapiti -u http://example.com/ -f html -o /tmp/report"
+          },
+          {
+            title: "Generate JSON report",
+            code: "wapiti -u http://example.com/ -f json -o report.json"
+          },
+          {
+            title: "Set crawl depth",
+            code: "wapiti -u http://example.com/ --depth 5"
+          },
+          {
+            title: "Use proxy",
+            code: "wapiti -u http://example.com/ --proxy http://127.0.0.1:8080"
+          },
+          {
+            title: "Verbose output",
+            code: "wapiti -u http://example.com/ -v 2"
+          },
+          {
+            title: "Resume previous scan",
+            code: "wapiti --resume /path/to/scan_folder"
+          },
+          {
+            title: "Set timeout and max crawl time",
+            code: "wapiti -u http://example.com/ --timeout 10 --max-scan-time 3600"
           }
         ],
         documentation: "Wapiti allows you to audit the security of your web applications. It performs black-box scans to find vulnerabilities such as SQL injections, XSS, CRLF injections, command execution, XXE injections, and more.",
@@ -1103,15 +1347,63 @@ export const toolsCategories: ToolCategory[] = [
         usage: "Autopsy is used for digital forensics investigations to recover and analyze evidence from disk images",
         examples: [
           {
-            title: "Start Autopsy",
-            code: "sudo autopsy"
+            title: "Start Autopsy (GUI version)",
+            code: "autopsy"
           },
           {
-            title: "Access web interface",
-            code: "Open browser and navigate to http://localhost:9999/autopsy"
+            title: "Create new case",
+            code: "Case > New Case > Enter case details"
+          },
+          {
+            title: "Add data source (disk image)",
+            code: "Case > Add Data Source > Disk Image > Browse to .dd, .E01, or .vmdk file"
+          },
+          {
+            title: "Run ingest modules",
+            code: "Select modules (File Type, Extension Mismatch, Keyword Search, etc.) > Finish"
+          },
+          {
+            title: "Keyword search",
+            code: "Tools > Keyword Search > Enter keywords > Search"
+          },
+          {
+            title: "Timeline analysis",
+            code: "Tools > Timeline > Select time range > View events"
+          },
+          {
+            title: "Extract file by hash",
+            code: "Tools > File Search by MD5 Hash > Enter hash > Search"
+          },
+          {
+            title: "View file metadata",
+            code: "Select file > Content Viewer > Application tab"
+          },
+          {
+            title: "Carve deleted files",
+            code: "Ingest Modules > PhotoRec Carver > Run"
+          },
+          {
+            title: "Analyze registry",
+            code: "Navigate to SYSTEM/Software/SAM hives > Registry Viewer"
+          },
+          {
+            title: "Extract email artifacts",
+            code: "Ingest Modules > Email Parser > PST/OST/MBOX"
+          },
+          {
+            title: "Web artifacts analysis",
+            code: "Ingest Modules > Recent Activity > Browser history, cookies, downloads"
+          },
+          {
+            title: "Generate HTML report",
+            code: "Case > Generate Report > HTML Report > Select artifacts"
+          },
+          {
+            title: "Export tagged files",
+            code: "Right-click tagged files > Export Files"
           }
         ],
-        documentation: "Autopsy is a digital forensics platform that provides a graphical interface to The Sleuth Kit and other digital forensics tools. It can be used by law enforcement, military, and corporate examiners to investigate what happened on a computer. It features timeline analysis, hash filtering, file system analysis, keyword searching, and more.",
+        documentation: "Autopsy is the premier open-source digital forensics platform developed by Basis Technology. Built on The Sleuth Kit (TSK) library, it provides a comprehensive GUI for examining disk images and mobile devices. Used by law enforcement, military, corporate investigators, and incident responders worldwide, Autopsy streamlines forensic analysis with powerful modules and an extensible architecture.\n\nCore Features:\n• Multi-Platform: Windows, Linux, macOS support\n• Disk Image Analysis: .dd, .img, .E01, .vmdk formats\n• File System Support: NTFS, FAT, exFAT, ext2/3/4, HFS+, APFS\n• Timeline Analysis: Temporal event correlation\n• Keyword Search: Content indexing and search\n• Hash Filtering: Known good/bad file detection\n• File Carving: Recover deleted files\n• Email Analysis: PST, OST, MBOX parsing\n• Registry Analysis: Windows registry examination\n• Web Artifacts: Browser history, cookies\n• Mobile Forensics: Android, iOS support\n• Reporting: HTML, Excel, PDF reports\n\nArchitecture:\n• Case Management: Organized investigation structure\n• Data Sources: Disk images, logical files, mobile\n• Ingest Modules: Automated analysis plugins\n• Content Viewer: Multiple file viewers\n• Result Viewer: Organized findings\n• Keyword Search: Solr-based indexing\n• Database: PostgreSQL or SQLite backend\n• Multi-User: Collaborative case analysis\n\nCase Management:\n• Create Case: Organize investigations\n• Multiple Data Sources: Add disks, devices\n• Case Settings: Configure options\n• Case Notes: Document findings\n• Tags: Label evidence\n• Bookmarks: Mark interesting items\n• Export: Package case for sharing\n• Archive: Long-term storage\n\nIngest Modules:\n• File Type Identification: MIME type detection\n• Extension Mismatch: Find renamed files\n• Embedded File Extractor: Archives, documents\n• PhotoRec Carver: Recover deleted files\n• Hash Lookup: NSRL, custom hash sets\n• Keyword Search: Index and search content\n• Email Parser: PST, OST, MBOX, EML\n• Encryption Detection: Identify encrypted files\n• Recent Activity: Web, OS artifacts\n• EXIF Parser: Image metadata\n• Android Analyzer: Mobile artifacts\n• Interesting Files: Predefined patterns\n• Central Repository: Cross-case correlation\n\nFile System Analysis:\n• Deleted Files: Recover deleted items\n• Slack Space: Examine unused sectors\n• Metadata: File attributes (MAC times)\n• $MFT Analysis: NTFS Master File Table\n• Journaling: File system logs\n• Alternate Data Streams: NTFS ADS\n• Directory Structure: Full tree view\n• Permissions: Access control lists\n\nTimeline Analysis:\n• Event Types:\n  • File Modified (M)\n  • File Accessed (A)\n  • File Created (C)\n  • File Changed (metadata)\n• Filters: Time range, event type, source\n• Clustering: Group related events\n• Visualization: Graphical timeline\n• Export: Timeline to CSV\n• Correlation: Link events across sources\n\nKeyword Search:\n• Indexing: Solr-based full-text search\n• Search Types:\n  • Exact Match: Literal strings\n  • Substring: Partial matches\n  • Regular Expressions: Pattern matching\n• Lists: Predefined keyword sets\n• Preview: In-context results\n• Export: Search results\n• Performance: Indexed for speed\n\nHash Analysis:\n• Hash Sets:\n  • NSRL: Known good files\n  • NIST: Reference Data Set\n  • Custom: Malware, contraband\n• Algorithms: MD5, SHA-1, SHA-256\n• Hash Database: Central repository\n• Import: CSV, EnCase, X-Ways\n• Match Detection: Automatic flagging\n• Use Cases: Filter OS files, find malware\n\nEmail Analysis:\n• Formats:\n  • PST: Outlook Personal Folders\n  • OST: Offline Outlook\n  • MBOX: Thunderbird, Unix mail\n  • EML: Individual messages\n• Extraction:\n  • Message content\n  • Attachments\n  • Headers\n  • Metadata\n• Search: Keyword search in emails\n• Viewing: Formatted message display\n\nWeb Artifacts:\n• Browser Support:\n  • Chrome\n  • Firefox\n  • Internet Explorer\n  • Edge\n  • Safari\n• Artifacts:\n  • History: URLs visited\n  • Cookies: Session data\n  • Downloads: File downloads\n  • Bookmarks: Saved links\n  • Form Data: Autofill\n  • Cache: Cached files\n• Timeline: Web activity chronology\n\nRegistry Analysis (Windows):\n• Hives:\n  • SYSTEM: Hardware config\n  • SOFTWARE: Installed apps\n  • SAM: User accounts\n  • NTUSER.DAT: User settings\n• Viewer: Registry viewer plugin\n• Recent Activity: MRU lists, recent files\n• Shellbags: Folder access\n• USB Devices: Connected devices\n• Network: Network configurations\n\nMobile Forensics:\n• Android:\n  • Logical extraction\n  • SMS messages\n  • Call logs\n  • Contacts\n  • App data\n  • SQLite databases\n• iOS:\n  • iTunes backups\n  • Property lists (plist)\n  • Photos, messages\n• Third-Party: Cellebrite, Oxygen integration\n\nFile Carving:\n• PhotoRec: Signature-based carving\n• File Types: 480+ formats\n• Deleted Files: Recover unallocated\n• Fragmented: Partial recovery\n• Limitations: Metadata may be lost\n• Output: Recovered files folder\n\nViewing Capabilities:\n• Application Viewer: Native rendering\n• Text Viewer: ASCII/Unicode\n• Hex Viewer: Binary data\n• Media: Images, videos\n• Strings: Extract text\n• Metadata: EXIF, document properties\n• Translation: Google Translate integration\n\nReporting:\n• HTML Report: Comprehensive findings\n• Excel Report: Tabular data\n• KML Report: Geolocation data\n• Body File: Timeline export\n• Custom: Select specific artifacts\n• Templates: Standardized reports\n• Attachments: Include files\n\nMulti-User Mode:\n• Collaboration: Team case analysis\n• PostgreSQL: Shared database\n• Concurrent Access: Multiple analysts\n• Message System: Team communication\n• Activity Logs: Audit trail\n• Permissions: Role-based access\n\nCentral Repository:\n• Purpose: Cross-case correlation\n• Data Types:\n  • File hashes\n  • Email addresses\n  • Phone numbers\n  • WiFi SSIDs\n  • USB devices\n• Notable Items: Flag recurring evidence\n• Previous Occurrences: Case history\n• PostgreSQL: Shared repository\n\nAdvanced Features:\n• Scripting: Python modules\n• Custom Ingest Modules: Java/Python\n• API: Programmatic access\n• Plugins: Extensible architecture\n• Data Source Processors: Custom formats\n• Content Viewers: Custom viewers\n• Result Viewers: Custom result displays\n\nBest Practices:\n• Write Blocker: Use for acquisition\n• Hash Verification: Verify image integrity\n• Documentation: Log all actions\n• Chain of Custody: Maintain evidence trail\n• Non-Destructive: Work on copies\n• Comprehensive Ingest: Run all relevant modules\n• Regular Saves: Backup case database\n• Hash Sets: Use NSRL to filter\n• Keyword Lists: Prepare searches\n• Report Regularly: Document findings\n\nWorkflows:\n• Initial Triage:\n  1. Create case\n  2. Add data source\n  3. Run basic ingest modules\n  4. Review file types\n  5. Keyword search\n• Deep Analysis:\n  1. Timeline analysis\n  2. Web artifacts\n  3. Email examination\n  4. Registry analysis\n  5. Carve deleted files\n• Reporting:\n  1. Tag evidence\n  2. Create bookmarks\n  3. Generate report\n  4. Export files\n\nIntegration:\n• The Sleuth Kit: Core library\n• Volatility: Memory forensics\n• Plaso: Timeline analysis\n• Bulk Extractor: Feature extraction\n• X-Ways: Export/import\n• EnCase: Hash set exchange\n• FTK: Cross-tool compatibility\n\nLimitations:\n• Performance: Large images slow\n• Memory: Resource intensive\n• Mobile: Limited compared to commercial\n• Encryption: Cannot break encryption\n• Learning Curve: Complex for beginners\n• Cloud Forensics: Limited cloud support\n\nReal-World Applications:\n• Criminal Investigations: Evidence discovery\n• Incident Response: Compromise analysis\n• Internal Investigations: Employee misconduct\n• E-Discovery: Legal proceedings\n• Malware Analysis: Infection forensics\n• Data Breach: Determine exfiltration\n• Litigation Support: Evidence collection\n\nLegal Considerations:\n• Chain of Custody: Maintain integrity\n• Documentation: Comprehensive notes\n• Court Admissibility: Forensically sound\n• Privacy: Handle PII appropriately\n• Authorization: Legal search warrant\n• Standards: Follow NIST guidelines\n• Expert Testimony: Explain findings",
         githubUrl: "https://github.com/sleuthkit/autopsy",
         tags: ["forensics", "disk image", "analysis", "evidence", "recovery"]
       },
