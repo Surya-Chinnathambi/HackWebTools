@@ -125,18 +125,26 @@ export const FeaturesSection = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
+        staggerChildren: 0.06,
+        delayChildren: 0.2,
+        ease: [0.4, 0, 0.2, 1]
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 40, opacity: 0, scale: 0.95, filter: "blur(10px)" },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
+      scale: 1,
+      filter: "blur(0px)",
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        mass: 0.8
+      }
     }
   };
 
@@ -153,31 +161,74 @@ export const FeaturesSection = () => {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "-100px" }}
       >
         {features.map((feature, i) => (
-          <motion.div key={i} variants={itemVariants}>
+          <motion.div
+            key={i}
+            variants={itemVariants}
+            whileHover={{
+              scale: 1.03,
+              y: -8,
+              transition: {
+                type: "spring",
+                stiffness: 400,
+                damping: 25
+              }
+            }}
+            whileTap={{ scale: 0.98 }}
+          >
             <Link to={feature.link}>
               <Card
-                className="backdrop-blur-sm bg-card/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-md h-full cursor-pointer hover:border-primary relative"
+                className="backdrop-blur-sm bg-card/60 h-full cursor-pointer relative overflow-hidden group border-2 hover:border-red-600/50 transition-all duration-500 hover:shadow-xl"
               >
+                {/* Animated gradient background */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-red-600/5 via-transparent to-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  animate={{
+                    backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+                  }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+
                 {(feature.phase === 2 || feature.phase === 3) && (
-                  <div className={`absolute top-2 right-2 text-xs font-bold px-2 py-1 rounded ${feature.phase === 3 ? 'bg-red-600 text-white' : 'bg-primary text-primary-foreground'
-                    }`}>
+                  <motion.div
+                    className={`absolute top-2 right-2 text-xs font-bold px-2 py-1 rounded ${feature.phase === 3 ? 'bg-red-600 text-white' : 'bg-primary text-primary-foreground'
+                      }`}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: i * 0.05 + 0.5, type: "spring", stiffness: 500, damping: 20 }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
                     {feature.phase === 3 ? 'PHASE 3' : 'NEW'}
-                  </div>
+                  </motion.div>
                 )}
-                <CardHeader>
+                <CardHeader className="relative z-10">
                   <motion.div
                     className="mb-2"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    whileHover={{
+                      scale: 1.15,
+                      rotate: [0, -5, 5, 0],
+                      transition: {
+                        rotate: {
+                          duration: 0.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }
+                      }
+                    }}
                   >
                     {feature.icon}
                   </motion.div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
+                  <CardTitle className="text-lg group-hover:text-red-600 transition-colors duration-300">
+                    {feature.title}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative z-10">
                   <p className="text-muted-foreground text-sm">{feature.description}</p>
                 </CardContent>
               </Card>

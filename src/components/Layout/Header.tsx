@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3 } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
@@ -15,10 +15,24 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const { scrollY } = useScroll();
+  const headerOpacity = useTransform(scrollY, [0, 50], [0.95, 1]);
+  const headerBlur = useTransform(scrollY, [0, 50], [12, 20]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -29,13 +43,37 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200" role="banner">
+    <motion.header
+      className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ${isScrolled ? "shadow-lg" : ""
+        }`}
+      role="banner"
+      style={{
+        opacity: headerOpacity,
+        backdropFilter: useTransform(headerBlur, (blur) => `blur(${blur}px)`),
+      }}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 transition-transform hover:scale-105 duration-300">
-          <div className="bg-primary rounded-full p-1">
+        <Link to="/" className="flex items-center gap-2 group">
+          <motion.div
+            className="bg-primary rounded-full p-1"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
             <code className="text-primary-foreground text-sm font-bold">SP</code>
-          </div>
-          <span className="font-bold text-lg hidden md:inline-block animate-fade-in">SecurePulse</span>
+          </motion.div>
+          <motion.span
+            className="font-bold text-lg hidden md:inline-block"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ x: 4 }}
+          >
+            SecurePulse
+          </motion.span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-4" aria-label="Primary navigation">
