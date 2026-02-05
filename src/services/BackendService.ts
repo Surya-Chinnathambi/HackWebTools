@@ -4,11 +4,13 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
 
 // API Client
 class APIClient {
+    baseURL: string;
+
     constructor(baseURL = API_BASE_URL) {
         this.baseURL = baseURL;
     }
 
-    async request(endpoint, options = {}) {
+    async request(endpoint: string, options: RequestInit = {}) {
         const url = `${this.baseURL}${endpoint}`;
         const config = {
             ...options,
@@ -153,6 +155,11 @@ class APIClient {
 
 // WebSocket Client
 class WebSocketClient {
+    url: string;
+    ws: WebSocket | null;
+    reconnectInterval: number;
+    listeners: Map<string, Array<(data: any) => void>>;
+
     constructor(url = WS_URL) {
         this.url = url;
         this.ws = null;
@@ -201,7 +208,7 @@ class WebSocketClient {
         }
     }
 
-    send(type, data) {
+    send(type: string, data: Record<string, any> = {}) {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({ type, ...data }));
         } else {
@@ -209,30 +216,32 @@ class WebSocketClient {
         }
     }
 
-    subscribe(channel) {
+    subscribe(channel: string) {
         this.send('subscribe', { channel });
     }
 
-    on(event, callback) {
+    on(event: string, callback: (data: any) => void) {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }
-        this.listeners.get(event).push(callback);
+        this.listeners.get(event)!.push(callback);
     }
 
-    off(event, callback) {
+    off(event: string, callback: (data: any) => void) {
         if (this.listeners.has(event)) {
             const callbacks = this.listeners.get(event);
-            const index = callbacks.indexOf(callback);
-            if (index > -1) {
-                callbacks.splice(index, 1);
+            if (callbacks) {
+                const index = callbacks.indexOf(callback);
+                if (index > -1) {
+                    callbacks.splice(index, 1);
+                }
             }
         }
     }
 
-    emit(event, data) {
+    emit(event: string, data: any) {
         if (this.listeners.has(event)) {
-            this.listeners.get(event).forEach(callback => callback(data));
+            this.listeners.get(event)!.forEach(callback => callback(data));
         }
     }
 }

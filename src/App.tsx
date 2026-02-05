@@ -29,6 +29,11 @@ import AdvancedVulnScanner from "./pages/AdvancedVulnScanner";
 import ThreatIntelligence from "./pages/ThreatIntelligence";
 import Dashboard from "./pages/Dashboard";
 import LearningHub from "./pages/LearningHub";
+import Labs from "./pages/Labs";
+import Progress from "./pages/Progress";
+import Glossary from "./pages/Glossary";
+import InterviewPrep from "./pages/InterviewPrep";
+import BlueTeam from "./pages/BlueTeam";
 import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 const queryClient = new QueryClient({
@@ -99,6 +104,11 @@ const App = () => (
               <Route path="/advanced-vuln-scanner" element={<AdvancedVulnScanner />} />
               <Route path="/threat-intelligence" element={<ThreatIntelligence />} />
               <Route path="/learning-hub" element={<LearningHub />} />
+              <Route path="/labs" element={<Labs />} />
+              <Route path="/progress" element={<Progress />} />
+              <Route path="/glossary" element={<Glossary />} />
+              <Route path="/interview-prep" element={<InterviewPrep />} />
+              <Route path="/blue-team" element={<BlueTeam />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

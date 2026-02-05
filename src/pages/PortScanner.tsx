@@ -432,7 +432,7 @@ const PortScanner = () => {
                                         <span>Scanning ports...</span>
                                         <span className="font-medium">{Math.round(scanProgress)}%</span>
                                     </div>
-                                    <div className="w-full bg-secondary rounded-full h-2">
+                                    <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                                         <div
                                             className="bg-primary rounded-full h-2 transition-all duration-300"
                                             style={{ width: `${scanProgress}%` }}

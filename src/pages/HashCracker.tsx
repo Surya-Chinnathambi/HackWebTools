@@ -430,7 +430,7 @@ const HashCracker = () => {
                                         <span>Cracking in progress...</span>
                                         <span className="font-medium">{Math.round(progress)}%</span>
                                     </div>
-                                    <div className="w-full bg-secondary rounded-full h-2">
+                                    <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                                         <div
                                             className="bg-primary rounded-full h-2 transition-all duration-300"
                                             style={{ width: `${progress}%` }}

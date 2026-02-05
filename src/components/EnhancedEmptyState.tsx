@@ -41,8 +41,8 @@ export const EnhancedEmptyState = ({
                 <Icon className="h-16 w-16 text-red-600" />
             </motion.div>
 
-            <h2 className="heading-2 mb-sm">{title}</h2>
-            <p className="body-large text-muted-foreground max-w-lg mb-xl">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-2">{title}</h2>
+            <p className="text-lg text-muted-foreground max-w-lg mb-6">
                 {description}
             </p>
 

@@ -493,6 +493,7 @@ END OF REPORT
                                 value={scanType}
                                 onChange={(e) => setScanType(e.target.value)}
                                 className="px-6 py-3 border-2 rounded-lg bg-background hover:border-purple-500 transition-all cursor-pointer"
+                                aria-label="Select scan type"
                             >
                                 <option value="quick">⚡ Quick Scan (5 CVEs)</option>
                                 <option value="comprehensive">🔍 Comprehensive (12 CVEs)</option>
@@ -562,7 +563,7 @@ END OF REPORT
                                         <div
                                             className="h-full bg-gradient-to-r from-red-600 to-pink-600 transition-all duration-1000"
                                             style={{ width: `${scanResults.riskScore}%` }}
-                                        ></div>
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -581,7 +582,7 @@ END OF REPORT
                                     </p>
                                     <div className="flex gap-1 mt-3">
                                         {Array.from({ length: Math.min(10, scanResults.vulnerabilities.length) }).map((_, i) => (
-                                            <div key={i} className="h-2 w-full bg-orange-600 rounded animate-pulse" style={{ animationDelay: `${i * 100}ms` }}></div>
+                                            <div key={i} className={`h-2 w-full bg-orange-600 rounded animate-pulse animation-delay-${i * 100}`}></div>
                                         ))}
                                     </div>
                                 </CardContent>

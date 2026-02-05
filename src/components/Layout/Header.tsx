@@ -217,10 +217,68 @@ const Header = () => {
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
+                        <Link to="/labs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-red-950/20 to-orange-950/20 border border-red-500/20">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            <Target className="h-4 w-4 text-red-500" />
+                            <span>Hands-On Labs</span>
+                            <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            SQL injection, XSS, and more challenges
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/progress" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Progress Tracker</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Skills, achievements & certificates
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
                         <Link to="/owasp-lab" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">OWASP Lab</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Interactive vulnerability training
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/glossary" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Glossary</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            200+ cybersecurity terms & definitions
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/interview-prep" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Interview Prep</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            50+ interview questions with good vs bad answers
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/blue-team" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-blue-950/20 to-cyan-950/20 border border-blue-500/20">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            <Shield className="h-4 w-4 text-blue-500" />
+                            <span>Blue Team / SOC</span>
+                            <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Defensive security playbooks & secure coding
                           </p>
                         </Link>
                       </NavigationMenuLink>

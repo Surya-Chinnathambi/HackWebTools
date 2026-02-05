@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Check, Terminal } from "lucide-react";
+import { Copy, Check, Terminal, Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import VirtualTerminal from "@/components/VirtualTerminal";
 
 const CommandGenerator = () => {
     const [copied, setCopied] = useState<string | null>(null);
@@ -593,13 +594,86 @@ const CommandGenerator = () => {
                 </p>
             </div>
 
-            <Tabs defaultValue="nmap" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 h-auto">
+            <Tabs defaultValue="terminal" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 h-auto">
+                    <TabsTrigger value="terminal">Terminal</TabsTrigger>
                     <TabsTrigger value="nmap">Nmap</TabsTrigger>
                     <TabsTrigger value="sqlmap">SQLMap</TabsTrigger>
                     <TabsTrigger value="gobuster">Gobuster</TabsTrigger>
                     <TabsTrigger value="hydra">Hydra</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="terminal" className="mt-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Terminal className="h-5 w-5" />
+                                Interactive Terminal Simulator
+                            </CardTitle>
+                            <CardDescription>
+                                Practice penetration testing commands in a safe, simulated environment
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="mb-4 p-4 bg-blue-950/20 border border-blue-500/20 rounded-lg flex items-start gap-3">
+                                <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                <div className="text-sm text-blue-300">
+                                    <p className="font-semibold mb-1">🎯 Learning Mode</p>
+                                    <p>
+                                        This terminal simulates real penetration testing tools. Try commands like{" "}
+                                        <code className="bg-blue-950 px-2 py-0.5 rounded">nmap</code>,{" "}
+                                        <code className="bg-blue-950 px-2 py-0.5 rounded">sqlmap</code>,{" "}
+                                        <code className="bg-blue-950 px-2 py-0.5 rounded">nikto</code>, and more!
+                                    </p>
+                                </div>
+                            </div>
+
+                            <VirtualTerminal />
+
+                            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Card className="bg-slate-900/50">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm">Available Commands</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2 text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-slate-950 px-2 py-1 rounded text-green-400">nmap</code>
+                                            <span className="text-slate-400">Network port scanner</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-slate-950 px-2 py-1 rounded text-green-400">sqlmap</code>
+                                            <span className="text-slate-400">SQL injection exploitation</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-slate-950 px-2 py-1 rounded text-green-400">nikto</code>
+                                            <span className="text-slate-400">Web server scanner</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-slate-950 px-2 py-1 rounded text-green-400">gobuster</code>
+                                            <span className="text-slate-400">Directory brute forcer</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <code className="bg-slate-950 px-2 py-1 rounded text-green-400">theharvester</code>
+                                            <span className="text-slate-400">OSINT gathering tool</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-slate-900/50">
+                                    <CardHeader>
+                                        <CardTitle className="text-sm">Pro Tips</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2 text-sm text-slate-300">
+                                        <p>• Use <kbd className="bg-slate-950 px-2 py-0.5 rounded">↑</kbd> and <kbd className="bg-slate-950 px-2 py-0.5 rounded">↓</kbd> arrows to navigate command history</p>
+                                        <p>• Type <code className="bg-slate-950 px-1 py-0.5 rounded">help</code> to see all available commands</p>
+                                        <p>• Type <code className="bg-slate-950 px-1 py-0.5 rounded">clear</code> to clear the terminal</p>
+                                        <p>• All commands are simulated - no actual network traffic is generated</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
                 <TabsContent value="nmap" className="mt-6">
                     <NmapGenerator />

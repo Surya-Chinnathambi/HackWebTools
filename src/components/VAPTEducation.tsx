@@ -92,8 +92,7 @@ const VAPTEducation = () => {
                             ))}
                         </div>
                         {/* Connecting Line Animation */}
-                        <div className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-rose-500 animate-gradient-x"
-                            style={{ width: '100%', transform: 'translateY(-50%)' }} />
+                        <div className="absolute top-1/2 left-0 h-1 w-full -translate-y-1/2 bg-gradient-to-r from-red-500 via-orange-500 to-rose-500 animate-gradient-x" />
                     </div>
 
                     {/* Phase Details */}

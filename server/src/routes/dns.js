@@ -2,6 +2,7 @@ import express from 'express';
 import dns from 'dns/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { validateDomain, validateIP } from '../middleware/validation.js';
 
 const router = express.Router();
 const execAsync = promisify(exec);
@@ -18,7 +19,8 @@ router.get('/lookup', async (req, res) => {
             return res.status(400).json({ error: 'Domain is required' });
         }
 
-        const cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+        // SECURITY: Validate and sanitize domain using middleware
+        const cleanDomain = validateDomain(domain);
 
         let records;
         switch (type.toUpperCase()) {

@@ -11,7 +11,7 @@ import { GraduationCap } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="flex flex-col gap-3xl md:gap-4xl pb-4xl relative">
+    <div className="flex flex-col gap-12 md:gap-16 pb-16 relative">
       <HeroSection />
       <NewsSection />
       <FeaturesSection />
@@ -23,8 +23,8 @@ const Index = () => {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="container mx-auto px-4"
       >
-        <div className="text-center mb-2xl">
-          <h2 className="heading-2 mb-md flex items-center justify-center gap-md">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-3 flex items-center justify-center gap-3">
             <GraduationCap className="h-8 w-8 text-red-600" />
             Security Fundamentals
           </h2>

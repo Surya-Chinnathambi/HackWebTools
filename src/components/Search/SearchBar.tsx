@@ -112,12 +112,14 @@ const SearchBar = () => {
           role="listbox"
           aria-label="Search results"
         >
-          <ul className="py-1 max-h-[70vh] overflow-auto">
+          <ul className="py-1 max-h-[70vh] overflow-auto" role="presentation">
             {results.map((result) => (
-              <li key={result.id} role="option">
+              <li key={result.id}>
                 <button
                   onClick={() => handleResultClick(result.id)}
                   className="flex flex-col w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors duration-200"
+                  role="option"
+                  aria-selected="false"
                   aria-label={`Go to ${result.name}`}
                 >
                   <div className="flex justify-between items-center">

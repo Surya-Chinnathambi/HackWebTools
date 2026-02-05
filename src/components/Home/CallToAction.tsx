@@ -15,9 +15,9 @@ export const CallToAction = () => {
         className="card-interactive p-2xl"
         whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex flex-col items-center justify-center space-y-lg text-center">
-          <h2 className="heading-2">Ready to explore the tools?</h2>
-          <p className="body-large text-muted-foreground">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">Ready to explore the tools?</h2>
+          <p className="text-lg text-muted-foreground">
             Discover detailed documentation, usage examples, and command references
           </p>
           <Button asChild size="lg" className="btn-primary group">

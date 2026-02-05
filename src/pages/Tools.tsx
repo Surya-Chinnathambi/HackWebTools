@@ -96,10 +96,10 @@ const Tools = () => {
               <Wrench className="h-8 w-8" />
             </div>
             <div>
-              <h1 className="heading-1 bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent">
                 Security Tools Arsenal
               </h1>
-              <p className="body-large text-white/90 mt-sm">
+              <p className="text-lg text-white/90 mt-2">
                 Professional-grade penetration testing and security assessment tools
               </p>
             </div>
@@ -125,7 +125,7 @@ const Tools = () => {
       <div className="flex flex-col gap-xl">
         <div className="flex items-center gap-sm">
           <Shield className="h-5 w-5 text-red-600" />
-          <h2 className="heading-3">Filter by Category</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight leading-snug">Filter by Category</h2>
           <InfoTooltip content="Browse tools by security testing category. Each category contains specialized tools for different phases of penetration testing." />
         </div>
         <Tabs
@@ -214,11 +214,7 @@ const Tools = () => {
             [...Array(8)].map((_, index) => (
               <div
                 key={`skeleton-${index}`}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                  animationFillMode: 'backwards'
-                }}
-                className="animate-fade-in"
+                className={`animate-fade-in animation-fill-backwards animation-delay-${index * 50}`}
               >
                 <ToolCardSkeleton />
               </div>
@@ -228,11 +224,7 @@ const Tools = () => {
             filteredTools.map((tool, index) => (
               <div
                 key={tool.id}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                  animationFillMode: 'backwards'
-                }}
-                className="animate-fade-in content-visibility-auto"
+                className={`animate-fade-in content-visibility-auto animation-fill-backwards animation-delay-${Math.min(index * 50, 1000)}`}
               >
                 <ToolCard
                   id={tool.id}

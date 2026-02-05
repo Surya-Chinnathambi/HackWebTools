@@ -1,5 +1,7 @@
 import express from 'express';
 import axios from 'axios';
+import { validateURL } from '../middleware/validation.js';
+import { validateSSRF } from '../middleware/ssrfProtection.js';
 
 const router = express.Router();
 
@@ -15,7 +17,13 @@ router.post('/headers', async (req, res) => {
             return res.status(400).json({ error: 'URL is required' });
         }
 
-        const response = await axios.get(url, {
+        // SECURITY: Validate URL format
+        const cleanURL = validateURL(url);
+
+        // SECURITY: Check for SSRF attempts
+        validateSSRF(cleanURL);
+
+        const response = await axios.get(cleanURL, {
             timeout: 10000,
             validateStatus: () => true // Accept any status code
         });
@@ -107,6 +115,16 @@ router.post('/ports', async (req, res) => {
 
         if (!target) {
             return res.status(400).json({ error: 'Target is required' });
+        }
+
+        // SECURITY: Validate target (domain or IP)
+        const { validateDomain, validateIP } = await import('../middleware/validation.js');
+        try {
+            // Try as domain first
+            validateDomain(target);
+        } catch {
+            // If not a domain, try as IP
+            validateIP(target);
         }
 
         res.json({

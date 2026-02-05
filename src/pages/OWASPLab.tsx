@@ -20,8 +20,29 @@ import {
     Lightbulb,
     Target,
     Trophy,
-    Play
+    Play,
+    DollarSign,
+    Building2,
+    Server,
+    Users,
+    Clock,
+    TrendingUp
 } from "lucide-react";
+
+interface AttackerMotivation {
+    financial?: string;
+    espionage?: string;
+    access?: string;
+    reputation?: string;
+}
+
+interface RealWorldImpact {
+    breachExample?: string;
+    averageCost?: string;
+    timeToExploit?: string;
+    severity?: string;
+    affected?: string;
+}
 
 interface OWASPVulnerability {
     id: number;
@@ -33,6 +54,8 @@ interface OWASPVulnerability {
     prevention: string[];
     difficulty: "beginner" | "intermediate" | "advanced";
     category: string;
+    attackerMotivation: AttackerMotivation;
+    realWorldImpact: RealWorldImpact;
 }
 
 interface LabExercise {
@@ -72,7 +95,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Rate limit API and controller access to minimize automated attack tooling"
         ],
         difficulty: "intermediate",
-        category: "Authorization"
+        category: "Authorization",
+        attackerMotivation: {
+            financial: "Access premium features without payment, steal customer data worth $50-200 per record on dark web",
+            access: "Escalate from regular user to admin, modify any user's data, access restricted functionality",
+            espionage: "View competitor data, steal business intelligence, access confidential documents"
+        },
+        realWorldImpact: {
+            breachExample: "Facebook Cambridge Analytica (2018): IDOR vulnerability allowed access to 87 million users' data through broken access control",
+            averageCost: "$3.86 million average breach cost (IBM 2023)",
+            timeToExploit: "5-30 minutes using browser dev tools or Burp Suite",
+            severity: "HIGH - Most common web vulnerability (94% of apps tested had some form)",
+            affected: "Every user account and their associated data"
+        }
     },
     {
         id: 2,
@@ -90,7 +125,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Store passwords using strong adaptive salted hashing functions"
         ],
         difficulty: "intermediate",
-        category: "Cryptography"
+        category: "Cryptography",
+        attackerMotivation: {
+            financial: "Crack password databases using rainbow tables, steal credit cards and sell for $10-100 each",
+            access: "Decrypt sensitive communications, access encrypted files, intercept HTTPS traffic with weak SSL",
+            espionage: "Read confidential business data, government secrets, trade secrets worth millions"
+        },
+        realWorldImpact: {
+            breachExample: "Yahoo (2013): 3 billion accounts compromised using MD5 hashing without proper salting. Passwords cracked in hours.",
+            averageCost: "$150 per stolen record containing PII (2023 data)",
+            timeToExploit: "Minutes to hours depending on algorithm weakness (MD5 cracked instantly, weak bcrypt in days)",
+            severity: "CRITICAL - Affects 100% of stolen data's confidentiality",
+            affected: "All users whose passwords or sensitive data is stored with weak crypto"
+        }
     },
     {
         id: 3,
@@ -107,7 +154,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Use LIMIT and other SQL controls within queries to prevent mass disclosure"
         ],
         difficulty: "beginner",
-        category: "Input Validation"
+        category: "Input Validation",
+        attackerMotivation: {
+            financial: "Dump entire customer database, extract credit cards, sell complete DB for $10k-500k on dark web",
+            access: "Bypass authentication (login as admin without password), execute OS commands, upload web shells",
+            reputation: "Most iconic hack technique - proves skill, easy to demonstrate in bug bounties ($500-50k rewards)"
+        },
+        realWorldImpact: {
+            breachExample: "Equifax (2017): Apache Struts SQL Injection led to 147 million records stolen. Settlement: $700 million. CEO resigned.",
+            averageCost: "$4.45 million average data breach cost",
+            timeToExploit: "30 seconds with SQLMap automated tool",
+            severity: "CRITICAL (CVSS 9.0+) - Complete database compromise",
+            affected: "Every database record in vulnerable table (potentially millions)"
+        }
     },
     {
         id: 4,
@@ -124,7 +183,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Write unit and integration tests to validate that all critical flows are resistant to threat models"
         ],
         difficulty: "advanced",
-        category: "Design"
+        category: "Design",
+        attackerMotivation: {
+            financial: "Exploit business logic to get free products/services, transfer funds without authorization",
+            access: "Bypass payment systems, manipulate pricing, abuse referral/reward programs",
+            reputation: "Find novel vulnerabilities that automated scanners miss - high bug bounty rewards ($1k-25k)"
+        },
+        realWorldImpact: {
+            breachExample: "Airline loyalty program: Logic flaw allowed users to book first-class flights for economy prices. Lost revenue: $1.2M",
+            averageCost: "Varies widely - from thousands in lost revenue to complete business model failure",
+            timeToExploit: "Hours to days of manual testing to discover, seconds to exploit once found",
+            severity: "MEDIUM to HIGH - Depends on business impact",
+            affected: "All users exploiting the flaw + company financial losses"
+        }
     },
     {
         id: 5,
@@ -141,7 +212,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Automate process to verify effectiveness of configurations in all environments"
         ],
         difficulty: "beginner",
-        category: "Configuration"
+        category: "Configuration",
+        attackerMotivation: {
+            financial: "Use default credentials to access admin panels, steal data, deploy ransomware",
+            access: "Exploit exposed debug endpoints, access internal APIs, enumerate system information",
+            reputation: "Low-hanging fruit - easy to find with automated scanners, proves basic pentesting skills"
+        },
+        realWorldImpact: {
+            breachExample: "MongoDB databases: 600+ million records exposed due to default 'no authentication' configuration in 2017-2019",
+            averageCost: "$2.8M average breach cost from misconfiguration",
+            timeToExploit: "5 minutes (automated scanners find these instantly)",
+            severity: "HIGH - 95% of breaches involve misconfiguration",
+            affected: "Entire application and all user data"
+        }
     },
     {
         id: 6,
@@ -158,7 +241,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Monitor for libraries and components that are unmaintained"
         ],
         difficulty: "intermediate",
-        category: "Components"
+        category: "Components",
+        attackerMotivation: {
+            financial: "Exploit public CVEs with ready-made exploit code - no skill needed, maximum impact",
+            access: "Remote code execution in hours, full server control, pivot to internal network",
+            reputation: "Automated mass-exploitation - hack thousands of sites simultaneously using Shodan + Metasploit"
+        },
+        realWorldImpact: {
+            breachExample: "Equifax (2017): Unpatched Apache Struts CVE-2017-5638. Breach: 147M records, Cost: $1.4 billion, CEO resigned, 4 executives charged",
+            averageCost: "$4.24M average breach + legal penalties + reputation damage",
+            timeToExploit: "Minutes (exploit code publicly available for known CVEs)",
+            severity: "CRITICAL (CVSS 9-10) - Often leads to full server compromise",
+            affected: "All application users + potential lateral movement to other systems"
+        }
     },
     {
         id: 7,
@@ -176,7 +271,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Use server-side, secure, built-in session manager"
         ],
         difficulty: "intermediate",
-        category: "Authentication"
+        category: "Authentication",
+        attackerMotivation: {
+            financial: "Take over accounts to steal payment info, cryptocurrency wallets, commit fraud using victim's identity",
+            access: "Brute force admin accounts, credential stuffing using leaked password databases (billions available)",
+            espionage: "Access email accounts for corporate espionage, government surveillance, blackmail material"
+        },
+        realWorldImpact: {
+            breachExample: "Dropbox (2012): 68M passwords stolen due to weak hashing. Uber (2016): AWS keys exposed, 57M records stolen. Cost: $148M settlement",
+            averageCost: "$4.5M average breach cost from credential theft",
+            timeToExploit: "Hours to days for brute force (1000s of attempts/sec), instant if credentials reused from previous breaches",
+            severity: "HIGH - Account takeover affects victim's entire digital life",
+            affected: "Individual users to entire user base if mass credential stuffing"
+        }
     },
     {
         id: 8,
@@ -193,7 +300,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Ensure unsigned or unencrypted serialized data is not sent to untrusted clients"
         ],
         difficulty: "advanced",
-        category: "Integrity"
+        category: "Integrity",
+        attackerMotivation: {
+            financial: "Inject malware into software updates reaching millions of users, cryptominers, ransomware distribution",
+            access: "Compromise CI/CD pipeline to backdoor all future releases, supply chain attack affecting thousands of companies",
+            espionage: "Nation-state attacks (SolarWinds-style) to infiltrate governments and Fortune 500 companies"
+        },
+        realWorldImpact: {
+            breachExample: "SolarWinds (2020): CI/CD compromise injected backdoor into Orion updates. Affected: 18,000 organizations, 9 US agencies. Estimated cost: $100+ billion",
+            averageCost: "Catastrophic - can exceed $10B for supply chain attacks",
+            timeToExploit: "Months of planning for supply chain attacks, seconds for deserialization exploits",
+            severity: "CRITICAL - Can affect millions of downstream users/customers",
+            affected: "All users of compromised software (potentially millions)"
+        }
     },
     {
         id: 9,
@@ -211,7 +330,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Establish or adopt an incident response and recovery plan"
         ],
         difficulty: "intermediate",
-        category: "Monitoring"
+        category: "Monitoring",
+        attackerMotivation: {
+            financial: "Stay undetected longer = more data stolen. Average breach detection: 287 days without monitoring",
+            access: "Cover tracks by deleting logs, prevent forensics investigation, avoid attribution",
+            reputation: "Advanced persistent threats (APTs) - maintain access for years without detection"
+        },
+        realWorldImpact: {
+            breachExample: "Target (2013): Breach undetected for weeks despite security alerts being ignored. 40M credit cards stolen. Cost: $202M + CEO resignation",
+            averageCost: "287 days average detection time × daily breach cost = $1.2M-4.5M additional losses",
+            timeToExploit: "N/A - This vulnerability allows OTHER exploits to go undetected",
+            severity: "HIGH - Multiplies impact of all other vulnerabilities",
+            affected: "All users (breach runs longer, more data stolen before detection)"
+        }
     },
     {
         id: 10,
@@ -228,7 +359,19 @@ const owaspTop10: OWASPVulnerability[] = [
             "Segment remote resource access functionality in separate networks"
         ],
         difficulty: "advanced",
-        category: "Input Validation"
+        category: "Input Validation",
+        attackerMotivation: {
+            financial: "Steal AWS/Azure credentials from cloud metadata, pivot to entire infrastructure, cryptomining on cloud resources",
+            access: "Access internal services (databases, admin panels) not exposed to internet, bypass firewalls",
+            espionage: "Read internal documentation, source code repositories, environment variables with secrets"
+        },
+        realWorldImpact: {
+            breachExample: "Capital One (2019): SSRF in AWS metadata service. 100M credit applications stolen. Fine: $80M, Total cost: $300M+",
+            averageCost: "$2.5M-5M+ (can escalate to full infrastructure compromise)",
+            timeToExploit: "5-30 minutes once SSRF found (cloud metadata at 169.254.169.254)",
+            severity: "HIGH to CRITICAL - Can expose entire cloud infrastructure",
+            affected: "All internal systems accessible from compromised server"
+        }
     }
 ];
 
@@ -500,6 +643,108 @@ const OWASPLab = () => {
                                             </li>
                                         ))}
                                     </ul>
+                                </div>
+
+                                {/* Why Attackers Love This Section */}
+                                <div className="border-t pt-4">
+                                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                                        <Target className="h-5 w-5 text-red-600" />
+                                        Why Attackers Love This
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {selectedVulnerability.attackerMotivation.financial && (
+                                            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-900">
+                                                <DollarSign className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <h5 className="font-semibold text-sm text-red-900 dark:text-red-100 mb-1">Financial Gain</h5>
+                                                    <p className="text-sm text-red-800 dark:text-red-200">{selectedVulnerability.attackerMotivation.financial}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {selectedVulnerability.attackerMotivation.espionage && (
+                                            <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-100 dark:border-purple-900">
+                                                <Building2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <h5 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-1">Corporate Espionage</h5>
+                                                    <p className="text-sm text-purple-800 dark:text-purple-200">{selectedVulnerability.attackerMotivation.espionage}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {selectedVulnerability.attackerMotivation.access && (
+                                            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900">
+                                                <Server className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <h5 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-1">System Control</h5>
+                                                    <p className="text-sm text-blue-800 dark:text-blue-200">{selectedVulnerability.attackerMotivation.access}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {selectedVulnerability.attackerMotivation.reputation && (
+                                            <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900">
+                                                <Users className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <h5 className="font-semibold text-sm text-orange-900 dark:text-orange-100 mb-1">Reputation / Notoriety</h5>
+                                                    <p className="text-sm text-orange-800 dark:text-orange-200">{selectedVulnerability.attackerMotivation.reputation}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Real World Impact Section */}
+                                <div className="border-t pt-4">
+                                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                                        <AlertTriangle className="h-5 w-5 text-amber-600" />
+                                        Real-World Impact
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {selectedVulnerability.realWorldImpact.breachExample && (
+                                            <Alert className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+                                                <TrendingUp className="h-4 w-4 text-amber-600" />
+                                                <AlertDescription className="text-sm text-amber-900 dark:text-amber-100">
+                                                    <strong>Famous Breach:</strong> {selectedVulnerability.realWorldImpact.breachExample}
+                                                </AlertDescription>
+                                            </Alert>
+                                        )}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {selectedVulnerability.realWorldImpact.averageCost && (
+                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <DollarSign className="h-4 w-4 text-gray-600" />
+                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Average Cost</span>
+                                                    </div>
+                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.averageCost}</p>
+                                                </div>
+                                            )}
+                                            {selectedVulnerability.realWorldImpact.timeToExploit && (
+                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Clock className="h-4 w-4 text-gray-600" />
+                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Time to Exploit</span>
+                                                    </div>
+                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.timeToExploit}</p>
+                                                </div>
+                                            )}
+                                            {selectedVulnerability.realWorldImpact.severity && (
+                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <AlertTriangle className="h-4 w-4 text-gray-600" />
+                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Severity</span>
+                                                    </div>
+                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.severity}</p>
+                                                </div>
+                                            )}
+                                            {selectedVulnerability.realWorldImpact.affected && (
+                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Users className="h-4 w-4 text-gray-600" />
+                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Affected</span>
+                                                    </div>
+                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.affected}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
