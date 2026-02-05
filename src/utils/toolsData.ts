@@ -208,11 +208,55 @@ export const toolsCategories: ToolCategory[] = [
             code: "nikto -h example.com -p 8080"
           },
           {
-            title: "Save output to file",
-            code: "nikto -h example.com -o report.html -Format html"
+            title: "Scan multiple ports",
+            code: "nikto -h example.com -p 80,443,8080,8443"
+          },
+          {
+            title: "Scan with authentication",
+            code: "nikto -h http://example.com -id username:password"
+          },
+          {
+            title: "Use specific tuning options",
+            code: "nikto -h http://example.com -Tuning 123bde"
+          },
+          {
+            title: "Scan through proxy",
+            code: "nikto -h http://example.com -useproxy http://proxy:8080"
+          },
+          {
+            title: "Update plugins database",
+            code: "nikto -update"
+          },
+          {
+            title: "Scan with custom User-Agent",
+            code: "nikto -h http://example.com -useragent \"Mozilla/5.0\""
+          },
+          {
+            title: "Output to multiple formats",
+            code: "nikto -h http://example.com -o report -Format htm,txt,csv"
+          },
+          {
+            title: "Evasion techniques (IDS bypass)",
+            code: "nikto -h http://example.com -evasion 1234567"
+          },
+          {
+            title: "Scan from file with multiple targets",
+            code: "nikto -h targets.txt"
+          },
+          {
+            title: "Disable SSL certificate verification",
+            code: "nikto -h https://example.com -ssl -no-ssl-cert"
+          },
+          {
+            title: "Specific plugin execution",
+            code: "nikto -h http://example.com -Plugins @@ALL;-@@NONE;tests(report_xml)"
+          },
+          {
+            title: "Comprehensive scan with timing",
+            code: "nikto -h http://example.com -C all -timeout 10"
           }
         ],
-        documentation: "Nikto is an open source web server scanner that performs comprehensive tests against web servers for multiple items, including over 6700 potentially dangerous files/CGIs, checks for outdated versions of over 1250 servers, and version specific problems on over 270 servers.",
+        documentation: "Nikto is an industry-standard open-source web server scanner created by Chris Sullo. First released in 2001, it performs comprehensive security assessments against web servers, testing for over 6,700 potentially dangerous files/programs, 1,250+ outdated server versions, and version-specific vulnerabilities across 270+ servers.\n\nCore Capabilities:\n• Server Fingerprinting: Identify web server type, version, OS\n• Dangerous Files: Detect default files, CGI scripts, backup files\n• Server Misconfigurations: Missing security headers, directory listings\n• Outdated Software: Identify known vulnerable versions\n• SSL/TLS Analysis: Certificate validation, cipher strength\n• HTTP Methods: Test for dangerous methods (PUT, DELETE, TRACE)\n• Default Credentials: Test for default admin credentials\n• XSS/SQL Injection: Basic vulnerability detection\n• Security Headers: Check for CSP, HSTS, X-Frame-Options\n\nTuning Options (-Tuning):\n• 0: File Upload - Test for file upload capabilities\n• 1: Interesting Files - Logs, configs, source code\n• 2: Misconfiguration - Server misconfigurations\n• 3: Information Disclosure - Version info, server details\n• 4: XSS - Cross-site scripting vulnerabilities\n• 5: Remote File Retrieval - Test for RFI\n• 6: Denial of Service - DoS potential\n• 7: Remote Code Execution - RCE vulnerabilities\n• 8: SQL Injection - SQLi detection\n• 9: File Inclusion - LFI/RFI tests\n• a: Authentication Bypass - Auth vulnerabilities\n• b: Software Identification - Identify installed software\n• c: Remote Source Inclusion - Include remote files\n• d: WebDAV - WebDAV detection and testing\n• e: Administrative Console - Find admin interfaces\n• x: Reverse Tuning - Exclude specific tests\n\nEvasion Techniques (-evasion):\n• 1: Random URI encoding (non-UTF8)\n• 2: Directory self-reference (/./)\n• 3: Premature URL ending\n• 4: Prepend long random string\n• 5: Fake parameter\n• 6: TAB as request spacer\n• 7: Change case of URL\n• 8: Use Windows directory separator (\\)\n• Combine: Use multiple techniques (e.g., -evasion 1234)\n\nOutput Formats (-Format):\n• csv: Comma-separated values\n• htm: HTML report with styling\n• msf+: Metasploit XML format\n• nbe: Nessus NBE format\n• txt: Plain text (default)\n• xml: Generic XML format\n• Multiple: Combine with comma (htm,txt,csv)\n\nAuthentication Support:\n• Basic Auth: -id username:password\n• NTLM: -id domain\\username:password\n• Cookie-based: -C cookie_name=value\n• Custom Headers: -H \"Header: Value\"\n• Client Certificates: -key keyfile -cert certfile\n\nAdvanced Features:\n• Plugin System: Modular architecture\n• Database Updates: Regular vulnerability feed updates\n• Custom Plugins: Write your own in Perl\n• Mutation Engine: Intelligent test case generation\n• HTTP Proxy Support: Route through Burp, ZAP, etc.\n• SSL/TLS Testing: Certificate and cipher analysis\n• Virtual Host Testing: Test multiple vhosts\n• Rate Limiting: -Pause seconds between requests\n\nPerformance Tuning:\n• -Pause N: Seconds between tests (IDS evasion)\n• -timeout N: Request timeout in seconds\n• -maxtime N: Maximum scan time\n• -Display: Control output verbosity\n• -no404: Disable 404 learning\n• -Cgidirs: Specify CGI directories\n\nProxy Configuration:\n• HTTP Proxy: -useproxy http://proxy:8080\n• SOCKS: Configure via libwhisker2\n• Authentication: proxy_username:proxy_password\n• Burp Integration: Route through Burp for manual testing\n• ZAP Integration: Combine with OWASP ZAP\n\nSSL/TLS Options:\n• -ssl: Force SSL mode\n• -nossl: Force non-SSL mode\n• -no-ssl-cert: Ignore certificate errors\n• -ssl-version: Specify SSL/TLS version\n• Certificate testing: Expiry, weak ciphers\n\nDatabase Management:\n• -update: Update vulnerability database\n• -list-plugins: Show available plugins\n• -dbcheck: Verify database integrity\n• Custom DB: Use alternative vulnerability database\n• Frequency: Update weekly for latest checks\n\nCommon Use Cases:\n• Web Server Hardening: Pre-deployment security audit\n• Compliance Testing: PCI DSS, OWASP Top 10 validation\n• Vulnerability Assessment: Initial reconnaissance\n• Configuration Review: Identify misconfigurations\n• Version Detection: Inventory web server versions\n• Penetration Testing: Automated vulnerability discovery\n• Bug Bounty: Quick vulnerability identification\n\nIntegration:\n• Nmap: Combine with NSE scripts\n• Metasploit: Import results for exploitation\n• Burp Suite: Use as reconnaissance tool\n• OWASP ZAP: Complementary scanning\n• Jenkins/CI: Automate security testing\n• SIEM: Export logs for correlation\n\nBest Practices:\n• Always get written authorization before scanning\n• Start with basic scan, then use tuning options\n• Use -Pause to avoid overwhelming servers\n• Update database regularly (-update)\n• Review false positives manually\n• Combine with manual testing\n• Use evasion for IDS bypass testing\n• Save reports in multiple formats\n• Document scan parameters\n• Test in non-production first\n\nCommon Pitfalls:\n• Scanning without authorization (illegal)\n• Overwhelming servers (DoS-like behavior)\n• Not updating database (missing vulnerabilities)\n• Ignoring false positives (bad reporting)\n• Scanning production during business hours\n• Not using -Pause with IDS/IPS present\n• Missing version-specific vulnerabilities\n• Not testing SSL/TLS properly\n\nLimitations:\n• Black-box testing only (no source code analysis)\n• High false positive rate\n• Limited JavaScript/AJAX testing\n• No authentication fuzzing\n• Basic XSS/SQLi detection only\n• Cannot test complex business logic\n• Limited modern framework support\n• Signature-based detection\n\nAlternatives and Complements:\n• Nessus: More comprehensive, commercial\n• OpenVAS: Full vulnerability management\n• Nuclei: Modern YAML-based scanner\n• WPScan: WordPress-specific\n• Skipfish: Google's web scanner\n• OWASP ZAP: Full proxy-based testing\n• Burp Suite: Professional web testing\n\nReal-World Applications:\n• Initial Reconnaissance: Quick vulnerability overview\n• Baseline Security: Establish security posture\n• Compliance Audits: Verify security controls\n• Pre-Production Testing: Catch issues before deployment\n• Continuous Monitoring: Regular security scans\n• Penetration Testing: Automated discovery phase\n• Red Team: Initial foothold identification\n• Bug Bounty: Fast vulnerability discovery",
         githubUrl: "https://github.com/sullo/nikto",
         tags: ["web", "scanner", "vulnerability", "webserver"],
         additionalInfo: "Nikto was originally written by Chris Sullo and is now maintained by a community of developers. It's included by default in many penetration testing Linux distributions like Kali Linux."
@@ -501,7 +545,7 @@ export const toolsCategories: ToolCategory[] = [
             code: "hydra -L users.txt -P passwords.txt 192.168.1.1 ssh ftp mysql"
           }
         ],
-        documentation: "Hydra is a parallelized login cracker which supports numerous protocols to attack. It is very fast and flexible, and new modules are easy to add. This tool makes it possible for researchers and security consultants to show how easy it would be to gain unauthorized access to a system.",
+        documentation: "THC-Hydra is the world's most popular network login cracker, supporting over 50 protocols. Created by van Hauser and part of The Hacker's Choice toolkit, it's extremely fast due to parallel connection support and modular architecture. Used by penetration testers and security auditors worldwide to test authentication security.\n\nSupported Protocols (50+):\n• Remote Access: SSH, Telnet, RDP, VNC, X11\n• File Transfer: FTP, FTPS, TFTP, SMB, NFS\n• Databases: MySQL, PostgreSQL, MSSQL, Oracle, MongoDB, Redis\n• Web: HTTP/HTTPS (GET/POST), HTTP-Proxy, HTTPS-form\n• Email: SMTP, POP3, IMAP, SMTP-Enum\n• Network Services: SNMP, LDAP, Cisco auth, Cisco enable\n• Proxies: SOCKS5, HTTP-Proxy\n• Other: SIP, IRC, ICQ, XMPP, NNTP, Subversion, Asterisk\n\nCore Features:\n• Parallel Attacks: Multiple connections simultaneously\n• Flexible Input: Username/password lists or single credentials\n• Resume Support: Continue interrupted attacks\n• Proxy Support: Route through HTTP/SOCKS proxies\n• SSL/TLS: Support for encrypted protocols\n• Exit Conditions: Stop on first success or continue\n• Verbosity Levels: Control output detail\n• Multi-Target: Attack multiple hosts\n• Loop Mode: Continuous testing\n\nAttack Modes:\n• Username List + Password List: -L users.txt -P passwords.txt\n• Single Username + Password List: -l admin -P passwords.txt\n• Username List + Single Password: -L users.txt -p Password123\n• Single Credentials: -l admin -p password\n• Colon-Separated File: -C credentials.txt (format: user:pass)\n• Empty Password: -e n (test null passwords)\n• Reverse Login: -e s (try login as password)\n• Same as Login: -e r (username = password)\n\nPerformance Tuning:\n• -t N: Number of parallel tasks (default 16)\n  • SSH: Limit to 4 (connection limits)\n  • HTTP: Use 16-64 (faster protocols)\n  • Adjust based on target capacity\n• -w N: Timeout in seconds (default 30)\n• -c N: Time between connection attempts\n• -W N: Wait time for responses\n• Memory: Loads files into RAM for speed\n\nHTTP/HTTPS Form Attacks:\n• http-get-form: GET method forms\n• http-post-form: POST method forms (most common)\n• Format: \"path:parameters:failure_string\"\n• Parameters:\n  • ^USER^: Username placeholder\n  • ^PASS^: Password placeholder\n  • F=text: Failure indicator\n  • S=text: Success indicator\n  • C=/page: Cookie requirement\n• Example: \"/login.php:user=^USER^&pass=^PASS^:F=incorrect\"\n• Cookie Support: -C \"PHPSESSID=abc123\"\n\nSuccess Detection:\n• F= Failure String: Stop when string NOT found\n• S= Success String: Stop when string IS found\n• H= Header Check: Look in HTTP headers\n• Conditional: F=invalid:S=welcome\n• Case Sensitivity: Exact match required\n\nVerbosity Options:\n• -v/-V: Verbose output (show attempts)\n• -d: Debug mode (detailed protocol info)\n• -q: Quiet mode (minimal output)\n• -o FILE: Save output to file\n• -b FORMAT: Output format (text, json, jsonv1)\n\nSession Management:\n• -R: Restore previous session\n• Auto-save: Every 5 minutes\n• .restore file: Contains session state\n• Safe interruption: Ctrl+C to save and exit\n• Multiple sessions: Use different output files\n\nProxy Configuration:\n• HTTP Proxy: -P http://proxy:8080\n• SOCKS5: -P socks5://proxy:1080\n• Authentication: -P http://user:pass@proxy:8080\n• Route through Burp: -P http://127.0.0.1:8080\n\nSSL/TLS Support:\n• Automatic SSL detection\n• Protocol-specific: ftps://, https://, smtps://\n• Certificate validation: Disabled by default\n• SNI support: Server Name Indication\n\nAdvanced Options:\n• -f: Exit after first found user/pass pair\n• -F: Exit after first found for any user\n• -M FILE: Attack multiple targets from file\n• -u: Loop users not passwords (reverse order)\n• -x: Brute force generation (min:max:charset)\n• -y: Disable protocol-specific optimizations\n• -I: Ignore existing restore file\n\nCredential File Formats:\n• Username List (-L): One username per line\n• Password List (-P): One password per line\n• Colon Format (-C): username:password per line\n• Comments: # at start of line\n• Whitespace: Trimmed automatically\n\nCommon Protocols:\n• SSH: ssh://192.168.1.1:22\n• FTP: ftp://192.168.1.1:21\n• HTTP POST: http-post-form\n• RDP: rdp://192.168.1.1:3389\n• MySQL: mysql://192.168.1.1:3306\n• SMB: smb://192.168.1.1:445\n\nBest Practices:\n• Always get authorization before testing\n• Start with small password lists\n• Use -t 4 for SSH (avoid lockouts)\n• Monitor for account lockouts\n• Use -f to stop on first success (stealth)\n• Test in lab environment first\n• Document all attempts for reporting\n• Combine with OSINT for targeted lists\n• Use company password policies for wordlist generation\n• Respect rate limits and lockout policies\n\nCommon Pitfalls:\n• Account Lockouts: Too many parallel tasks\n• IP Blocking: No delay between attempts\n• SSL Issues: Certificate validation errors\n• Form Detection: Wrong failure string\n• Connection Limits: SSH max sessions\n• Resource Exhaustion: Target overload\n• False Positives: Incorrect success detection\n• Session Cookies: Not maintaining state\n\nWordlist Strategies:\n• Common Passwords: rockyou.txt, SecLists\n• Company-Specific: OSINT-derived terms\n• Policy-Based: Follow known password policies\n• Seasonal: Current year, season, month\n• Username Variations: Names, roles, departments\n• Default Credentials: Vendor defaults\n• Leaked Passwords: Breach databases (legal use only)\n\nIntegration:\n• Nmap: Enumerate services, then attack\n• Metasploit: auxiliary/scanner/http/http_login\n• Burp Suite: Intercept and craft form attacks\n• Medusa: Alternative tool (similar features)\n• Patator: Python-based alternative\n• Crackmapexec: SMB/WinRM specialized\n• Ncrack: Nmap's login cracker\n\nDefensive Measures (Know Your Enemy):\n• Account Lockout: 5 attempts, 30-minute lockout\n• Rate Limiting: Delay between attempts\n• CAPTCHA: Prevent automated attacks\n• Multi-Factor Authentication: Add second factor\n• Geo-Blocking: Block suspicious locations\n• Honeypots: Detect and track attackers\n• Strong Passwords: Enforce complexity\n• Monitor Logs: Alert on brute force patterns\n\nReal-World Applications:\n• Penetration Testing: Test authentication security\n• Security Audits: Validate password policies\n• Red Team: Gain initial access\n• Compliance: Demonstrate weak credentials\n• Incident Response: Test compromised accounts\n• Bug Bounty: Identify weak authentication\n• Password Auditing: Test organizational passwords\n• Recovery: Legitimate password recovery (authorized)\n\nLegal and Ethical Considerations:\n• Authorization Required: Written permission only\n• Scope Definition: Stay within authorized targets\n• Data Handling: Secure credential storage\n• Compliance: Follow local laws (CFAA, etc.)\n• Responsible Disclosure: Report findings properly\n• Impact Assessment: Avoid service disruption\n• Documentation: Log all activities\n\nAlternatives:\n• Medusa: Similar tool, different architecture\n• Ncrack: Nmap project, network authentication\n• Patator: Python-based, highly modular\n• Crowbar: RDP and VNC focused\n• Crackmapexec: Windows-specific, very powerful\n• Brutespray: Nmap to Hydra automation",
         githubUrl: "https://github.com/vanhauser-thc/thc-hydra",
         tags: ["brute force", "password", "authentication", "cracking", "login"],
         additionalInfo: "THC-Hydra is maintained by van Hauser and was developed as part of THC (The Hackers Choice) group's tools. It's considered one of the fastest network login crackers with support for more than 50 protocols and services."
@@ -840,27 +884,79 @@ export const toolsCategories: ToolCategory[] = [
         usage: "Aircrack-ng is used to monitor, attack, test, and crack WiFi networks. It includes tools for packet capture, WEP/WPA key cracking, and analysis.",
         examples: [
           {
+            title: "Check wireless card compatibility",
+            code: "airmon-ng"
+          },
+          {
             title: "Enable monitor mode",
             code: "airmon-ng start wlan0"
           },
           {
-            title: "Capture packets",
+            title: "Kill interfering processes",
+            code: "airmon-ng check kill"
+          },
+          {
+            title: "Discover all nearby networks",
             code: "airodump-ng wlan0mon"
           },
           {
-            title: "Targeted capture",
-            code: "airodump-ng -c 1 --bssid 00:11:22:33:44:55 -w capture wlan0mon"
+            title: "Targeted capture on specific channel",
+            code: "airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon"
           },
           {
-            title: "Deauthentication attack",
-            code: "aireplay-ng -0 10 -a 00:11:22:33:44:55 wlan0mon"
+            title: "Capture on 5GHz band",
+            code: "airodump-ng --band a wlan0mon"
           },
           {
-            title: "Crack WPA handshake",
-            code: "aircrack-ng -w wordlist.txt capture-01.cap"
+            title: "Capture with filtering",
+            code: "airodump-ng -c 1-14 --band bg -w capture wlan0mon"
+          },
+          {
+            title: "Deauthentication attack (capture handshake)",
+            code: "aireplay-ng -0 5 -a AA:BB:CC:DD:EE:FF -c 11:22:33:44:55:66 wlan0mon"
+          },
+          {
+            title: "Continuous deauth (denial of service)",
+            code: "aireplay-ng -0 0 -a AA:BB:CC:DD:EE:FF wlan0mon"
+          },
+          {
+            title: "Fake authentication attack",
+            code: "aireplay-ng -1 0 -a AA:BB:CC:DD:EE:FF -h 00:11:22:33:44:55 wlan0mon"
+          },
+          {
+            title: "ARP replay attack (WEP)",
+            code: "aireplay-ng -3 -b AA:BB:CC:DD:EE:FF -h 00:11:22:33:44:55 wlan0mon"
+          },
+          {
+            title: "Crack WPA/WPA2 with wordlist",
+            code: "aircrack-ng -w rockyou.txt -b AA:BB:CC:DD:EE:FF capture-01.cap"
+          },
+          {
+            title: "Crack WEP key",
+            code: "aircrack-ng -b AA:BB:CC:DD:EE:FF capture*.cap"
+          },
+          {
+            title: "Crack with BSSID and ESSID",
+            code: "aircrack-ng -w wordlist.txt -b AA:BB:CC:DD:EE:FF -e \"NetworkName\" capture-01.cap"
+          },
+          {
+            title: "Convert capture to hashcat format",
+            code: "aircrack-ng capture-01.cap -J hashcat_file"
+          },
+          {
+            title: "Test injection capability",
+            code: "aireplay-ng -9 wlan0mon"
+          },
+          {
+            title: "Create virtual interface",
+            code: "iw phy phy0 interface add wlan0mon type monitor"
+          },
+          {
+            title: "Disable monitor mode",
+            code: "airmon-ng stop wlan0mon"
           }
         ],
-        documentation: "Aircrack-ng is a network software suite consisting of a detector, packet sniffer, WEP and WPA/WPA2-PSK cracker and analysis tool for 802.11 wireless LANs. It works with any wireless network interface controller whose driver supports raw monitoring mode and can sniff 802.11a, 802.11b and 802.11g traffic.",
+        documentation: "Aircrack-ng is the most widely used wireless network security assessment suite, originally forked from the original Aircrack in 2006. It's a complete toolkit for wireless auditing: monitoring, attacking, testing, and cracking WiFi networks. Supports 802.11a/b/g/n/ac/ax standards and works with any wireless card supporting raw monitoring mode.\n\nSuite Components:\n• airmon-ng: Enable/disable monitor mode on wireless interfaces\n• airodump-ng: Packet capture and network discovery\n• aireplay-ng: Packet injection and attack tool\n• aircrack-ng: WEP/WPA/WPA2 key cracking\n• airdecap-ng: Decrypt WEP/WPA captures\n• airbase-ng: Create fake access points\n• airdecloak-ng: Remove WEP cloaking\n• airolib-ng: Manage password databases\n• packetforge-ng: Create encrypted packets\n• ivstools: Merge/convert IVS files\n• easside-ng: Auto WEP cracking\n• tkiptun-ng: WPA/TKIP attacks\n• wesside-ng: Automatic WEP key recovery\n\nMonitor Mode (airmon-ng):\n• Enable: airmon-ng start wlan0\n• Check Compatibility: airmon-ng (shows adapters)\n• Kill Processes: airmon-ng check kill\n• Disable: airmon-ng stop wlan0mon\n• Channel Hopping: Default behavior in monitor mode\n• Fixed Channel: Set with airodump-ng -c N\n• Requirements: Compatible wireless card and driver\n\nCompatible Wireless Cards:\n• Atheros: AR9271, AR5B95, AR9285 (best)\n• Ralink: RT3070, RT3572, RT5370\n• Realtek: RTL8812AU, RTL8814AU (with modified drivers)\n• Intel: Limited support, usually no injection\n• Recommended: Alfa AWUS036ACH, AWUS036NHA\n• External: USB adapters often better than internal\n\nNetwork Discovery (airodump-ng):\n• Basic: airodump-ng wlan0mon\n• Channel: -c N (specific channel) or -c 1-14 (range)\n• Band: --band abg (2.4GHz+5GHz)\n• BSSID Filter: --bssid AA:BB:CC:DD:EE:FF\n• Output: -w filename (creates .cap, .csv, .log files)\n• Update Speed: --update N (seconds)\n• Manufacturer: --manufacturer (show OUI)\n• WPS Info: --wps (detect WPS-enabled APs)\n\nDisplay Information:\n• BSSID: Access point MAC address\n• PWR: Signal strength (closer = higher)\n• Beacons: Beacon frames received\n• Data: Data packets captured\n• CH: Channel number\n• MB: Maximum speed\n• ENC: Encryption (OPN, WEP, WPA, WPA2, WPA3)\n• CIPHER: CCMP, TKIP, WEP\n• AUTH: PSK, MGT (enterprise)\n• ESSID: Network name\n\nPacket Injection (aireplay-ng):\n• Test Injection: -9 (injection test)\n• Deauth: -0 count (deauthentication)\n• Fake Auth: -1 delay (associate with AP)\n• ARP Replay: -3 (replay ARP packets for WEP)\n• Chopchop: -4 (decrypt WEP packet)\n• Fragment: -5 (fragment attack)\n• Caffe Latte: -6 (clientless WEP attack)\n• Target: -a BSSID (access point)\n• Client: -c MAC (specific client)\n• Deauth Count: -0 0 (unlimited)\n\nDeauthentication Attacks:\n• Capture Handshake: Force reconnection\n• Denial of Service: Continuous deauth\n• Targeted: -c CLIENT_MAC (specific client)\n• Broadcast: Deauth all clients\n• Continuous: -0 0 (infinite)\n• Burst: -0 5 (5 packets)\n• Legal Use: Only on authorized networks\n\nWPA/WPA2 Handshake Capture:\n1. Start airodump-ng on target channel\n2. Wait for client connection or\n3. Force reconnection with deauth\n4. Look for \"WPA handshake\" message\n5. Need all 4-way handshake packets\n6. Requires active client\n\nWEP Cracking:\n• Requirements: Capture IVs (initialization vectors)\n• Data Needed: 40-bit WEP = 250K IVs, 104-bit = 1M IVs\n• Active Attack: ARP replay to generate traffic\n• Passive: Wait for enough data packets\n• PTW Attack: aircrack-ng -z (faster, fewer packets)\n• Dictionary: aircrack-ng -w wordlist (if passphrase)\n• Time: Minutes with active attack\n\nWPA/WPA2-PSK Cracking:\n• Requires: Valid 4-way handshake\n• Method: Dictionary/brute force attack\n• Command: aircrack-ng -w wordlist.txt -b BSSID file.cap\n• ESSID: -e \"NetworkName\" (if multiple networks)\n• Speed: CPU-dependent, slow (1000-10000 keys/sec)\n• GPU: Use hashcat for GPU acceleration (much faster)\n• Time: Hours to never (depends on password)\n\nWPA3 Considerations:\n• SAE: Simultaneous Authentication of Equals\n• Dragonfly: Handshake replacement\n• Harder: Resistant to offline dictionary attacks\n• Downgrade: May force WPA2 on dual-mode APs\n• Tools: Limited support as of 2024\n\nPMKID Attack (WPA/WPA2):\n• Alternative: No client needed\n• Capture: PMKID from EAPOL frame\n• Tool: hcxdumptool + hcxtools\n• Hashcat: Mode 22000 for cracking\n• Advantage: Clientless WPA attack\n• Defense: Disable roaming features\n\nWPS Attacks:\n• Pixie Dust: Weak random number generation\n• Brute Force: Try all 8-digit PINs\n• Tools: Reaver, Bully\n• Time: 4-10 hours (brute force)\n• Detection: --wps flag in airodump-ng\n• Defense: Disable WPS\n\nFake Access Point (airbase-ng):\n• Evil Twin: Clone legitimate AP\n• Captive Portal: Phishing for credentials\n• MITM: Intercept traffic\n• Command: airbase-ng -e \"FreeWiFi\" -c 6 wlan0mon\n• DHCP: Need DHCP server for clients\n• Bridge: Route traffic through internet\n\nAdvanced Techniques:\n• Fragmentation: Bypass packet size limits\n• MAC Spoofing: Impersonate trusted client\n• Channel Hopping: Scan all channels\n• Hidden SSID: --showack to reveal\n• Multiple Captures: Merge with mergecap\n• PMKID Capture: Alternative to 4-way handshake\n\nCracking Optimization:\n• Wordlists: rockyou.txt, crackstation\n• Rules: John/Hashcat rules for mutations\n• GPU Acceleration: Export to hashcat format\n• Rainbow Tables: Pre-computed (airolib-ng)\n• Distributed: cowpatty for clusters\n• Targeted: OSINT for company-specific terms\n\nOutput Formats:\n• .cap: Standard pcap format\n• .csv: Airodump summary (CSV)\n• .kismet.csv: Kismet compatible\n• .kismet.netxml: Kismet XML\n• .log.csv: GPS coordinates (if available)\n• Hashcat: -J for WPA handshakes\n\nBest Practices:\n• Authorization: Only test networks you own\n• Lab Environment: Practice on isolated networks\n• Legal Compliance: Know local laws (often illegal)\n• Documentation: Log all activities\n• Responsible Disclosure: Report vulnerabilities\n• Target Selection: Avoid production networks\n• Client Impact: Deauth causes service disruption\n• Range: Stay within property boundaries\n\nDefensive Measures:\n• Strong Passphrases: 15+ random characters\n• WPA3: Upgrade when possible\n• Disable WPS: Most common vulnerability\n• MAC Filtering: Limited effectiveness\n• Hidden SSID: Security through obscurity (weak)\n• Monitor: Detect deauth attacks\n• 802.11w: Management frame protection\n• Enterprise: WPA2-Enterprise (RADIUS)\n\nCommon Pitfalls:\n• Wrong Card: No monitor mode/injection support\n• Driver Issues: Need compatible drivers\n• Interference: 2.4GHz crowded band\n• Weak Signal: Too far from target\n• No Clients: Can't capture handshake\n• Insufficient IVs: Not enough WEP data\n• Weak Wordlist: Missing target password\n• Channel Hopping: Lock to target channel\n\nIntegration:\n• Wireshark: Analyze captures in detail\n• Hashcat: GPU-accelerated WPA cracking\n• John the Ripper: Alternative cracking\n• Kismet: Wireless network detection\n• Reaver/Bully: WPS attacks\n• Wifite: Automated aircrack-ng wrapper\n• Fluxion: Social engineering attacks\n• Cowpatty: WPA-PSK cracking\n\nReal-World Applications:\n• Penetration Testing: Authorized wireless auditing\n• Red Team: Assess wireless security posture\n• Security Research: Test encryption implementations\n• Compliance: Validate security controls\n• Forensics: Analyze wireless attacks\n• Training: Hands-on security education\n• Bug Bounty: Test wireless vulnerabilities\n\nLegal and Ethical Considerations:\n• Authorization: Written permission required\n• Illegal: Attacking networks without authorization\n• Penalties: Federal crimes (CFAA, wiretap laws)\n• Jamming: FCC violations (illegal in US)\n• Privacy: Client privacy protection\n• Responsible Use: Educational/authorized only\n• Disclosure: Report vulnerabilities properly",
         githubUrl: "https://github.com/aircrack-ng/aircrack-ng",
         tags: ["wireless", "WiFi", "WEP", "WPA", "cracking", "monitoring"]
       },
