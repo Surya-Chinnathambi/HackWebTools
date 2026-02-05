@@ -294,7 +294,7 @@ const Header = () => {
 
       {/* Mobile menu with animation */}
       {isMenuOpen && (
-        <div 
+        <div
           id="mobile-navigation"
           className="md:hidden border-t animate-fade-in relative z-50 bg-background shadow-lg"
           role="navigation"
