@@ -35,6 +35,7 @@ import Glossary from "./pages/Glossary";
 import InterviewPrep from "./pages/InterviewPrep";
 import BlueTeam from "./pages/BlueTeam";
 import KeyboardShortcuts from "./components/KeyboardShortcuts";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,78 +47,77 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        {/* Skip to main content for keyboard navigation */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
-        >
-          Skip to main content
-        </a>
-        <div className="min-h-screen flex flex-col dark:bg-background">
-          <Header />
-          <main id="main-content" className="flex-1 container mx-auto px-4 md:px-6 py-8" role="main">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route
-                path="/tools"
-                element={
-                  <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
-                    <Sidebar className="hidden md:block" />
-                    <main className="flex-1">
-                      <Tools />
-                    </main>
-                  </div>
-                }
-              />
-              <Route
-                path="/tools/:toolId"
-                element={
-                  <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
-                    <Sidebar className="hidden md:block" />
-                    <main className="flex-1">
-                      <ToolDetail />
-                    </main>
-                  </div>
-                }
-              />
-              <Route path="/payloads" element={<Payloads />} />
-              <Route path="/payload-categories" element={<PayloadCategories />} />
-              <Route path="/payload-history" element={<PayloadHistory />} />
-              <Route path="/xss" element={<XSS />} />
-              <Route path="/encoder-decoder" element={<EncoderDecoder />} />
-              <Route path="/reverse-shell" element={<ReverseShellGenerator />} />
-              <Route path="/command-generator" element={<CommandGenerator />} />
-              <Route path="/xss-tester" element={<XSSTester />} />
-              <Route path="/report-generator" element={<ReportGenerator />} />
-              <Route path="/exploit-db" element={<ExploitDB />} />
-              <Route path="/wordlist-generator" element={<WordlistGenerator />} />
-              <Route path="/api-security-tester" element={<APISecurityTester />} />
-              <Route path="/port-scanner" element={<PortScanner />} />
-              <Route path="/hash-cracker" element={<HashCracker />} />
-              <Route path="/owasp-lab" element={<OWASPLab />} />
-              <Route path="/advanced-vuln-scanner" element={<AdvancedVulnScanner />} />
-              <Route path="/threat-intelligence" element={<ThreatIntelligence />} />
-              <Route path="/learning-hub" element={<LearningHub />} />
-              <Route path="/labs" element={<Labs />} />
-              <Route path="/progress" element={<Progress />} />
-              <Route path="/glossary" element={<Glossary />} />
-              <Route path="/interview-prep" element={<InterviewPrep />} />
-              <Route path="/blue-team" element={<BlueTeam />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <KeyboardShortcuts />
-        </div>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          {/* Skip to main content for keyboard navigation */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+          >
+            Skip to main content
+          </a>
+          <div className="min-h-screen flex flex-col dark:bg-background">
+            <Header />
+            <main id="main-content" className="flex-1 container mx-auto px-4 md:px-6 py-8" role="main">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route
+                  path="/tools"
+                  element={
+                    <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
+                      <Sidebar className="hidden md:block" />
+                      <main className="flex-1">
+                        <Tools />
+                      </main>
+                    </div>
+                  }
+                />
+                <Route
+                  path="/tools/:toolId"
+                  element={
+                    <div className="flex flex-col md:flex-row gap-8 animate-fade-in">
+                      <Sidebar className="hidden md:block" />
+                      <main className="flex-1">
+                        <ToolDetail />
+                      </main>
+                    </div>
+                  }
+                />
+                <Route path="/payloads" element={<Payloads />} />
+                <Route path="/payload-categories" element={<PayloadCategories />} />
+                <Route path="/payload-history" element={<PayloadHistory />} />
+                <Route path="/xss" element={<XSS />} />
+                <Route path="/encoder-decoder" element={<EncoderDecoder />} />
+                <Route path="/reverse-shell" element={<ReverseShellGenerator />} />
+                <Route path="/command-generator" element={<CommandGenerator />} />
+                <Route path="/xss-tester" element={<XSSTester />} />
+                <Route path="/report-generator" element={<ReportGenerator />} />
+                <Route path="/exploit-db" element={<ExploitDB />} />
+                <Route path="/wordlist-generator" element={<WordlistGenerator />} />
+                <Route path="/api-security-tester" element={<APISecurityTester />} />
+                <Route path="/port-scanner" element={<PortScanner />} />
+                <Route path="/hash-cracker" element={<HashCracker />} />
+                <Route path="/owasp-lab" element={<OWASPLab />} />
+                <Route path="/advanced-vuln-scanner" element={<AdvancedVulnScanner />} />
+                <Route path="/threat-intelligence" element={<ThreatIntelligence />} />
+                <Route path="/learning-hub" element={<LearningHub />} />
+                <Route path="/labs" element={<Labs />} />
+                <Route path="/progress" element={<Progress />} />
+                <Route path="/glossary" element={<Glossary />} />
+                <Route path="/interview-prep" element={<InterviewPrep />} />
+                <Route path="/blue-team" element={<BlueTeam />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+            <KeyboardShortcuts />
+          </div>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
