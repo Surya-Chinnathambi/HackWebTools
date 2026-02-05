@@ -1,13 +1,11 @@
 # 🛡️ HackWebTools - Professional Security Testing Platform
 
 [![Live Demo](https://img.shields.io/badge/demo-live-success)](https://hackingtoolsinfo.netlify.app/)
-[![Backend](https://img.shields.io/badge/backend-active-blue)](https://hackwebtools-backend.onrender.com/health)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 > **Comprehensive web-based penetration testing toolkit with REAL security testing capabilities powered by FREE APIs.**
 
 🔗 **Live Application**: https://hackingtoolsinfo.netlify.app/  
-🔗 **API Backend**: https://hackwebtools-backend.onrender.com/api  
+🔗
 📚 **Deployment Guide**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 
 ---
