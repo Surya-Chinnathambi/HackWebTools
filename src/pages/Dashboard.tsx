@@ -85,68 +85,68 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6 pb-16">
+        <div className="flex flex-col gap-xl pb-4xl">
             {/* Header */}
-            <div className="flex flex-col gap-2">
-                <h1 className="text-4xl font-bold flex items-center gap-3">
+            <div className="flex flex-col gap-sm">
+                <h1 className="heading-1 flex items-center gap-md">
                     <BarChart3 className="h-10 w-10 text-red-600" />
                     Security Operations Dashboard
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="body-large text-muted-foreground">
                     Real-time security metrics, vulnerability tracking, and compliance monitoring
                 </p>
             </div>
 
             {/* Key Metrics */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border-l-4 border-l-red-600">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="grid gap-lg md:grid-cols-2 lg:grid-cols-4">
+                <Card className="card-interactive border-l-4 border-l-red-600">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-sm">
                         <CardTitle className="text-sm font-medium">Overall Security Score</CardTitle>
                         <Shield className="h-4 w-4 text-red-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{securityMetrics.overallScore}%</div>
-                        <Progress value={securityMetrics.overallScore} className="mt-2" />
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <Progress value={securityMetrics.overallScore} className="mt-sm" />
+                        <p className="text-xs text-muted-foreground mt-sm">
                             +5% from last month
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-orange-600">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Card className="card-interactive border-l-4 border-l-orange-600">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-sm">
                         <CardTitle className="text-sm font-medium">Critical Vulnerabilities</CardTitle>
                         <AlertTriangle className="h-4 w-4 text-orange-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{securityMetrics.criticalVulns}</div>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-sm">
                             {securityMetrics.highVulns} high, {securityMetrics.mediumVulns} medium
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-green-600">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Card className="card-interactive border-l-4 border-l-green-600">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-sm">
                         <CardTitle className="text-sm font-medium">Resolved This Week</CardTitle>
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{securityMetrics.resolvedThisWeek}</div>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-sm">
                             Avg: {securityMetrics.avgResolutionTime}
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="border-l-4 border-l-blue-600">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Card className="card-interactive border-l-4 border-l-blue-600">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-sm">
                         <CardTitle className="text-sm font-medium">Active Scans</CardTitle>
                         <Activity className="h-4 w-4 text-blue-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{activeScans}</div>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-xs text-muted-foreground mt-sm">
                             {todayScans} completed today
                         </p>
                     </CardContent>
@@ -162,18 +162,18 @@ const Dashboard = () => {
                 </TabsList>
 
                 {/* Vulnerabilities Tab */}
-                <TabsContent value="vulnerabilities" className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <Card>
+                <TabsContent value="vulnerabilities" className="space-y-lg">
+                    <div className="grid gap-lg md:grid-cols-2">
+                        <Card className="card-base">
                             <CardHeader>
                                 <CardTitle>Top Critical Vulnerabilities</CardTitle>
                                 <CardDescription>Prioritized by CVSS score and impact</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-3">
+                            <CardContent className="space-y-md">
                                 {topVulnerabilities.map((vuln, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent transition-colors">
+                                    <div key={idx} className="flex items-center justify-between p-md border rounded-lg hover:bg-accent transition-colors">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
+                                            <div className="flex items-center gap-sm mb-xs">
                                                 <Badge variant="outline" className="text-xs">{vuln.cve}</Badge>
                                                 <Badge className={`${getSeverityColor(vuln.cvss)} text-white text-xs`}>
                                                     {vuln.cvss}
@@ -190,14 +190,14 @@ const Dashboard = () => {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="card-base">
                             <CardHeader>
                                 <CardTitle>Vulnerability Distribution</CardTitle>
                                 <CardDescription>By severity level</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-lg">
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center justify-between mb-sm">
                                         <span className="text-sm font-medium flex items-center gap-2">
                                             <span className="h-3 w-3 bg-red-600 rounded-full" />
                                             Critical
@@ -345,8 +345,8 @@ const Dashboard = () => {
                                 {recentActivity.map((activity, idx) => (
                                     <div key={idx} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-accent transition-colors">
                                         <div className={`p-2 rounded-full ${activity.type === "scan" ? "bg-blue-100 dark:bg-blue-950" :
-                                                activity.type === "threat" ? "bg-red-100 dark:bg-red-950" :
-                                                    "bg-green-100 dark:bg-green-950"
+                                            activity.type === "threat" ? "bg-red-100 dark:bg-red-950" :
+                                                "bg-green-100 dark:bg-green-950"
                                             }`}>
                                             {activity.type === "scan" && <Target className="h-4 w-4 text-blue-600" />}
                                             {activity.type === "threat" && <AlertTriangle className="h-4 w-4 text-red-600" />}

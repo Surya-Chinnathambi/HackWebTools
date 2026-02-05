@@ -9,6 +9,11 @@ import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ValidatedInput from "@/components/ValidatedInput";
+import InfoTooltip from "@/components/InfoTooltip";
+import FeedbackMessage from "@/components/FeedbackMessage";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { validators } from "@/utils/validators";
 
 const XSSTester = () => {
     const [payload, setPayload] = useState("");

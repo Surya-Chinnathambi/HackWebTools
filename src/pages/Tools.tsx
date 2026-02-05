@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Search, X, Shield, Zap, Lock, Target, Globe, Code, Wrench, GraduationCap, Layers } from "lucide-react";
 import ToolCard from "@/components/ToolCard";
 import ToolCardSkeleton from "@/components/ToolCardSkeleton";
+import EnhancedEmptyState from "@/components/EnhancedEmptyState";
+import InfoTooltip from "@/components/InfoTooltip";
 import { getAllTools, toolsCategories, getToolsByCategory } from "@/utils/toolsData";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -84,34 +86,34 @@ const Tools = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-16">
+    <div className="flex flex-col gap-2xl pb-4xl">
       {/* Enhanced Header with Gradient */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-600 via-orange-600 to-rose-600 p-8 md:p-12 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-600 via-orange-600 to-rose-600 p-2xl md:p-3xl text-white shadow-2xl">
         <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
+        <div className="relative z-10 flex flex-col gap-lg">
+          <div className="flex items-center gap-md">
+            <div className="p-md bg-white/20 backdrop-blur-sm rounded-xl">
               <Wrench className="h-8 w-8" />
             </div>
             <div>
-              <h1 className="font-bold text-4xl md:text-5xl bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent">
+              <h1 className="heading-1 bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent">
                 Security Tools Arsenal
               </h1>
-              <p className="text-white/90 mt-2 text-sm md:text-base">
+              <p className="body-large text-white/90 mt-sm">
                 Professional-grade penetration testing and security assessment tools
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 mt-4">
-            <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2 border border-white/20">
+          <div className="flex flex-wrap gap-lg mt-lg">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg px-lg py-md border border-white/20">
               <div className="text-2xl font-bold">{getAllTools().length}</div>
               <div className="text-xs text-white/80">Total Tools</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg px-lg py-md border border-white/20">
               <div className="text-2xl font-bold">{toolsCategories.length}</div>
               <div className="text-xs text-white/80">Categories</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg px-lg py-md border border-white/20">
               <div className="text-2xl font-bold">{filteredTools.length}</div>
               <div className="text-xs text-white/80">Showing</div>
             </div>
@@ -120,10 +122,11 @@ const Tools = () => {
       </div>
 
       {/* Enhanced Filters with Icons */}
-      <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-xl">
+        <div className="flex items-center gap-sm">
           <Shield className="h-5 w-5 text-red-600" />
-          <h2 className="text-xl font-semibold">Filter by Category</h2>
+          <h2 className="heading-3">Filter by Category</h2>
+          <InfoTooltip content="Browse tools by security testing category. Each category contains specialized tools for different phases of penetration testing." />
         </div>
         <Tabs
           defaultValue={activeCategory}
@@ -179,12 +182,12 @@ const Tools = () => {
       </div>
 
       {/* Enhanced Results summary */}
-      <div className="flex items-center justify-between bg-muted/30 rounded-lg px-4 py-3 border">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-red-600/10 rounded-lg">
+      <div className="flex items-center justify-between bg-muted/30 rounded-lg px-lg py-md border">
+        <div className="flex items-center gap-sm">
+          <div className="p-sm bg-red-600/10 rounded-lg">
             <Target className="h-4 w-4 text-red-600" />
           </div>
-          <p className="text-sm font-medium">
+          <p className="body-normal font-medium">
             Showing <span className="text-red-600 font-bold">{filteredTools.length}</span> {filteredTools.length === 1 ? 'tool' : 'tools'}
             {searchQuery && (
               <span className="text-muted-foreground"> matching "<strong className="text-foreground">{searchQuery}</strong>"</span>
@@ -199,7 +202,7 @@ const Tools = () => {
       {/* Enhanced Tools grid with animations */}
       {filteredTools.length > 0 ? (
         <div className={cn(
-          "grid gap-6",
+          "grid gap-xl",
           "grid-cols-1",
           "sm:grid-cols-2",
           "lg:grid-cols-3",
@@ -244,33 +247,22 @@ const Tools = () => {
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border-2 border-dashed bg-muted/20">
-          <div className="p-6 bg-red-600/10 rounded-full mb-6">
-            <Search className="h-16 w-16 text-red-600" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">No tools found</h2>
-          <p className="text-muted-foreground mt-2 max-w-lg mb-6">
-            We couldn't find any tools that match your search criteria.
-            Try adjusting your filters or search query.
-          </p>
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setSearchQuery("")}
-            >
-              Clear Search
-            </Button>
-            <Button
-              className="bg-gradient-to-r from-red-600 to-orange-600 text-white hover:shadow-lg"
-              onClick={() => {
-                setSearchQuery("");
-                setActiveCategory("all");
-              }}
-            >
-              Show All Tools
-            </Button>
-          </div>
-        </div>
+        <EnhancedEmptyState
+          icon={Search}
+          title="No tools found"
+          description="We couldn't find any tools that match your search criteria. Try adjusting your filters or search query."
+          action={{
+            label: "Show All Tools",
+            onClick: () => {
+              setSearchQuery("");
+              setActiveCategory("all");
+            },
+          }}
+          secondaryAction={{
+            label: "Clear Search",
+            onClick: () => setSearchQuery(""),
+          }}
+        />
       )}
     </div>
   );
