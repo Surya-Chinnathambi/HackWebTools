@@ -176,6 +176,19 @@
     animation: float 4s ease-in-out infinite;
   }
 
+  /* Performance: GPU-accelerated animations */
+  .card-hover,
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down {
+    will-change: transform, opacity;
+  }
+
+  /* Remove will-change after animation completes */
+  .card-hover:not(:hover) {
+    will-change: auto;
+  }
+
   /* Accessibility: Proper focus indicators */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary ring-0;
@@ -240,6 +253,23 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Performance: Content visibility for off-screen content */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
   }
 }
 

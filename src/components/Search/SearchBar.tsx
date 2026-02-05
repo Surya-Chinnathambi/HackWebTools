@@ -19,7 +19,7 @@ const SearchBar = () => {
     if (isActive && inputRef.current) {
       inputRef.current.focus();
     }
-    
+
     // Close search results when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -38,11 +38,11 @@ const SearchBar = () => {
     }
 
     const allTools = getAllTools();
-    
+
     const filteredResults = allTools.filter((tool) =>
       tool.name.toLowerCase().includes(query.toLowerCase()) ||
       tool.description.toLowerCase().includes(query.toLowerCase()) ||
-      (tool.tags && tool.tags.some(tag => 
+      (tool.tags && tool.tags.some(tag =>
         tag.toLowerCase().includes(query.toLowerCase())
       ))
     ).slice(0, 6); // Limit to 6 results
@@ -65,7 +65,7 @@ const SearchBar = () => {
   return (
     <div ref={searchRef} className="relative w-full">
       <div className="relative">
-        <Search 
+        <Search
           className={cn(
             "absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground",
             isActive && "text-primary"
@@ -106,7 +106,7 @@ const SearchBar = () => {
       </div>
 
       {isActive && results.length > 0 && (
-        <div 
+        <div
           id="search-results"
           className="absolute top-full mt-1 w-full z-10 bg-popover/95 backdrop-blur-sm text-popover-foreground shadow-lg rounded-md overflow-hidden border animate-fade-in"
           role="listbox"

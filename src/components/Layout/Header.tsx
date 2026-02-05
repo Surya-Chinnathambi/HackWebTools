@@ -235,9 +235,9 @@ const Header = () => {
             <div className="hidden xl:block w-[250px]">
               <Popover open={searchOpen} onOpenChange={setSearchOpen}>
                 <PopoverTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start text-sm text-muted-foreground" 
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-sm text-muted-foreground"
                     onClick={toggleSearch}
                     aria-label="Open search"
                   >
@@ -260,9 +260,9 @@ const Header = () => {
             </div>
 
             <Button variant="ghost" size="icon" asChild className="hidden lg:flex">
-              <a 
-                href="https://github.com/Surya-Chinnathambi/HackWebTools" 
-                target="_blank" 
+              <a
+                href="https://github.com/Surya-Chinnathambi/HackWebTools"
+                target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View project on GitHub (opens in new tab)"
               >

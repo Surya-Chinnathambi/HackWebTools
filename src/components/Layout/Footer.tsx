@@ -12,17 +12,17 @@ const Footer = () => {
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Data sourced from{" "}
-            <a 
-              href="https://github.com/aw-junaid/Hacking-Tools" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              href="https://github.com/aw-junaid/Hacking-Tools"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hover:underline text-primary transition-colors"
             >
               Surya-Chinnathambi repository
             </a>
           </p>
         </div>
-        
+
         <nav className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-6" aria-label="Footer navigation">
           <Link
             to="/tools"
@@ -31,7 +31,7 @@ const Footer = () => {
             <Book size={16} />
             <span>Tools</span>
           </Link>
-          
+
           <Link
             to="/payloads"
             className="text-sm flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1"
@@ -39,7 +39,7 @@ const Footer = () => {
             <Code size={16} />
             <span>Payloads</span>
           </Link>
-          
+
           <Link
             to="/xss"
             className="text-sm flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1"
@@ -47,7 +47,7 @@ const Footer = () => {
             <Shield size={16} />
             <span>XSS</span>
           </Link>
-          
+
           <a
             href="https://github.com/Surya-Chinnathambi/HackWebTools"
             target="_blank"

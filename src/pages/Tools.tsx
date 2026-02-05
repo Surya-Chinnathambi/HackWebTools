@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, Shield, Zap, Lock, Target, Globe, Code, Wrench, GraduationCap, Layers } from "lucide-react";
 import ToolCard from "@/components/ToolCard";
+import ToolCardSkeleton from "@/components/ToolCardSkeleton";
 import { getAllTools, toolsCategories, getToolsByCategory } from "@/utils/toolsData";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const Tools = () => {
   const location = useLocation();
@@ -18,6 +20,19 @@ const Tools = () => {
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredTools, setFilteredTools] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Debounce search query to reduce filtering operations
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Simulate loading (in real app, this would be actual data fetching)
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [activeCategory]);
 
   // Update URL when category changes
   useEffect(() => {
@@ -28,24 +43,25 @@ const Tools = () => {
     }
   }, [activeCategory, navigate]);
 
-  // Filter tools based on category and search query
+  // Filter tools based on category and debounced search query
   useEffect(() => {
     let tools = activeCategory === "all"
       ? getAllTools()
       : getToolsByCategory(activeCategory);
 
-    if (searchQuery) {
+    if (debouncedSearchQuery) {
       tools = tools.filter((tool) =>
-        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
         (tool.tags && tool.tags.some(tag =>
-          tag.toLowerCase().includes(searchQuery.toLowerCase())
+          tag.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         ))
       );
     }
 
     setFilteredTools(tools);
-  }, [activeCategory, searchQuery]);
+    setIsLoading(false);
+  }, [activeCategory, debouncedSearchQuery]);
 
   const handleCategoryChange = (value: string) => {
     setActiveCategory(value);
@@ -190,25 +206,42 @@ const Tools = () => {
           "2xl:grid-cols-4",
           "animate-fade-in"
         )}>
-          {filteredTools.map((tool, index) => (
-            <div
-              key={tool.id}
-              style={{
-                animationDelay: `${index * 50}ms`,
-                animationFillMode: 'backwards'
-              }}
-              className="animate-fade-in"
-            >
-              <ToolCard
-                id={tool.id}
-                name={tool.name}
-                description={tool.description}
-                category={tool.category}
-                tags={tool.tags}
-                githubUrl={tool.githubUrl}
-              />
-            </div>
-          ))}
+          {isLoading ? (
+            // Show skeleton loaders while loading
+            [...Array(8)].map((_, index) => (
+              <div
+                key={`skeleton-${index}`}
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  animationFillMode: 'backwards'
+                }}
+                className="animate-fade-in"
+              >
+                <ToolCardSkeleton />
+              </div>
+            ))
+          ) : (
+            // Show actual tool cards when loaded
+            filteredTools.map((tool, index) => (
+              <div
+                key={tool.id}
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  animationFillMode: 'backwards'
+                }}
+                className="animate-fade-in content-visibility-auto"
+              >
+                <ToolCard
+                  id={tool.id}
+                  name={tool.name}
+                  description={tool.description}
+                  category={tool.category}
+                  tags={tool.tags}
+                  githubUrl={tool.githubUrl}
+                />
+              </div>
+            ))
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-center rounded-2xl border-2 border-dashed bg-muted/20">
