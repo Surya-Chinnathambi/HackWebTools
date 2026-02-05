@@ -603,19 +603,79 @@ export const toolsCategories: ToolCategory[] = [
         usage: "Hashcat is used for high-speed password cracking with GPU acceleration",
         examples: [
           {
-            title: "Basic MD5 cracking",
+            title: "Basic MD5 cracking with wordlist",
             code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt"
           },
           {
-            title: "Brute force attack",
+            title: "Brute force attack (6 chars, all characters)",
             code: "hashcat -m 0 -a 3 hashes.txt ?a?a?a?a?a?a"
           },
           {
-            title: "Rule-based attack",
+            title: "Rule-based attack with best64 rules",
             code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt -r rules/best64.rule"
+          },
+          {
+            title: "Crack Windows NTLM hashes",
+            code: "hashcat -m 1000 -a 0 ntlm.txt rockyou.txt"
+          },
+          {
+            title: "Crack bcrypt hashes",
+            code: "hashcat -m 3200 -a 0 bcrypt.txt wordlist.txt"
+          },
+          {
+            title: "Crack WPA/WPA2 handshakes",
+            code: "hashcat -m 22000 -a 0 capture.hc22000 wordlist.txt"
+          },
+          {
+            title: "Mask attack with known pattern (Password + 3 digits)",
+            code: "hashcat -m 0 -a 3 hashes.txt Password?d?d?d"
+          },
+          {
+            title: "Hybrid wordlist + mask attack",
+            code: "hashcat -m 0 -a 6 hashes.txt wordlist.txt ?d?d?d?d"
+          },
+          {
+            title: "Combination attack (two wordlists)",
+            code: "hashcat -m 0 -a 1 hashes.txt wordlist1.txt wordlist2.txt"
+          },
+          {
+            title: "Use multiple GPUs",
+            code: "hashcat -m 0 -a 0 -d 1,2,3 hashes.txt wordlist.txt"
+          },
+          {
+            title: "Show cracked passwords",
+            code: "hashcat -m 0 hashes.txt --show"
+          },
+          {
+            title: "Benchmark all hash types",
+            code: "hashcat -b"
+          },
+          {
+            title: "Session management (resume)",
+            code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt --session=mysession\\nhashcat --session=mysession --restore"
+          },
+          {
+            title: "Increment mode (try 1-8 character passwords)",
+            code: "hashcat -m 0 -a 3 hashes.txt --increment --increment-min=1 --increment-max=8 ?a?a?a?a?a?a?a?a"
+          },
+          {
+            title: "Custom charset definition",
+            code: "hashcat -m 0 -a 3 hashes.txt -1 ?l?u?d ?1?1?1?1?1?1?1?1"
+          },
+          {
+            title: "Potfile output (save cracked hashes)",
+            code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt --potfile-path=custom.pot"
+          },
+          {
+            title: "Crack with multiple rules",
+            code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt -r rules/best64.rule -r rules/toggles1.rule"
+          },
+          {
+            title: "Hash cracking with status updates",
+            code: "hashcat -m 0 -a 0 hashes.txt wordlist.txt --status --status-timer=10"
           }
         ],
-        documentation: "Hashcat is the world's fastest and most advanced password recovery utility, supporting five unique attack modes for over 300 highly-optimized hashing algorithms. It features both CPU and GPU acceleration, multi-hash and multi-OS support.",
+        documentation: "Hashcat is the world's fastest password recovery tool, holding multiple world records for speed. Created by Jens 'atom' Steube, it's the first and only password cracker to support GPU acceleration with native OpenCL and CUDA support. It supports over 350 hash algorithms and five attack modes.\\n\\nSupported Hash Algorithms (350+):\\n• Raw Hashes: MD4, MD5, SHA1, SHA2-224/256/384/512, SHA3, BLAKE2\\n• Salted Hashes: MD5(salt.pass), sha1(salt.pass), custom salt positions\\n• Iterated Hashes: PBKDF2-HMAC-SHA1/SHA256/SHA512, bcrypt, scrypt\\n• Operating Systems: Unix crypt, macOS, Windows LM/NTLM/NTLMv2\\n• Network Protocols: NetNTLMv1/v2, Kerberos 5 TGS-REP, IKE-PSK, WPA/WPA2\\n• Applications: 7-Zip, RAR3/RAR5, ZIP, Office, PDF, Bitcoin, Ethereum\\n• Database Systems: MySQL, PostgreSQL, Oracle, MSSQL, MongoDB\\n• Web Applications: WordPress, Joomla, Drupal, phpBB3, Django\\n• VPN/Network: Cisco IOS, Juniper, IPsec, IKEv2, PPTP\\n\\nAttack Modes:\\n• Straight (-a 0): Dictionary attack with optional rules\\n  • Simple wordlist processing\\n  • Combine with rules for mutations\\n  • Most common and efficient mode\\n  • Example: hashcat -m 0 -a 0 hash.txt rockyou.txt\\n• Combination (-a 1): Combine words from two wordlists\\n  • Joins word1 + word2\\n  • Effective for compound passwords\\n  • Example: password + 123 = password123\\n  • Can generate massive candidates\\n• Brute-force (-a 3): Try all combinations (mask attack)\\n  • Position-specific character sets\\n  • Masks: ?l (lower), ?u (upper), ?d (digit), ?s (special), ?a (all)\\n  • Example: Password?d?d?d?d\\n  • Use --increment for variable length\\n• Hybrid Wordlist+Mask (-a 6): Wordlist followed by mask\\n  • Append brute-force to dictionary words\\n  • Example: password + ?d?d?d = password123\\n  • Efficient for known patterns\\n• Hybrid Mask+Wordlist (-a 7): Mask followed by wordlist\\n  • Prepend brute-force to dictionary words\\n  • Example: ?d?d?d + password = 123password\\n\\nGPU Acceleration:\\n• OpenCL: Cross-platform (AMD, NVIDIA, Intel)\\n• CUDA: NVIDIA-specific (often faster than OpenCL)\\n• Multi-GPU: Use -d flag to specify devices\\n• Workload Tuning: -w 1-4 (1=low, 4=nightmare)\\n• Performance: 100-1000x faster than CPU\\n• Power Usage: Monitor temps with --hwmon-temp-abort\\n• Memory: Hash tables loaded into GPU VRAM\\n\\nRule-Based Attacks:\\n• Built-in Rules: best64.rule, dive.rule, generated.rule, toggles*.rule\\n• Operations:\\n  • Append/Prepend: $1, $!, ^1, ^!\\n  • Replace: sa@ (replace a with @)\\n  • Case: u (uppercase), l (lowercase), c (capitalize)\\n  • Duplicate: d (double word)\\n  • Reverse: r\\n  • Delete: [ (first char), ] (last char)\\n• Custom Rules: Create in .rule files\\n• Multiple Rules: Stack with multiple -r flags\\n• Rule Generator: Generate rules based on patterns\\n\\nMask Attack Charsets:\\n• Built-in:\\n  • ?l = lowercase (abcdefghijklmnopqrstuvwxyz)\\n  • ?u = uppercase (ABCDEFGHIJKLMNOPQRSTUVWXYZ)\\n  • ?d = digits (0123456789)\\n  • ?s = special (!\\\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~)\\n  • ?a = all printable ASCII\\n  • ?b = all bytes (0x00-0xFF)\\n• Custom Charsets: -1, -2, -3, -4\\n  • Example: -1 ?l?u -2 ?d?s (charset 1 = letters, charset 2 = digits+special)\\n  • Use in mask: ?1?1?1?1?2?2\\n\\nIncrement Mode:\\n• Variable length attacks\\n• --increment: Enable increment mode\\n• --increment-min: Starting length\\n• --increment-max: Maximum length\\n• Example: Try 1-8 character passwords\\n• Significantly increases attack time\\n\\nSession Management:\\n• --session=NAME: Create named session\\n• --restore: Resume crashed/stopped session\\n• Auto-save every 10 seconds\\n• Checkpoint/restore functionality\\n• Potfile: Stores cracked hashes (.pot)\\n• Skip cracked hashes automatically\\n\\nPotfile Management:\\n• Default: hashcat.potfile\\n• Custom: --potfile-path=custom.pot\\n• Format: hash:password\\n• Automatic deduplication\\n• --show: Display cracked passwords\\n• --left: Show uncracked hashes\\n• --username: Include usernames in output\\n\\nPerformance Tuning:\\n• Workload Profiles (-w):\\n  • 1: Low (Desktop usable, slower)\\n  • 2: Default (Balanced)\\n  • 3: High (Desktop laggy)\\n  • 4: Nightmare (System unresponsive, fastest)\\n• Kernel Accel (-n): Workload size\\n• Kernel Loops (-u): Iteration count\\n• --force: Bypass warnings (use cautiously)\\n• --backend-devices: Select specific GPUs\\n\\nHash Mode Selection (-m):\\n• 0: MD5\\n• 100: SHA1\\n• 1000: NTLM\\n• 1400: SHA2-256\\n• 1700: SHA2-512\\n• 1800: Unix crypt SHA-512\\n• 3200: bcrypt\\n• 22000: WPA-PBKDF2-PMKID+EAPOL\\n• Full list: hashcat --help | grep -i 'mode'\\n\\nBenchmarking:\\n• --benchmark (-b): Test all algorithms\\n• --benchmark-all: Include slow algorithms\\n• Shows hashes/second per algorithm\\n• Use to select optimal workload\\n• Compare CPU vs GPU performance\\n\\nOutput Options:\\n• --outfile: Save cracked passwords to file\\n• --outfile-format: Custom output format\\n  • 1: hash\\n  • 2: plain\\n  • 3: hash:plain\\n  • 5: hash:plain:hex_plain\\n• --status: Display status screen\\n• --status-timer: Update interval (seconds)\\n• --quiet: Suppress output\\n• --remove: Remove cracked hashes from input\\n\\nBest Practices:\\n• Start with straight attack + rules (fastest)\\n• Use increment mode cautiously (exponential time)\\n• Monitor GPU temperature (--hwmon-temp-abort=90)\\n• Use workload profile 3 or 4 for dedicated machines\\n• Keep potfile backed up\\n• Use sessions for long-running attacks\\n• Benchmark before production use\\n• Update regularly for new hash support\\n• Use multiple GPUs for massive jobs\\n• Combine masks with knowledge (known patterns)\\n\\nCommon Pitfalls:\\n• Wrong hash mode (-m) selection\\n• Not using rules with dictionaries\\n• Increment mode on large keyspace (years to complete)\\n• Overheating GPUs without monitoring\\n• Forgetting to check potfile before restarting\\n• Using workload 4 on desktop workstation\\n• Not using session for long attacks\\n• Inefficient mask patterns\\n• Ignoring benchmark results\\n\\nIntegration:\\n• John the Ripper: Complementary CPU-focused tool\\n• Hashcat-utils: Preprocessing utilities\\n• PACK: Password analysis and cracking kit\\n• Mentalist: GUI for wordlist generation\\n• Crunch: Custom wordlist generator\\n• CeWL: Website word scraper\\n• Cain & Abel: Windows hash extraction\\n\\nReal-World Applications:\\n• Penetration Testing: Crack captured hashes\\n• Security Audits: Test password strength\\n• Forensics: Recover passwords from seized systems\\n• Red Team: Post-exploitation credential access\\n• WiFi Security: WPA/WPA2 handshake cracking\\n• Cloud Security: Test credential policies\\n• Compliance: Validate password complexity (PCI DSS, NIST)\\n• Incident Response: Analyze compromised credentials\\n\\nAdvanced Techniques:\\n• Rule Stacking: Multiple rule files for complex mutations\\n• Hybrid Attacks: Combine wordlist with masks\\n• Prince Attack: Password candidate generator\\n• Combinator Attack: Combine multiple wordlists\\n• Toggle Case: Try all case combinations\\n• Custom Charsets: Language-specific characters\\n• Markov Chains: Probability-based generation\\n• PACK Statsprocessor: Statistics-based masks\\n\\nLegal and Ethical Considerations:\\n• Only crack hashes you own or have authorization\\n• Document authorization before engagement\\n• Comply with local laws regarding security testing\\n• Follow responsible disclosure for findings\\n• Securely dispose of captured hashes after testing",
         githubUrl: "https://github.com/hashcat/hashcat",
         tags: ["password", "hash", "cracking", "GPU", "acceleration"]
       }
