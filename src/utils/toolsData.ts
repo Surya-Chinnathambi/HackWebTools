@@ -1523,11 +1523,67 @@ export const toolsCategories: ToolCategory[] = [
           },
           {
             title: "Create new project",
-            code: "File > New Project"
+            code: "File > New Project > Non-Shared Project > Choose location"
           },
           {
             title: "Import binary",
-            code: "File > Import File"
+            code: "File > Import File > Select binary > Analyze? Yes"
+          },
+          {
+            title: "Auto analyze (after import)",
+            code: "Analysis > Auto Analyze > Select analyzers > Analyze"
+          },
+          {
+            title: "Navigate to function",
+            code: "Symbol Tree > Functions > Double-click function name"
+          },
+          {
+            title: "View decompiled code",
+            code: "Window > Decompile (or press Ctrl+E)"
+          },
+          {
+            title: "Search for strings",
+            code: "Search > For Strings > Set minimum length > Search"
+          },
+          {
+            title: "Find cross-references",
+            code: "Right-click function/variable > References > Show References to"
+          },
+          {
+            title: "Rename function/variable",
+            code: "Right-click > Rename Function (or press L key)"
+          },
+          {
+            title: "Add comment",
+            code: "Right-click instruction > Comments > Set Pre Comment (or press ;)"
+          },
+          {
+            title: "View call graph",
+            code: "Right-click function > References > Show Call Tree"
+          },
+          {
+            title: "Compare functions",
+            code: "Tools > Function Comparison"
+          },
+          {
+            title: "Export to C header",
+            code: "File > Export Program > C/C++ > Export"
+          },
+          {
+            title: "Scripting - Python",
+            code: "Window > Script Manager > New > Python > Write script"
+          },
+          {
+            title: "Version tracking (compare binaries)",
+            code: "Tools > Version Tracking > New Session"
+          },
+          {
+            title: "Patch instruction",
+            code: "Right-click instruction > Patch Instruction"
+          },
+          {
+            title: "Batch import multiple files",
+            code: "File > Batch Import"
           }
         ],
         documentation: "Ghidra is a software reverse engineering (SRE) framework created and maintained by the National Security Agency. It includes a suite of full-featured, high-end software analysis tools that enable users to analyze compiled code on a variety of platforms including Windows, macOS, and Linux.",
