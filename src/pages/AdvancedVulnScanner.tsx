@@ -559,12 +559,7 @@ END OF REPORT
                                     <p className="text-sm font-medium text-red-700/80 dark:text-red-300/80 mt-2">
                                         / 100 {scanResults.riskScore >= 75 ? "🔴 Critical" : scanResults.riskScore >= 50 ? "🟠 High" : "🟡 Medium"} Risk
                                     </p>
-                                    <div className="mt-3 h-2 bg-red-200 dark:bg-red-900 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-red-600 to-pink-600 transition-all duration-1000"
-                                            style={{ width: `${scanResults.riskScore}%` }}
-                                        />
-                                    </div>
+                                    <div className="mt-3 h-2 bg-red-200 dark:bg-red-900 rounded-full overflow-hidden\">\n                                        <div\n                                            className=\"h-full bg-gradient-to-r from-red-600 to-pink-600 transition-all duration-1000\"\n                                            style={{ width: `${Math.min(100, Math.max(0, scanResults.riskScore))}%` } as React.CSSProperties}\n                                        />\n                                    </div>
                                 </CardContent>
                             </Card>
 

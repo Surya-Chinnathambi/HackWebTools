@@ -433,7 +433,7 @@ const HashCracker = () => {
                                     <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                                         <div
                                             className="bg-primary rounded-full h-2 transition-all duration-300"
-                                            style={{ width: `${progress}%` }}
+                                            style={{ width: `${Math.min(100, Math.max(0, progress))}%` } as React.CSSProperties}
                                         />
                                     </div>
                                     {currentAttempt && (

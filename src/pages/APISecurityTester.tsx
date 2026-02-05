@@ -438,7 +438,7 @@ const APISecurityTester = () => {
                                     <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                                         <div
                                             className="bg-primary rounded-full h-2 transition-all duration-300"
-                                            style={{ width: `${scanProgress}%` }}
+                                            style={{ width: `${Math.min(100, Math.max(0, scanProgress))}%` } as React.CSSProperties}
                                         />
                                     </div>
                                 </div>

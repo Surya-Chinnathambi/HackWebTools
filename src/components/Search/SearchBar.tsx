@@ -89,8 +89,8 @@ const SearchBar = () => {
           onKeyDown={handleKeyDown}
           aria-label="Search documentation"
           aria-autocomplete="list"
-          aria-expanded={isActive && results.length > 0}
-          aria-controls={isActive && results.length > 0 ? "search-results" : undefined}
+          aria-expanded={isActive && results.length > 0 ? "true" : "false"}
+          aria-controls={isActive && results.length > 0 ? "search-results" : ""}
           role="combobox"
         />
         {query && (

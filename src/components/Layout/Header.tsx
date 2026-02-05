@@ -377,7 +377,7 @@ const Header = () => {
             onClick={toggleMenu}
             className="p-2 transition-transform hover:scale-110"
             aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isMenuOpen}
+            aria-expanded={isMenuOpen ? "true" : "false"}
             aria-controls="mobile-navigation"
           >
             {isMenuOpen ? (
