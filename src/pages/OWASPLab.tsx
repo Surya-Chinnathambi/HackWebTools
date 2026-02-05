@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,6 +7,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     Shield,
     AlertTriangle,
@@ -26,7 +29,17 @@ import {
     Server,
     Users,
     Clock,
-    TrendingUp
+    TrendingUp,
+    Zap,
+    Flame,
+    Award,
+    ChevronRight,
+    Copy,
+    Eye,
+    EyeOff,
+    Terminal,
+    Bug,
+    Layers
 } from "lucide-react";
 
 interface AttackerMotivation {
@@ -76,6 +89,34 @@ interface ExerciseResult {
     userInput: string;
     feedback: string;
     timestamp: string;
+    pointsEarned?: number;
+    timeSpent?: number;
+}
+
+interface CodePlayground {
+    id: string;
+    title: string;
+    description: string;
+    vulnerableCode: string;
+    secureCode: string;
+    language: string;
+    explanation: string;
+}
+
+interface AttackFlow {
+    step: number;
+    action: string;
+    payload: string;
+    result: string;
+    severity: "info" | "warning" | "danger";
+}
+
+interface UserProgress {
+    totalPoints: number;
+    level: number;
+    completedExercises: number;
+    streak: number;
+    badges: string[];
 }
 
 const owaspTop10: OWASPVulnerability[] = [
@@ -440,23 +481,162 @@ const OWASPLab = () => {
     const [exerciseResults, setExerciseResults] = useState<ExerciseResult[]>([]);
     const [showHint, setShowHint] = useState(false);
     const [showSolution, setShowSolution] = useState(false);
+    const [showCode, setShowCode] = useState(false);
+    const [activeCodeTab, setActiveCodeTab] = useState<"vulnerable" | "secure">("vulnerable");
+    const [userProgress, setUserProgress] = useState<UserProgress>({
+        totalPoints: 0,
+        level: 1,
+        completedExercises: 0,
+        streak: 0,
+        badges: []
+    });
+    const [showAttackFlow, setShowAttackFlow] = useState(false);
+    const [copySuccess, setCopySuccess] = useState(false);
+
+    // Code playground examples for each vulnerability
+    const codePlaygrounds: CodePlayground[] = [
+        {
+            id: "sqli-playground",
+            title: "SQL Injection Example",
+            description: "Compare vulnerable vs secure SQL query implementation",
+            language: "python",
+            vulnerableCode: `# VULNERABLE CODE
+def login(username, password):
+    query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
+    # Direct string concatenation - vulnerable to SQL injection
+    result = db.execute(query)
+    return result
+
+# Attack: username = "admin' --"
+# Result: Query becomes: SELECT * FROM users WHERE username='admin' --' AND password='...'`,
+            secureCode: `# SECURE CODE
+def login(username, password):
+    query = "SELECT * FROM users WHERE username=? AND password=?"
+    # Parameterized query - safe from SQL injection
+    result = db.execute(query, (username, password))
+    return result
+
+# Attack fails: Special characters are escaped automatically`,
+            explanation: "Use parameterized queries (prepared statements) instead of string concatenation. The database treats user input as data, not executable code."
+        },
+        {
+            id: "xss-playground",
+            title: "Cross-Site Scripting (XSS) Example",
+            description: "Compare vulnerable vs secure output encoding",
+            language: "javascript",
+            vulnerableCode: `// VULNERABLE CODE
+function displayComment(comment) {
+    document.getElementById('comments').innerHTML = comment;
+    // Directly inserts HTML - vulnerable to XSS
+}
+
+// Attack: comment = "<script>alert('XSS')</script>"
+// Result: Script executes in victim's browser`,
+            secureCode: `// SECURE CODE
+function displayComment(comment) {
+    const div = document.getElementById('comments');
+    div.textContent = comment; // Auto-escapes HTML
+    // Or use: div.innerText = comment;
+}
+
+// Attack fails: Script appears as text: "&lt;script&gt;alert('XSS')&lt;/script&gt;"`,
+            explanation: "Use textContent instead of innerHTML, or properly escape HTML entities. Never trust user input."
+        },
+        {
+            id: "auth-playground",
+            title: "Broken Authentication Example",
+            description: "Compare weak vs strong authentication",
+            language: "javascript",
+            vulnerableCode: `// VULNERABLE CODE
+const session = {
+    userId: request.body.userId, // User-controlled
+    isAdmin: false
+};
+
+// Later in admin panel:
+if (session.userId === adminId) {
+    // Grant admin access
+}
+
+// Attack: User modifies userId in session cookie`,
+            secureCode: `// SECURE CODE  
+const session = {
+    userId: authenticatedUserId, // Server-verified
+    isAdmin: user.role === 'admin',
+    sessionToken: crypto.randomUUID() // Signed token
+};
+
+// Verify session with server-side validation
+if (verifySession(session) && session.isAdmin) {
+    // Grant admin access
+}`,
+            explanation: "Never trust client-side data. Use server-side session management with signed tokens. Implement proper authentication checks."
+        }
+    ];
+
+    // Attack flow visualization
+    const getAttackFlow = (vulnerabilityId: number): AttackFlow[] => {
+        const flows: Record<number, AttackFlow[]> = {
+            3: [ // SQL Injection
+                { step: 1, action: "Identify input field", payload: "username field", result: "Found login form", severity: "info" },
+                { step: 2, action: "Test for SQL injection", payload: "' OR '1'='1", result: "Syntax error - vulnerable!", severity: "warning" },
+                { step: 3, action: "Exploit authentication", payload: "admin' --", result: "Bypassed login", severity: "danger" },
+                { step: 4, action: "Access admin panel", payload: "Navigate to /admin", result: "Full admin access gained", severity: "danger" }
+            ],
+            1: [ // Broken Access Control  
+                { step: 1, action: "Enumerate endpoints", payload: "GET /api/users/1", result: "View own profile", severity: "info" },
+                { step: 2, action: "Test parameter", payload: "GET /api/users/2", result: "Access denied", severity: "warning" },
+                { step: 3, action: "Bypass check", payload: "GET /api/admin/users/2", result: "Unauthorized access!", severity: "danger" },
+                { step: 4, action: "Extract data", payload: "Download user records", result: "Data breach complete", severity: "danger" }
+            ]
+        };
+        return flows[vulnerabilityId] || [];
+    };
 
     const runExercise = () => {
         if (!selectedExercise) return;
 
+        const startTime = Date.now();
         const isCorrect = userInput.trim().toLowerCase() === selectedExercise.solution.toLowerCase();
+        const timeSpent = Date.now() - startTime;
+
+        // Calculate points
+        let pointsEarned = 0;
+        if (isCorrect) {
+            const basePoints = selectedVulnerability.difficulty === "beginner" ? 10 :
+                selectedVulnerability.difficulty === "intermediate" ? 25 : 50;
+            const hintPenalty = showHint ? basePoints * 0.3 : 0;
+            const solutionPenalty = showSolution ? basePoints * 0.5 : 0;
+            pointsEarned = Math.round(basePoints - hintPenalty - solutionPenalty);
+
+            // Update progress
+            setUserProgress(prev => ({
+                ...prev,
+                totalPoints: prev.totalPoints + pointsEarned,
+                completedExercises: prev.completedExercises + 1,
+                level: Math.floor((prev.totalPoints + pointsEarned) / 100) + 1
+            }));
+        }
 
         const result: ExerciseResult = {
             exerciseId: selectedExercise.id,
             success: isCorrect,
             userInput,
             feedback: isCorrect
-                ? `✅ ${selectedExercise.expectedOutput}`
+                ? `✅ ${selectedExercise.expectedOutput} | +${pointsEarned} points!`
                 : `❌ Incorrect. The input doesn't exploit the vulnerability correctly.`,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            pointsEarned,
+            timeSpent
         };
 
         setExerciseResults([result, ...exerciseResults]);
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
     };
 
     const resetExercise = () => {
@@ -509,482 +689,657 @@ const OWASPLab = () => {
             </Alert>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
+                <Card className="border-2 border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-2">
                             <Trophy className="h-8 w-8 mx-auto text-yellow-600" />
-                            <div className="text-2xl font-bold">{completedCount}/{totalExercises}</div>
-                            <div className="text-sm text-muted-foreground">Completed</div>
+                            <div className="text-3xl font-bold text-yellow-700">{userProgress.level}</div>
+                            <div className="text-sm text-muted-foreground">Security Level</div>
+                            <Progress value={(userProgress.totalPoints % 100)} className="h-2" />
+                            <div className="text-xs text-muted-foreground">
+                                {userProgress.totalPoints % 100}/100 XP to next level
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-2">
-                            <Target className="h-8 w-8 mx-auto text-primary" />
-                            <div className="text-2xl font-bold">{exerciseResults.length}</div>
-                            <div className="text-sm text-muted-foreground">Attempts</div>
+                            <Zap className="h-8 w-8 mx-auto text-blue-600" />
+                            <div className="text-3xl font-bold text-blue-700">{userProgress.totalPoints}</div>
+                            <div className="text-sm text-muted-foreground">Total Points</div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-2">
                             <CheckCircle2 className="h-8 w-8 mx-auto text-green-600" />
-                            <div className="text-2xl font-bold">{successRate.toFixed(0)}%</div>
-                            <div className="text-sm text-muted-foreground">Success Rate</div>
+                            <div className="text-3xl font-bold text-green-700">{completedCount}/{totalExercises}</div>
+                            <div className="text-sm text-muted-foreground">Exercises Completed</div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
                     <CardContent className="pt-6">
                         <div className="text-center space-y-2">
-                            <Shield className="h-8 w-8 mx-auto text-blue-600" />
-                            <div className="text-2xl font-bold">10</div>
-                            <div className="text-sm text-muted-foreground">OWASP Top 10</div>
+                            <Flame className="h-8 w-8 mx-auto text-purple-600" />
+                            <div className="text-3xl font-bold text-purple-700">{userProgress.streak}</div>
+                            <div className="text-sm text-muted-foreground">Day Streak</div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+            <div className="text-sm text-muted-foreground">OWASP Top 10</div>
+        </div>
+                    </CardContent >
+                </Card >
+            </div >
 
-            <Tabs defaultValue="learn" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="learn">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Learn
-                    </TabsTrigger>
-                    <TabsTrigger value="practice">
-                        <Code className="h-4 w-4 mr-2" />
-                        Practice
-                    </TabsTrigger>
-                    <TabsTrigger value="results">
-                        <Trophy className="h-4 w-4 mr-2" />
-                        Progress
-                    </TabsTrigger>
-                </TabsList>
+    <Tabs defaultValue="learn" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="learn">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Learn
+            </TabsTrigger>
+            <TabsTrigger value="practice">
+                <Code className="h-4 w-4 mr-2" />
+                Practice
+            </TabsTrigger>
+            <TabsTrigger value="results">
+                <Trophy className="h-4 w-4 mr-2" />
+                Progress
+            </TabsTrigger>
+        </TabsList>
 
-                {/* Learn Tab */}
-                <TabsContent value="learn" className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div className="lg:col-span-1 space-y-2">
-                            <h3 className="font-semibold text-sm text-muted-foreground uppercase">
-                                OWASP Top 10 2021
-                            </h3>
-                            <div className="space-y-1">
-                                {owaspTop10.map((vuln) => (
-                                    <Button
-                                        key={vuln.id}
-                                        onClick={() => setSelectedVulnerability(vuln)}
-                                        variant={selectedVulnerability.id === vuln.id ? "default" : "outline"}
-                                        className="w-full justify-start text-left"
-                                        size="sm"
-                                    >
-                                        <span className="font-mono mr-2">{vuln.rank}</span>
-                                        <span className="truncate">{vuln.title}</span>
-                                    </Button>
-                                ))}
+        {/* Learn Tab */}
+        <TabsContent value="learn" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-1 space-y-2">
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+                        OWASP Top 10 2021
+                    </h3>
+                    <div className="space-y-1">
+                        {owaspTop10.map((vuln) => (
+                            <Button
+                                key={vuln.id}
+                                onClick={() => setSelectedVulnerability(vuln)}
+                                variant={selectedVulnerability.id === vuln.id ? "default" : "outline"}
+                                className="w-full justify-start text-left"
+                                size="sm"
+                            >
+                                <span className="font-mono mr-2">{vuln.rank}</span>
+                                <span className="truncate">{vuln.title}</span>
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+
+                <Card className="lg:col-span-2">
+                    <CardHeader>
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Badge variant="outline" className="font-mono">
+                                        {selectedVulnerability.rank}
+                                    </Badge>
+                                    <Badge className={getDifficultyColor(selectedVulnerability.difficulty)}>
+                                        {selectedVulnerability.difficulty}
+                                    </Badge>
+                                    <Badge variant="outline">{selectedVulnerability.category}</Badge>
+                                </div>
+                                <CardTitle className="text-2xl">{selectedVulnerability.title}</CardTitle>
+                            </div>
+                        </div>
+                        <CardDescription className="text-base mt-2">
+                            {selectedVulnerability.description}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-orange-600" />
+                                Impact
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                                {selectedVulnerability.impact}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                <Code className="h-4 w-4 text-primary" />
+                                Example
+                            </h4>
+                            <div className="p-3 bg-muted rounded-lg">
+                                <p className="text-sm font-mono">{selectedVulnerability.example}</p>
                             </div>
                         </div>
 
-                        <Card className="lg:col-span-2">
-                            <CardHeader>
-                                <div className="flex items-start justify-between">
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Badge variant="outline" className="font-mono">
-                                                {selectedVulnerability.rank}
-                                            </Badge>
-                                            <Badge className={getDifficultyColor(selectedVulnerability.difficulty)}>
-                                                {selectedVulnerability.difficulty}
-                                            </Badge>
-                                            <Badge variant="outline">{selectedVulnerability.category}</Badge>
+                        <div>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                <Shield className="h-4 w-4 text-green-600" />
+                                Prevention
+                            </h4>
+                            <ul className="space-y-2">
+                                {selectedVulnerability.prevention.map((item, index) => (
+                                    <li key={index} className="flex items-start gap-2 text-sm">
+                                        <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                        <span className="text-muted-foreground">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Why Attackers Love This Section */}
+                        <div className="border-t pt-4">
+                            <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                                <Target className="h-5 w-5 text-red-600" />
+                                Why Attackers Love This
+                            </h4>
+                            <div className="space-y-3">
+                                {selectedVulnerability.attackerMotivation.financial && (
+                                    <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-900">
+                                        <DollarSign className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h5 className="font-semibold text-sm text-red-900 dark:text-red-100 mb-1">Financial Gain</h5>
+                                            <p className="text-sm text-red-800 dark:text-red-200">{selectedVulnerability.attackerMotivation.financial}</p>
                                         </div>
-                                        <CardTitle className="text-2xl">{selectedVulnerability.title}</CardTitle>
                                     </div>
-                                </div>
-                                <CardDescription className="text-base mt-2">
-                                    {selectedVulnerability.description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                                        <AlertTriangle className="h-4 w-4 text-orange-600" />
-                                        Impact
-                                    </h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        {selectedVulnerability.impact}
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                                        <Code className="h-4 w-4 text-primary" />
-                                        Example
-                                    </h4>
-                                    <div className="p-3 bg-muted rounded-lg">
-                                        <p className="text-sm font-mono">{selectedVulnerability.example}</p>
+                                )}
+                                {selectedVulnerability.attackerMotivation.espionage && (
+                                    <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-100 dark:border-purple-900">
+                                        <Building2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h5 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-1">Corporate Espionage</h5>
+                                            <p className="text-sm text-purple-800 dark:text-purple-200">{selectedVulnerability.attackerMotivation.espionage}</p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+                                {selectedVulnerability.attackerMotivation.access && (
+                                    <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900">
+                                        <Server className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h5 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-1">System Control</h5>
+                                            <p className="text-sm text-blue-800 dark:text-blue-200">{selectedVulnerability.attackerMotivation.access}</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {selectedVulnerability.attackerMotivation.reputation && (
+                                    <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900">
+                                        <Users className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h5 className="font-semibold text-sm text-orange-900 dark:text-orange-100 mb-1">Reputation / Notoriety</h5>
+                                            <p className="text-sm text-orange-800 dark:text-orange-200">{selectedVulnerability.attackerMotivation.reputation}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-                                <div>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2">
-                                        <Shield className="h-4 w-4 text-green-600" />
-                                        Prevention
-                                    </h4>
-                                    <ul className="space-y-2">
-                                        {selectedVulnerability.prevention.map((item, index) => (
-                                            <li key={index} className="flex items-start gap-2 text-sm">
-                                                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                                <span className="text-muted-foreground">{item}</span>
-                                            </li>
+                        {/* Real World Impact Section */}
+                        <div className="border-t pt-4">
+                            <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
+                                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                                Real-World Impact
+                            </h4>
+                            <div className="space-y-3">
+                                {selectedVulnerability.realWorldImpact.breachExample && (
+                                    <Alert className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+                                        <TrendingUp className="h-4 w-4 text-amber-600" />
+                                        <AlertDescription className="text-sm text-amber-900 dark:text-amber-100">
+                                            <strong>Famous Breach:</strong> {selectedVulnerability.realWorldImpact.breachExample}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {selectedVulnerability.realWorldImpact.averageCost && (
+                                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <DollarSign className="h-4 w-4 text-gray-600" />
+                                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Average Cost</span>
+                                            </div>
+                                            <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.averageCost}</p>
+                                        </div>
+                                    )}
+                                    {selectedVulnerability.realWorldImpact.timeToExploit && (
+                                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Clock className="h-4 w-4 text-gray-600" />
+                                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Time to Exploit</span>
+                                            </div>
+                                            <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.timeToExploit}</p>
+                                        </div>
+                                    )}
+                                    {selectedVulnerability.realWorldImpact.severity && (
+                                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <AlertTriangle className="h-4 w-4 text-gray-600" />
+                                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Severity</span>
+                                            </div>
+                                            <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.severity}</p>
+                                        </div>
+                                    )}
+                                    {selectedVulnerability.realWorldImpact.affected && (
+                                        <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <Users className="h-4 w-4 text-gray-600" />
+                                                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Affected</span>
+                                            </div>
+                                            <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.affected}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Code Playground Section */}
+                        <Separator className="my-6" />
+                        <div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="font-semibold flex items-center gap-2 text-lg">
+                                    <Terminal className="h-5 w-5 text-blue-600" />
+                                    Interactive Code Example
+                                </h4>
+                                <Button
+                                    onClick={() => setShowCode(!showCode)}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    {showCode ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                                    {showCode ? "Hide" : "Show"} Code
+                                </Button>
+                            </div>
+
+                            <AnimatePresence>
+                                {showCode && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        {codePlaygrounds
+                                            .filter(cp => cp.id.includes(selectedVulnerability.title.toLowerCase().split(' ')[0]))
+                                            .map(playground => (
+                                                <div key={playground.id} className="space-y-4">
+                                                    <Alert className="bg-blue-50 border-blue-200">
+                                                        <Lightbulb className="h-4 w-4 text-blue-600" />
+                                                        <AlertDescription>
+                                                            <strong>{playground.title}</strong>
+                                                            <p className="text-sm mt-1">{playground.description}</p>
+                                                        </AlertDescription>
+                                                    </Alert>
+
+                                                    <Tabs value={activeCodeTab} onValueChange={(v) => setActiveCodeTab(v as "vulnerable" | "secure")}>
+                                                        <TabsList className="grid w-full grid-cols-2">
+                                                            <TabsTrigger value="vulnerable" className="gap-2">
+                                                                <Bug className="h-4 w-4" />
+                                                                Vulnerable Code
+                                                            </TabsTrigger>
+                                                            <TabsTrigger value="secure" className="gap-2">
+                                                                <Shield className="h-4 w-4" />
+                                                                Secure Code
+                                                            </TabsTrigger>
+                                                        </TabsList>
+
+                                                        <TabsContent value="vulnerable" className="space-y-2">
+                                                            <div className="relative">
+                                                                <pre className="p-4 bg-red-950/10 border border-red-200 rounded-lg overflow-x-auto">
+                                                                    <code className="text-sm font-mono text-red-900 dark:text-red-100">
+                                                                        {playground.vulnerableCode}
+                                                                    </code>
+                                                                </pre>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    className="absolute top-2 right-2"
+                                                                    onClick={() => copyToClipboard(playground.vulnerableCode)}
+                                                                >
+                                                                    {copySuccess ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                                                                </Button>
+                                                            </div>
+                                                        </TabsContent>
+
+                                                        <TabsContent value="secure" className="space-y-2">
+                                                            <div className="relative">
+                                                                <pre className="p-4 bg-green-950/10 border border-green-200 rounded-lg overflow-x-auto">
+                                                                    <code className="text-sm font-mono text-green-900 dark:text-green-100">
+                                                                        {playground.secureCode}
+                                                                    </code>
+                                                                </pre>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    className="absolute top-2 right-2"
+                                                                    onClick={() => copyToClipboard(playground.secureCode)}
+                                                                >
+                                                                    {copySuccess ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                                                                </Button>
+                                                            </div>
+                                                        </TabsContent>
+                                                    </Tabs>
+
+                                                    <Alert>
+                                                        <Lightbulb className="h-4 w-4" />
+                                                        <AlertDescription>
+                                                            <strong>Key Difference:</strong> {playground.explanation}
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                </div>
+                                            ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Attack Flow Visualization */}
+                        <Separator className="my-6" />
+                        <div>
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="font-semibold flex items-center gap-2 text-lg">
+                                    <Layers className="h-5 w-5 text-purple-600" />
+                                    Attack Flow Simulation
+                                </h4>
+                                <Button
+                                    onClick={() => setShowAttackFlow(!showAttackFlow)}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    {showAttackFlow ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                                    {showAttackFlow ? "Hide" : "Show"} Attack Flow
+                                </Button>
+                            </div>
+
+                            <AnimatePresence>
+                                {showAttackFlow && getAttackFlow(selectedVulnerability.id).length > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="space-y-3"
+                                    >
+                                        {getAttackFlow(selectedVulnerability.id).map((flow, index) => (
+                                            <motion.div
+                                                key={flow.step}
+                                                initial={{ x: -20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: index * 0.1 }}
+                                                className={`p-4 rounded-lg border-l-4 ${flow.severity === "info" ? "bg-blue-50 border-blue-600" :
+                                                        flow.severity === "warning" ? "bg-yellow-50 border-yellow-600" :
+                                                            "bg-red-50 border-red-600"
+                                                    }`}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold ${flow.severity === "info" ? "bg-blue-600 text-white" :
+                                                            flow.severity === "warning" ? "bg-yellow-600 text-white" :
+                                                                "bg-red-600 text-white"
+                                                        }`}>
+                                                        {flow.step}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h5 className="font-semibold mb-1">{flow.action}</h5>
+                                                        <div className="space-y-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <Badge variant="outline" className="text-xs">Payload</Badge>
+                                                                <code className="text-xs font-mono bg-white px-2 py-1 rounded">{flow.payload}</code>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                                <span className="text-sm text-muted-foreground">{flow.result}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
                                         ))}
-                                    </ul>
-                                </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </TabsContent>
 
-                                {/* Why Attackers Love This Section */}
-                                <div className="border-t pt-4">
-                                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
-                                        <Target className="h-5 w-5 text-red-600" />
-                                        Why Attackers Love This
-                                    </h4>
-                                    <div className="space-y-3">
-                                        {selectedVulnerability.attackerMotivation.financial && (
-                                            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-100 dark:border-red-900">
-                                                <DollarSign className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-                                                <div>
-                                                    <h5 className="font-semibold text-sm text-red-900 dark:text-red-100 mb-1">Financial Gain</h5>
-                                                    <p className="text-sm text-red-800 dark:text-red-200">{selectedVulnerability.attackerMotivation.financial}</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {selectedVulnerability.attackerMotivation.espionage && (
-                                            <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-100 dark:border-purple-900">
-                                                <Building2 className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                                                <div>
-                                                    <h5 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-1">Corporate Espionage</h5>
-                                                    <p className="text-sm text-purple-800 dark:text-purple-200">{selectedVulnerability.attackerMotivation.espionage}</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {selectedVulnerability.attackerMotivation.access && (
-                                            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-100 dark:border-blue-900">
-                                                <Server className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                                                <div>
-                                                    <h5 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-1">System Control</h5>
-                                                    <p className="text-sm text-blue-800 dark:text-blue-200">{selectedVulnerability.attackerMotivation.access}</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {selectedVulnerability.attackerMotivation.reputation && (
-                                            <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-100 dark:border-orange-900">
-                                                <Users className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
-                                                <div>
-                                                    <h5 className="font-semibold text-sm text-orange-900 dark:text-orange-100 mb-1">Reputation / Notoriety</h5>
-                                                    <p className="text-sm text-orange-800 dark:text-orange-200">{selectedVulnerability.attackerMotivation.reputation}</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+        {/* Practice Tab */}
+        <TabsContent value="practice" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-1 space-y-2">
+                    <h3 className="font-semibold text-sm text-muted-foreground uppercase">
+                        Lab Exercises
+                    </h3>
+                    <div className="space-y-1">
+                        {labExercises.map((exercise) => {
+                            const isCompleted = completedExercises.has(exercise.id);
+                            return (
+                                <Button
+                                    key={exercise.id}
+                                    onClick={() => {
+                                        setSelectedExercise(exercise);
+                                        resetExercise();
+                                    }}
+                                    variant={selectedExercise?.id === exercise.id ? "default" : "outline"}
+                                    className="w-full justify-start text-left"
+                                    size="sm"
+                                >
+                                    {isCompleted && <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />}
+                                    <span className="truncate">{exercise.title}</span>
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </div>
 
-                                {/* Real World Impact Section */}
-                                <div className="border-t pt-4">
-                                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-lg">
-                                        <AlertTriangle className="h-5 w-5 text-amber-600" />
-                                        Real-World Impact
-                                    </h4>
-                                    <div className="space-y-3">
-                                        {selectedVulnerability.realWorldImpact.breachExample && (
-                                            <Alert className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
-                                                <TrendingUp className="h-4 w-4 text-amber-600" />
-                                                <AlertDescription className="text-sm text-amber-900 dark:text-amber-100">
-                                                    <strong>Famous Breach:</strong> {selectedVulnerability.realWorldImpact.breachExample}
-                                                </AlertDescription>
-                                            </Alert>
-                                        )}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            {selectedVulnerability.realWorldImpact.averageCost && (
-                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <DollarSign className="h-4 w-4 text-gray-600" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Average Cost</span>
-                                                    </div>
-                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.averageCost}</p>
-                                                </div>
-                                            )}
-                                            {selectedVulnerability.realWorldImpact.timeToExploit && (
-                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <Clock className="h-4 w-4 text-gray-600" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Time to Exploit</span>
-                                                    </div>
-                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.timeToExploit}</p>
-                                                </div>
-                                            )}
-                                            {selectedVulnerability.realWorldImpact.severity && (
-                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <AlertTriangle className="h-4 w-4 text-gray-600" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Severity</span>
-                                                    </div>
-                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.severity}</p>
-                                                </div>
-                                            )}
-                                            {selectedVulnerability.realWorldImpact.affected && (
-                                                <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border">
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <Users className="h-4 w-4 text-gray-600" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Affected</span>
-                                                    </div>
-                                                    <p className="text-sm font-medium">{selectedVulnerability.realWorldImpact.affected}</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                <div className="lg:col-span-2">
+                    {!selectedExercise ? (
+                        <Card>
+                            <CardContent className="py-12 text-center">
+                                <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                <h3 className="text-lg font-medium mb-2">Select an Exercise</h3>
+                                <p className="text-muted-foreground">
+                                    Choose a lab exercise from the list to begin practicing
+                                </p>
                             </CardContent>
                         </Card>
-                    </div>
-                </TabsContent>
-
-                {/* Practice Tab */}
-                <TabsContent value="practice" className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div className="lg:col-span-1 space-y-2">
-                            <h3 className="font-semibold text-sm text-muted-foreground uppercase">
-                                Lab Exercises
-                            </h3>
-                            <div className="space-y-1">
-                                {labExercises.map((exercise) => {
-                                    const isCompleted = completedExercises.has(exercise.id);
-                                    return (
-                                        <Button
-                                            key={exercise.id}
-                                            onClick={() => {
-                                                setSelectedExercise(exercise);
-                                                resetExercise();
-                                            }}
-                                            variant={selectedExercise?.id === exercise.id ? "default" : "outline"}
-                                            className="w-full justify-start text-left"
-                                            size="sm"
-                                        >
-                                            {isCompleted && <CheckCircle2 className="h-4 w-4 mr-2 text-green-600" />}
-                                            <span className="truncate">{exercise.title}</span>
-                                        </Button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <div className="lg:col-span-2">
-                            {!selectedExercise ? (
-                                <Card>
-                                    <CardContent className="py-12 text-center">
-                                        <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                                        <h3 className="text-lg font-medium mb-2">Select an Exercise</h3>
-                                        <p className="text-muted-foreground">
-                                            Choose a lab exercise from the list to begin practicing
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            ) : (
-                                <Card>
-                                    <CardHeader>
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <CardTitle>{selectedExercise.title}</CardTitle>
-                                                <CardDescription className="mt-2">
-                                                    {selectedExercise.description}
-                                                </CardDescription>
-                                            </div>
-                                            {completedExercises.has(selectedExercise.id) && (
-                                                <Badge className="bg-green-600">
-                                                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                                                    Completed
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <Alert>
-                                            <Target className="h-4 w-4" />
-                                            <AlertDescription>
-                                                <strong>Objective:</strong> {selectedExercise.objective}
-                                            </AlertDescription>
-                                        </Alert>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="exploit-input">Your Exploit Attempt</Label>
-                                            <Textarea
-                                                id="exploit-input"
-                                                value={userInput}
-                                                onChange={(e) => setUserInput(e.target.value)}
-                                                placeholder="Enter your exploit payload here..."
-                                                rows={4}
-                                                className="font-mono"
-                                            />
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <Button onClick={runExercise} className="flex-1">
-                                                <Play className="h-4 w-4 mr-2" />
-                                                Test Exploit
-                                            </Button>
-                                            <Button onClick={resetExercise} variant="outline">
-                                                Reset
-                                            </Button>
-                                        </div>
-
-                                        {exerciseResults.filter(r => r.exerciseId === selectedExercise.id).length > 0 && (
-                                            <Alert className={
-                                                exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.success
-                                                    ? "border-green-200 bg-green-50"
-                                                    : "border-red-200 bg-red-50"
-                                            }>
-                                                {exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.success ? (
-                                                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                                ) : (
-                                                    <XCircle className="h-4 w-4 text-red-600" />
-                                                )}
-                                                <AlertDescription>
-                                                    {exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.feedback}
-                                                </AlertDescription>
-                                            </Alert>
-                                        )}
-
-                                        <div className="space-y-2 pt-4 border-t">
-                                            <Button
-                                                onClick={() => setShowHint(!showHint)}
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full"
-                                            >
-                                                <Lightbulb className="h-4 w-4 mr-2" />
-                                                {showHint ? "Hide Hint" : "Show Hint"}
-                                            </Button>
-
-                                            {showHint && (
-                                                <Alert className="border-yellow-200 bg-yellow-50">
-                                                    <Lightbulb className="h-4 w-4 text-yellow-600" />
-                                                    <AlertDescription>
-                                                        <strong>Hint:</strong> {selectedExercise.hint}
-                                                    </AlertDescription>
-                                                </Alert>
-                                            )}
-
-                                            <Button
-                                                onClick={() => setShowSolution(!showSolution)}
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full"
-                                            >
-                                                <Lock className="h-4 w-4 mr-2" />
-                                                {showSolution ? "Hide Solution" : "Show Solution"}
-                                            </Button>
-
-                                            {showSolution && (
-                                                <Alert className="border-blue-200 bg-blue-50">
-                                                    <FileCode className="h-4 w-4 text-blue-600" />
-                                                    <AlertDescription>
-                                                        <strong>Solution:</strong>
-                                                        <div className="mt-2 p-2 bg-white rounded border font-mono text-sm">
-                                                            {selectedExercise.solution}
-                                                        </div>
-                                                    </AlertDescription>
-                                                </Alert>
-                                            )}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
-                    </div>
-                </TabsContent>
-
-                {/* Results Tab */}
-                <TabsContent value="results" className="space-y-4">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Your Progress</CardTitle>
-                            <CardDescription>
-                                Track your learning journey through OWASP Top 10 vulnerabilities
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {labExercises.map((exercise) => {
-                                    const attempts = exerciseResults.filter(r => r.exerciseId === exercise.id);
-                                    const isCompleted = completedExercises.has(exercise.id);
-
-                                    return (
-                                        <div key={exercise.id} className="p-4 border rounded-lg">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    {isCompleted ? (
-                                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                                    ) : (
-                                                        <XCircle className="h-5 w-5 text-gray-400" />
-                                                    )}
-                                                    <div>
-                                                        <div className="font-medium">{exercise.title}</div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {exercise.description}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <Badge variant="outline">
-                                                    {attempts.length} attempt{attempts.length !== 1 ? 's' : ''}
-                                                </Badge>
-                                            </div>
-
-                                            {attempts.length > 0 && (
-                                                <div className="mt-2 text-sm text-muted-foreground">
-                                                    Last attempt: {new Date(attempts[0].timestamp).toLocaleString()}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {exerciseResults.length > 0 && (
+                    ) : (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Recent Activity</CardTitle>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle>{selectedExercise.title}</CardTitle>
+                                        <CardDescription className="mt-2">
+                                            {selectedExercise.description}
+                                        </CardDescription>
+                                    </div>
+                                    {completedExercises.has(selectedExercise.id) && (
+                                        <Badge className="bg-green-600">
+                                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                                            Completed
+                                        </Badge>
+                                    )}
+                                </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-4">
+                                <Alert>
+                                    <Target className="h-4 w-4" />
+                                    <AlertDescription>
+                                        <strong>Objective:</strong> {selectedExercise.objective}
+                                    </AlertDescription>
+                                </Alert>
+
                                 <div className="space-y-2">
-                                    {exerciseResults.slice(0, 10).map((result, index) => {
-                                        const exercise = labExercises.find(e => e.id === result.exerciseId);
-                                        return (
-                                            <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                                                {result.success ? (
-                                                    <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
-                                                ) : (
-                                                    <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                                                )}
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="font-medium truncate">{exercise?.title}</div>
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {new Date(result.timestamp).toLocaleString()}
-                                                    </div>
+                                    <Label htmlFor="exploit-input">Your Exploit Attempt</Label>
+                                    <Textarea
+                                        id="exploit-input"
+                                        value={userInput}
+                                        onChange={(e) => setUserInput(e.target.value)}
+                                        placeholder="Enter your exploit payload here..."
+                                        rows={4}
+                                        className="font-mono"
+                                    />
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <Button onClick={runExercise} className="flex-1">
+                                        <Play className="h-4 w-4 mr-2" />
+                                        Test Exploit
+                                    </Button>
+                                    <Button onClick={resetExercise} variant="outline">
+                                        Reset
+                                    </Button>
+                                </div>
+
+                                {exerciseResults.filter(r => r.exerciseId === selectedExercise.id).length > 0 && (
+                                    <Alert className={
+                                        exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.success
+                                            ? "border-green-200 bg-green-50"
+                                            : "border-red-200 bg-red-50"
+                                    }>
+                                        {exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.success ? (
+                                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                        ) : (
+                                            <XCircle className="h-4 w-4 text-red-600" />
+                                        )}
+                                        <AlertDescription>
+                                            {exerciseResults.find(r => r.exerciseId === selectedExercise.id)?.feedback}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                <div className="space-y-2 pt-4 border-t">
+                                    <Button
+                                        onClick={() => setShowHint(!showHint)}
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                    >
+                                        <Lightbulb className="h-4 w-4 mr-2" />
+                                        {showHint ? "Hide Hint" : "Show Hint"}
+                                    </Button>
+
+                                    {showHint && (
+                                        <Alert className="border-yellow-200 bg-yellow-50">
+                                            <Lightbulb className="h-4 w-4 text-yellow-600" />
+                                            <AlertDescription>
+                                                <strong>Hint:</strong> {selectedExercise.hint}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+
+                                    <Button
+                                        onClick={() => setShowSolution(!showSolution)}
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                    >
+                                        <Lock className="h-4 w-4 mr-2" />
+                                        {showSolution ? "Hide Solution" : "Show Solution"}
+                                    </Button>
+
+                                    {showSolution && (
+                                        <Alert className="border-blue-200 bg-blue-50">
+                                            <FileCode className="h-4 w-4 text-blue-600" />
+                                            <AlertDescription>
+                                                <strong>Solution:</strong>
+                                                <div className="mt-2 p-2 bg-white rounded border font-mono text-sm">
+                                                    {selectedExercise.solution}
                                                 </div>
-                                            </div>
-                                        );
-                                    })}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
                     )}
-                </TabsContent>
-            </Tabs>
-        </div>
+                </div>
+            </div>
+        </TabsContent>
+
+        {/* Results Tab */}
+        <TabsContent value="results" className="space-y-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Your Progress</CardTitle>
+                    <CardDescription>
+                        Track your learning journey through OWASP Top 10 vulnerabilities
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {labExercises.map((exercise) => {
+                            const attempts = exerciseResults.filter(r => r.exerciseId === exercise.id);
+                            const isCompleted = completedExercises.has(exercise.id);
+
+                            return (
+                                <div key={exercise.id} className="p-4 border rounded-lg">
+                                    <div className="flex items-start justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            {isCompleted ? (
+                                                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                            ) : (
+                                                <XCircle className="h-5 w-5 text-gray-400" />
+                                            )}
+                                            <div>
+                                                <div className="font-medium">{exercise.title}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {exercise.description}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Badge variant="outline">
+                                            {attempts.length} attempt{attempts.length !== 1 ? 's' : ''}
+                                        </Badge>
+                                    </div>
+
+                                    {attempts.length > 0 && (
+                                        <div className="mt-2 text-sm text-muted-foreground">
+                                            Last attempt: {new Date(attempts[0].timestamp).toLocaleString()}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {exerciseResults.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Recent Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            {exerciseResults.slice(0, 10).map((result, index) => {
+                                const exercise = labExercises.find(e => e.id === result.exerciseId);
+                                return (
+                                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                                        {result.success ? (
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                                        ) : (
+                                            <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                                        )}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-medium truncate">{exercise?.title}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {new Date(result.timestamp).toLocaleString()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+        </TabsContent>
+    </Tabs>
+        </div >
     );
 };
 
