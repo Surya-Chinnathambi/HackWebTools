@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="border-t py-6 md:py-8 bg-background/95 backdrop-blur-sm">
+    <footer className="border-t py-6 md:py-8 bg-background/95 backdrop-blur-sm" role="contentinfo">
       <div className="container flex flex-col md:flex-row items-center justify-between gap-6 md:h-24">
         <div className="flex flex-col items-center md:items-start animate-fade-in">
           <p className="text-sm text-muted-foreground text-center md:text-left">
@@ -23,7 +23,7 @@ const Footer = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-6">
+        <nav className="grid grid-cols-2 md:flex md:items-center gap-4 md:gap-6" aria-label="Footer navigation">
           <Link
             to="/tools"
             className="text-sm flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1"
@@ -54,10 +54,10 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="text-sm flex items-center gap-2 hover:text-primary transition-all duration-300 hover:translate-x-1"
           >
-            <Github size={16} />
+            <Github size={16} aria-hidden="true" />
             <span>GitHub</span>
           </a>
-        </div>
+        </nav>
       </div>
     </footer>
   );

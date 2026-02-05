@@ -81,9 +81,10 @@ const ToolCard = ({
           <Link
             to={`/tools/${id}`}
             className="inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:gap-3 transition-all group/link"
+            aria-label={`View documentation for ${name}`}
           >
             View Details
-            <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+            <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
 
           {githubUrl && (
@@ -93,9 +94,9 @@ const ToolCard = ({
               rel="noopener noreferrer"
               className="p-2 rounded-lg text-muted-foreground hover:text-red-600 hover:bg-red-600/10 transition-all"
               onClick={(e) => e.stopPropagation()}
-              title="View on GitHub"
+              aria-label={`View ${name} on GitHub (opens in new tab)`}
             >
-              <Github className="h-4 w-4" />
+              <Github className="h-4 w-4" aria-hidden="true" />
             </a>
           )}
         </div>

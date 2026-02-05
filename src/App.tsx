@@ -29,6 +29,7 @@ import AdvancedVulnScanner from "./pages/AdvancedVulnScanner";
 import ThreatIntelligence from "./pages/ThreatIntelligence";
 import Dashboard from "./pages/Dashboard";
 import LearningHub from "./pages/LearningHub";
+import KeyboardShortcuts from "./components/KeyboardShortcuts";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,9 +46,16 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* Skip to main content for keyboard navigation */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
         <div className="min-h-screen flex flex-col dark:bg-background">
           <Header />
-          <div className="flex-1 container mx-auto px-4 md:px-6 py-8">
+          <main id="main-content" className="flex-1 container mx-auto px-4 md:px-6 py-8" role="main">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -93,8 +101,9 @@ const App = () => (
               <Route path="/learning-hub" element={<LearningHub />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </div>
+          </main>
           <Footer />
+          <KeyboardShortcuts />
         </div>
       </BrowserRouter>
     </TooltipProvider>

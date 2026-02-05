@@ -29,7 +29,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200" role="banner">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2 transition-transform hover:scale-105 duration-300">
           <div className="bg-primary rounded-full p-1">
@@ -38,7 +38,7 @@ const Header = () => {
           <span className="font-bold text-lg hidden md:inline-block animate-fade-in">SecurePulse</span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-4">
+        <nav className="hidden lg:flex items-center gap-4" aria-label="Primary navigation">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -235,8 +235,13 @@ const Header = () => {
             <div className="hidden xl:block w-[250px]">
               <Popover open={searchOpen} onOpenChange={setSearchOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-sm text-muted-foreground" onClick={toggleSearch}>
-                    <SearchIcon className="mr-2 h-4 w-4" />
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start text-sm text-muted-foreground" 
+                    onClick={toggleSearch}
+                    aria-label="Open search"
+                  >
+                    <SearchIcon className="mr-2 h-4 w-4" aria-hidden="true" />
                     <span>Search...</span>
                   </Button>
                 </PopoverTrigger>
@@ -255,14 +260,19 @@ const Header = () => {
             </div>
 
             <Button variant="ghost" size="icon" asChild className="hidden lg:flex">
-              <a href="https://github.com/aw-junaid/Hacking-Tools" target="_blank" rel="noopener noreferrer">
-                <Github className="h-5 w-5" />
+              <a 
+                href="https://github.com/Surya-Chinnathambi/HackWebTools" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                aria-label="View project on GitHub (opens in new tab)"
+              >
+                <Github className="h-5 w-5" aria-hidden="true" />
               </a>
             </Button>
 
             <ThemeToggle />
           </div>
-        </div>
+        </nav>
 
         {/* Mobile menu button */}
         <div className="flex lg:hidden items-center gap-3">

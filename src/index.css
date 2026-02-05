@@ -188,6 +188,17 @@
   select:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
   }
+
+  /* Screen reader only - visible on focus */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .sr-only:not(:focus):not(:active) {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
 }
 
 @layer utilities {

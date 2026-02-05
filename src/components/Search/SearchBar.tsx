@@ -87,31 +87,42 @@ const SearchBar = () => {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsActive(true)}
           onKeyDown={handleKeyDown}
+          aria-label="Search documentation"
+          aria-autocomplete="list"
+          aria-expanded={isActive && results.length > 0}
+          aria-controls={isActive && results.length > 0 ? "search-results" : undefined}
+          role="combobox"
         />
         {query && (
           <button
             type="button"
             onClick={() => setQuery("")}
             className="absolute right-2.5 top-2.5 h-5 w-5 rounded-full text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted flex items-center justify-center transition-all"
-            aria-label="Clear search"
+            aria-label="Clear search query"
           >
-            <X className="h-3 w-3" />
+            <X className="h-3 w-3" aria-hidden="true" />
           </button>
         )}
       </div>
 
       {isActive && results.length > 0 && (
-        <div className="absolute top-full mt-1 w-full z-10 bg-popover/95 backdrop-blur-sm text-popover-foreground shadow-lg rounded-md overflow-hidden border animate-fade-in">
+        <div 
+          id="search-results"
+          className="absolute top-full mt-1 w-full z-10 bg-popover/95 backdrop-blur-sm text-popover-foreground shadow-lg rounded-md overflow-hidden border animate-fade-in"
+          role="listbox"
+          aria-label="Search results"
+        >
           <ul className="py-1 max-h-[70vh] overflow-auto">
             {results.map((result) => (
-              <li key={result.id}>
+              <li key={result.id} role="option">
                 <button
                   onClick={() => handleResultClick(result.id)}
                   className="flex flex-col w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors duration-200"
+                  aria-label={`Go to ${result.name}`}
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{result.name}</span>
-                    <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                    <ArrowRight className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
                   </div>
                   <span className="text-xs text-muted-foreground line-clamp-2 mt-1">
                     {result.description}
