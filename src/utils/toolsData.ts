@@ -1417,7 +1417,7 @@ export const toolsCategories: ToolCategory[] = [
         usage: "Volatility is used to extract digital artifacts from volatile memory (RAM) samples",
         examples: [
           {
-            title: "Identify memory profile",
+            title: "Identify memory profile (Volatility 2)",
             code: "volatility -f memory.dmp imageinfo"
           },
           {
@@ -1425,8 +1425,76 @@ export const toolsCategories: ToolCategory[] = [
             code: "volatility -f memory.dmp --profile=Win10x64_19041 pslist"
           },
           {
+            title: "Process tree visualization",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 pstree"
+          },
+          {
             title: "Show network connections",
             code: "volatility -f memory.dmp --profile=Win10x64_19041 netscan"
+          },
+          {
+            title: "List loaded DLLs",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 dlllist -p 1234"
+          },
+          {
+            title: "Command line arguments",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 cmdline"
+          },
+          {
+            title: "Dump process memory",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 memdump -p 1234 -D output/"
+          },
+          {
+            title: "Extract executable from memory",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 procdump -p 1234 -D output/"
+          },
+          {
+            title: "Registry hives",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 hivelist"
+          },
+          {
+            title: "Print specific registry key",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 printkey -K 'ControlSet001\\Services'"
+          },
+          {
+            title: "List services",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 svcscan"
+          },
+          {
+            title: "Scan for malware (malfind)",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 malfind"
+          },
+          {
+            title: "Detect hidden processes",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 psxview"
+          },
+          {
+            title: "List handles (files, registry, mutexes)",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 handles -p 1234"
+          },
+          {
+            title: "Extract files from memory",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 filescan"
+          },
+          {
+            title: "Dump file from memory",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 dumpfiles -Q 0x12345678 -D output/"
+          },
+          {
+            title: "Timeline creation (timeliner)",
+            code: "volatility -f memory.dmp --profile=Win10x64_19041 timeliner --output=body > timeline.body"
+          },
+          {
+            title: "Volatility 3 - List processes",
+            code: "vol -f memory.dmp windows.pslist"
+          },
+          {
+            title: "Volatility 3 - Network scan",
+            code: "vol -f memory.dmp windows.netscan"
+          },
+          {
+            title: "Volatility 3 - Dump process",
+            code: "vol -f memory.dmp -o /output windows.pslist.PsList --pid 1234 --dump"
           }
         ],
         documentation: "Volatility is an advanced memory forensics framework that helps extract digital artifacts from volatile memory (RAM) samples. It is used for incident response, malware analysis, and general forensics investigations. The framework is written in Python and supports analysis of Windows, Linux, and macOS memory dumps.",
