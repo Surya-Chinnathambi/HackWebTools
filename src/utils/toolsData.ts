@@ -1604,12 +1604,80 @@ export const toolsCategories: ToolCategory[] = [
             code: "r2 binary.exe"
           },
           {
-            title: "Analyze all",
+            title: "Open in write mode",
+            code: "r2 -w binary.exe"
+          },
+          {
+            title: "Analyze all (aaaa = full deep analysis)",
             code: "r2 binary.exe\n[0x00000000]> aaa"
           },
           {
-            title: "Show functions",
-            code: "r2 binary.exe\n[0x00000000]> afl"
+            title: "Show functions list",
+            code: "[0x00000000]> afl"
+          },
+          {
+            title: "Seek to main function",
+            code: "[0x00000000]> s main"
+          },
+          {
+            title: "Print disassembly",
+            code: "[0x00000000]> pdf @ main"
+          },
+          {
+            title: "Visual mode (interactive)",
+            code: "[0x00000000]> VV"
+          },
+          {
+            title: "Show strings",
+            code: "[0x00000000]> iz"
+          },
+          {
+            title: "Search for string",
+            code: "[0x00000000]> / password"
+          },
+          {
+            title: "Show imports",
+            code: "[0x00000000]> ii"
+          },
+          {
+            title: "Show exports",
+            code: "[0x00000000]> iE"
+          },
+          {
+            title: "Cross-references",
+            code: "[0x00000000]> axt @ sym.function"
+          },
+          {
+            title: "Graph view",
+            code: "[0x00000000]> VV @ main"
+          },
+          {
+            title: "Write bytes",
+            code: "[0x00000000]> wx 9090"
+          },
+          {
+            title: "Patch instruction",
+            code: "[0x00000000]> wa nop"
+          },
+          {
+            title: "Compare binaries",
+            code: "r2 -c 'c binary2.exe' binary1.exe"
+          },
+          {
+            title: "Debug mode",
+            code: "r2 -d binary.exe args"
+          },
+          {
+            title: "Set breakpoint",
+            code: "[0x00000000]> db main"
+          },
+          {
+            title: "Continue execution",
+            code: "[0x00000000]> dc"
+          },
+          {
+            title: "Step instruction",
+            code: "[0x00000000]> ds"
           }
         ],
         documentation: "Radare2 is a complete framework for reverse-engineering and analyzing binaries. It's composed of a set of small utilities that can be used together or independently from the command line. It provides advanced features like binary diffing, binary patching, and scripted reverse engineering.",
