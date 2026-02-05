@@ -17,277 +17,593 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const LearningHub = () => {
-    const [completedDays, setCompletedDays] = useState<number[]>([]);
+    const [completedWeeks, setCompletedWeeks] = useState<number[]>([]);
     const [streak, setStreak] = useState(0);
     const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+    const [selectedMonth, setSelectedMonth] = useState<number>(1);
 
-    const toggleDayCompletion = (day: number) => {
-        setCompletedDays(prev =>
-            prev.includes(day)
-                ? prev.filter(d => d !== day)
-                : [...prev, day]
+    const toggleWeekCompletion = (week: number) => {
+        setCompletedWeeks(prev =>
+            prev.includes(week)
+                ? prev.filter(w => w !== week)
+                : [...prev, week]
         );
     };
+
+    const totalWeeks = 24; // 6 months = ~24 weeks
+    const progressPercentage = Math.round((completedWeeks.length / totalWeeks) * 100);
 
     const learningPaths = [
         {
             id: "beginner",
-            title: "Beginner Path",
-            duration: "4-6 weeks",
+            title: "Foundation Phase",
+            duration: "Months 1-2",
             icon: GraduationCap,
             color: "from-green-600 to-emerald-600",
-            topics: ["Linux Basics", "Networking Fundamentals", "Python Scripting", "Git Basics"]
+            topics: ["Linux Mastery", "Networking Deep Dive", "Python & Bash Scripting", "Git & Development Workflow", "Web Fundamentals"]
         },
         {
             id: "intermediate",
-            title: "Intermediate Path",
-            duration: "8-10 weeks",
+            title: "Practical Skills Phase",
+            duration: "Months 3-4",
             icon: Shield,
             color: "from-blue-600 to-cyan-600",
-            topics: ["Web Application Security", "Network Pentesting", "Exploit Development", "OWASP Top 10"]
+            topics: ["Web Application Security", "Network Penetration Testing", "Active Directory Attacks", "OWASP Top 10 Mastery", "Cloud Security Basics"]
         },
         {
             id: "advanced",
-            title: "Advanced Path",
-            duration: "12-16 weeks",
+            title: "Advanced & Specialization",
+            duration: "Months 5-6",
             icon: Trophy,
             color: "from-red-600 to-orange-600",
-            topics: ["Binary Exploitation", "Reverse Engineering", "Red Team Operations", "Zero-Day Research"]
+            topics: ["Binary Exploitation", "Reverse Engineering", "Advanced Red Teaming", "API Security", "Mobile Security", "Bug Bounty & Real-World Practice"]
         }
     ];
 
-    const thirtyDayRoadmap = [
+    const sixMonthRoadmap = [
         {
-            week: 1,
-            theme: "Foundations & Environment Setup",
-            days: [
+            month: 1,
+            title: "Foundation Month: Linux, Networking & Programming",
+            theme: "Build Your Technical Foundation",
+            weeks: [
                 {
-                    day: 1,
-                    title: "Linux Fundamentals",
-                    topics: ["Linux file system", "Basic commands (ls, cd, pwd, cat)", "File permissions (chmod, chown)", "Process management"],
-                    resources: ["https://linuxjourney.com", "https://overthewire.org/wargames/bandit/"],
-                    practice: "Set up Kali Linux VM, practice 50 basic commands"
+                    week: 1,
+                    title: "Linux Fundamentals & Shell Mastery",
+                    focus: "Operating System Basics",
+                    topics: [
+                        "Linux file system hierarchy (/etc, /var, /home, /opt)",
+                        "Essential commands: navigation, file manipulation, process management",
+                        "File permissions and ownership (chmod, chown, sticky bits)",
+                        "User and group management",
+                        "Package management (apt, yum, dnf)",
+                        "System monitoring (top, htop, ps, netstat)"
+                    ],
+                    resources: [
+                        { name: "Linux Journey", url: "https://linuxjourney.com", type: "Interactive Tutorial" },
+                        { name: "OverTheWire: Bandit", url: "https://overthewire.org/wargames/bandit/", type: "Hands-on Practice" },
+                        { name: "Linux Command Line Basics (Udacity)", url: "https://www.udacity.com/course/linux-command-line-basics", type: "Free Course" },
+                        { name: "Linux Survival", url: "https://linuxsurvival.com", type: "Interactive" }
+                    ],
+                    labs: ["Set up Kali Linux VM", "Complete Bandit Levels 0-15", "Create 10 shell scripts for automation"],
+                    certificationPrep: "Linux+ foundational knowledge"
                 },
                 {
-                    day: 2,
-                    title: "Git Basics & Version Control",
-                    topics: ["Git installation & config", "Repository initialization", "Basic workflow (add, commit, push)", "Branching basics"],
-                    resources: ["https://git-scm.com/book", "https://learngitbranching.js.org"],
-                    practice: "Create GitHub account, initialize first repository, make 10 commits"
+                    week: 2,
+                    title: "Advanced Linux & Bash Scripting",
+                    focus: "Automation & Scripting",
+                    topics: [
+                        "Bash scripting fundamentals (variables, loops, conditionals)",
+                        "Text processing with grep, sed, awk",
+                        "Regular expressions mastery",
+                        "Cron jobs and task scheduling",
+                        "SSH configuration and key management",
+                        "Log analysis techniques"
+                    ],
+                    resources: [
+                        { name: "Bash Scripting Tutorial", url: "https://www.shellscript.sh", type: "Tutorial" },
+                        { name: "Explainshell.com", url: "https://explainshell.com", type: "Tool" },
+                        { name: "Regex101", url: "https://regex101.com", type: "Practice Tool" },
+                        { name: "Command Line Kung Fu", url: "https://blog.commandlinekungfu.com", type: "Blog" }
+                    ],
+                    labs: ["Build log parser script", "Automate system hardening", "Create backup automation script"],
+                    certificationPrep: "Scripting for eJPT"
                 },
                 {
-                    day: 3,
-                    title: "Git Advanced Concepts",
-                    topics: ["Branching strategies", "Merge vs Rebase", "Resolving conflicts", "Git workflow best practices"],
-                    resources: ["https://www.atlassian.com/git/tutorials", "https://github.com/git-tips/tips"],
-                    practice: "Create feature branches, practice merging, handle conflicts"
+                    week: 3,
+                    title: "Networking Fundamentals - Theory",
+                    focus: "Network Protocols & Architecture",
+                    topics: [
+                        "OSI Model (all 7 layers explained)",
+                        "TCP/IP Model and protocol suite",
+                        "IP addressing, subnetting, CIDR notation",
+                        "Common protocols: HTTP/HTTPS, DNS, FTP, SSH, SMTP",
+                        "Port numbers (well-known, registered, dynamic)",
+                        "Network topologies and devices (routers, switches, firewalls)"
+                    ],
+                    resources: [
+                        { name: "Professor Messer Network+ Course", url: "https://www.professormesser.com/network-plus/n10-008/n10-008-training-course/", type: "Free Video Course" },
+                        { name: "Subnet Calculator", url: "https://www.subnet-calculator.com", type: "Tool" },
+                        { name: "Network Lessons", url: "https://networklessons.com", type: "Tutorials" },
+                        { name: "Practical Networking", url: "https://www.practicalnetworking.net", type: "Blog/Videos" }
+                    ],
+                    labs: ["Subnet 10 different networks", "Analyze DNS queries with Wireshark", "Map network topology"],
+                    certificationPrep: "Network+ theory"
                 },
                 {
-                    day: 4,
-                    title: "Networking Basics",
-                    topics: ["OSI & TCP/IP models", "IP addressing & subnetting", "Common protocols (HTTP, DNS, FTP)", "Port numbers"],
-                    resources: ["https://www.networklessons.com", "https://packetlife.net"],
-                    practice: "Use Wireshark to capture traffic, analyze HTTP requests"
-                },
-                {
-                    day: 5,
-                    title: "Python for Security",
-                    topics: ["Python basics", "Socket programming", "HTTP requests library", "File operations"],
-                    resources: ["https://www.hackingarticles.in/python-for-pentester/", "https://realpython.com"],
-                    practice: "Write port scanner, HTTP request script, file parser"
-                },
-                {
-                    day: 6,
-                    title: "Command Line Tools",
-                    topics: ["Grep, sed, awk", "Curl & wget", "SSH & SCP", "Tmux/Screen"],
-                    resources: ["https://explainshell.com", "https://cmdchallenge.com"],
-                    practice: "Parse logs with grep/awk, automate downloads, use SSH keys"
-                },
-                {
-                    day: 7,
-                    title: "Week 1 Project",
-                    topics: ["Build automated recon tool", "GitHub portfolio", "Documentation"],
-                    resources: ["Personal project", "README best practices"],
-                    practice: "Create tool combining week's learnings, push to GitHub with docs"
+                    week: 4,
+                    title: "Networking Fundamentals - Practice",
+                    focus: "Traffic Analysis & Troubleshooting",
+                    topics: [
+                        "Wireshark mastery (filters, following streams)",
+                        "tcpdump for packet capture",
+                        "Analyzing HTTP/HTTPS traffic",
+                        "Understanding three-way handshake",
+                        "Network troubleshooting methodology",
+                        "Common network attacks overview"
+                    ],
+                    resources: [
+                        { name: "Wireshark University", url: "https://www.wireshark.org/docs/", type: "Official Docs" },
+                        { name: "Malware Traffic Analysis", url: "https://www.malware-traffic-analysis.net", type: "PCAP Analysis Practice" },
+                        { name: "PacketLife", url: "https://packetlife.net", type: "Cheat Sheets" },
+                        { name: "Chris Greer YouTube", url: "https://www.youtube.com/user/ChrisGreer", type: "Video Tutorials" }
+                    ],
+                    labs: ["Capture and analyze 100 packets", "Identify malicious traffic patterns", "Complete Wireshark challenges"],
+                    certificationPrep: "Network traffic analysis for pentesting"
                 }
             ]
         },
         {
-            week: 2,
-            theme: "Web Application Security Fundamentals",
-            days: [
+            month: 2,
+            title: "Programming & Development Workflow",
+            theme: "Code Like a Pro",
+            weeks: [
                 {
-                    day: 8,
-                    title: "HTTP Protocol Deep Dive",
-                    topics: ["HTTP methods", "Headers & cookies", "Status codes", "REST APIs"],
-                    resources: ["https://developer.mozilla.org/en-US/docs/Web/HTTP", "https://httpbin.org"],
-                    practice: "Use Burp Suite to intercept & modify requests"
+                    week: 5,
+                    title: "Python for Cybersecurity - Basics",
+                    focus: "Programming Fundamentals",
+                    topics: [
+                        "Python syntax, data types, control structures",
+                        "Functions, modules, and packages",
+                        "File I/O operations",
+                        "Exception handling",
+                        "Regular expressions in Python",
+                        "Virtual environments and pip"
+                    ],
+                    resources: [
+                        { name: "Python for Everybody", url: "https://www.py4e.com", type: "Free Course" },
+                        { name: "Automate the Boring Stuff", url: "https://automatetheboringstuff.com", type: "Free Book" },
+                        { name: "Real Python", url: "https://realpython.com", type: "Tutorials" },
+                        { name: "Python Crash Course", url: "https://ehmatthes.github.io/pcc/", type: "Book Resources" }
+                    ],
+                    labs: ["Build CLI tool", "Create file parser", "Automate 5 repetitive tasks"],
+                    certificationPrep: "Python scripting for OSCP"
                 },
                 {
-                    day: 9,
+                    week: 6,
+                    title: "Python for Security - Advanced",
+                    focus: "Security-Focused Programming",
+                    topics: [
+                        "Socket programming (TCP/UDP)",
+                        "HTTP requests with requests library",
+                        "BeautifulSoup for web scraping",
+                        "Paramiko for SSH automation",
+                        "Scapy for packet manipulation",
+                        "Multi-threading for scanners"
+                    ],
+                    resources: [
+                        { name: "Black Hat Python", url: "https://nostarch.com/black-hat-python2E", type: "Book" },
+                        { name: "Violent Python", url: "https://www.amazon.com/Violent-Python-Cookbook-Penetration-Engineers/dp/1597499579", type: "Book" },
+                        { name: "Python for Pentesters", url: "https://www.hackingarticles.in/python-for-pentester/", type: "Tutorial Series" },
+                        { name: "Scapy Documentation", url: "https://scapy.readthedocs.io", type: "Docs" }
+                    ],
+                    labs: ["Build port scanner", "Create HTTP fuzzer", "Develop subdomain enumerator"],
+                    certificationPrep: "Custom tool development"
+                },
+                {
+                    week: 7,
+                    title: "Git & Version Control Mastery",
+                    focus: "Professional Development Workflow",
+                    topics: [
+                        "Git fundamentals (init, add, commit, push, pull)",
+                        "Branching strategies (feature branches, git-flow)",
+                        "Merge vs rebase",
+                        "Resolving merge conflicts",
+                        "GitHub/GitLab workflow",
+                        "Pull requests and code review"
+                    ],
+                    resources: [
+                        { name: "Pro Git Book", url: "https://git-scm.com/book/en/v2", type: "Free Book" },
+                        { name: "Learn Git Branching", url: "https://learngitbranching.js.org", type: "Interactive" },
+                        { name: "GitHub Learning Lab", url: "https://lab.github.com", type: "Hands-on Courses" },
+                        { name: "Atlassian Git Tutorials", url: "https://www.atlassian.com/git/tutorials", type: "Tutorials" }
+                    ],
+                    labs: ["Create GitHub portfolio", "Contribute to open-source project", "Master git workflow"],
+                    certificationPrep: "Version control for collaboration"
+                },
+                {
+                    week: 8,
+                    title: "Web Development Fundamentals",
+                    focus: "Understanding Web Technologies",
+                    topics: [
+                        "HTML5, CSS3, JavaScript basics",
+                        "HTTP protocol deep dive (methods, headers, status codes)",
+                        "Cookies, sessions, tokens",
+                        "RESTful APIs and JSON",
+                        "Browser DevTools mastery",
+                        "Same-Origin Policy and CORS"
+                    ],
+                    resources: [
+                        { name: "MDN Web Docs", url: "https://developer.mozilla.org", type: "Documentation" },
+                        { name: "freeCodeCamp", url: "https://www.freecodecamp.org", type: "Interactive Course" },
+                        { name: "HTTP Protocol Course", url: "https://www.youtube.com/watch?v=iYM2zFP3Zn0", type: "Video" },
+                        { name: "The Odin Project", url: "https://www.theodinproject.com", type: "Full Course" }
+                    ],
+                    labs: ["Build simple web app", "Analyze HTTP traffic", "Understand session management"],
+                    certificationPrep: "Web fundamentals for BWAPP/DVWA"
+                }
+            ]
+        },
+        {
+            month: 3,
+            title: "Web Application Security",
+            theme: "Master the OWASP Top 10",
+            weeks: [
+                {
+                    week: 9,
                     title: "XSS (Cross-Site Scripting)",
-                    topics: ["Reflected XSS", "Stored XSS", "DOM-based XSS", "XSS prevention"],
-                    resources: ["https://portswigger.net/web-security/cross-site-scripting", "https://xss-game.appspot.com"],
-                    practice: "Complete XSS challenges on PortSwigger Academy"
+                    focus: "Client-Side Attacks",
+                    topics: [
+                        "Reflected XSS exploitation",
+                        "Stored XSS and persistence",
+                        "DOM-based XSS",
+                        "XSS filters and bypasses",
+                        "Cookie theft and session hijacking",
+                        "BeEF Framework for XSS exploitation"
+                    ],
+                    resources: [
+                        { name: "PortSwigger XSS Labs", url: "https://portswigger.net/web-security/cross-site-scripting", type: "Interactive Labs" },
+                        { name: "XSS Game", url: "https://xss-game.appspot.com", type: "Practice Game" },
+                        { name: "Payload All The Things", url: "https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection", type: "Cheat Sheet" },
+                        { name: "OWASP XSS Guide", url: "https://owasp.org/www-community/attacks/xss/", type: "Documentation" }
+                    ],
+                    labs: ["Complete all PortSwigger XSS labs", "Exploit XSS on DVWA", "Test 10 real applications (with permission)"],
+                    certificationPrep: "OWASP Top 10 - A03"
                 },
                 {
-                    day: 10,
+                    week: 10,
                     title: "SQL Injection",
-                    topics: ["Union-based SQLi", "Blind SQLi", "Time-based SQLi", "SQLMap usage"],
-                    resources: ["https://portswigger.net/web-security/sql-injection", "https://www.hacksplaining.com/exercises/sql-injection"],
-                    practice: "Exploit SQLi on DVWA, use SQLMap"
+                    focus: "Database Attacks",
+                    topics: [
+                        "Union-based SQLi",
+                        "Boolean-based blind SQLi",
+                        "Time-based blind SQLi",
+                        "Error-based SQLi",
+                        "SQLMap automation",
+                        "Manual SQLi techniques"
+                    ],
+                    resources: [
+                        { name: "PortSwigger SQL Injection", url: "https://portswigger.net/web-security/sql-injection", type: "Labs" },
+                        { name: "PentesterLab SQLi", url: "https://pentesterlab.com/exercises/from_sqli_to_shell", type: "Practice" },
+                        { name: "SQLMap Tutorial", url: "https://github.com/sqlmapproject/sqlmap/wiki/Usage", type: "Tool Guide" },
+                        { name: "HackerSploit SQLi", url: "https://www.youtube.com/watch?v=2OPVViV-GQk", type: "Video Series" }
+                    ],
+                    labs: ["Exploit DVWA SQLi (all levels)", "Use SQLMap on 5 targets", "Write SQL injection cheat sheet"],
+                    certificationPrep: "Database exploitation for eWPT"
                 },
                 {
-                    day: 11,
-                    title: "Authentication Attacks",
-                    topics: ["Brute force", "Session hijacking", "JWT vulnerabilities", "OAuth flaws"],
-                    resources: ["https://owasp.org/www-project-web-security-testing-guide/", "https://jwt.io"],
-                    practice: "Crack passwords with Hydra, analyze JWT tokens"
+                    week: 11,
+                    title: "Authentication & Session Management",
+                    focus: "Access Control Attacks",
+                    topics: [
+                        "Brute force attacks (Hydra, Burp Intruder)",
+                        "Session hijacking and fixation",
+                        "JWT vulnerabilities (algorithm confusion, weak secrets)",
+                        "OAuth 2.0 misconfigurations",
+                        "Password reset flaws",
+                        "Multi-factor authentication bypasses"
+                    ],
+                    resources: [
+                        { name: "PortSwigger Authentication Labs", url: "https://portswigger.net/web-security/authentication", type: "Labs" },
+                        { name: "JWT.io Debugger", url: "https://jwt.io", type: "Tool" },
+                        { name: "OAuth Security Cheat Sheet", url: "https://cheatsheetseries.owasp.org/cheatsheets/OAuth2_Cheatsheet.html", type: "Reference" },
+                        { name: "HackerOne JWT Reports", url: "https://github.com/ticarpi/jwt_tool", type: "Tool & Examples" }
+                    ],
+                    labs: ["Crack passwords with Hydra", "Exploit JWT vulnerabilities", "Complete auth bypass challenges"],
+                    certificationPrep: "OWASP Top 10 - A07"
                 },
                 {
-                    day: 12,
-                    title: "CSRF & SSRF",
-                    topics: ["CSRF tokens", "SSRF exploitation", "Prevention techniques"],
-                    resources: ["https://portswigger.net/web-security/csrf", "https://portswigger.net/web-security/ssrf"],
-                    practice: "Complete CSRF & SSRF labs"
-                },
-                {
-                    day: 13,
-                    title: "File Upload Vulnerabilities",
-                    topics: ["Bypassing file type checks", "Path traversal", "Web shells", "Mitigation"],
-                    resources: ["https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload"],
-                    practice: "Upload web shells, exploit path traversal"
-                },
-                {
-                    day: 14,
-                    title: "Week 2 CTF Challenge",
-                    topics: ["Web exploitation CTF"],
-                    resources: ["https://www.hackthebox.eu", "https://tryhackme.com"],
-                    practice: "Complete 3 web-focused CTF challenges"
+                    week: 12,
+                    title: "CSRF, SSRF, XXE & File Upload",
+                    focus: "Advanced Web Attacks",
+                    topics: [
+                        "CSRF token bypasses",
+                        "SSRF to internal network access",
+                        "XXE (XML External Entity) attacks",
+                        "File upload filter bypasses",
+                        "Path traversal exploitation",
+                        "Remote Code Execution via file upload"
+                    ],
+                    resources: [
+                        { name: "PortSwigger SSRF Labs", url: "https://portswigger.net/web-security/ssrf", type: "Labs" },
+                        { name: "File Upload Attacks", url: "https://owasp.org/www-community/vulnerabilities/Unrestricted_File_Upload", type: "Guide" },
+                        { name: "XXE Cheat Sheet", url: "https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html", type: "Reference" },
+                        { name: "HackTricks Web Attacks", url: "https://book.hacktricks.xyz/pentesting-web/", type: "Comprehensive Guide" }
+                    ],
+                    labs: ["Complete SSRF & XXE labs", "Upload web shells", "Exploit file inclusion vulnerabilities"],
+                    certificationPrep: "Web pentesting methodology"
                 }
             ]
         },
         {
-            week: 3,
-            theme: "Network Security & Reconnaissance",
-            days: [
+            month: 4,
+            title: "Network Penetration Testing",
+            theme: "From Reconnaissance to Exploitation",
+            weeks: [
                 {
-                    day: 15,
-                    title: "Information Gathering",
-                    topics: ["OSINT techniques", "Google dorking", "Subdomain enumeration", "Metadata analysis"],
-                    resources: ["https://osintframework.com", "https://github.com/jivoi/awesome-osint"],
-                    practice: "Enumerate company infrastructure, find sensitive data"
+                    week: 13,
+                    title: "Information Gathering & OSINT",
+                    focus: "Reconnaissance Phase",
+                    topics: [
+                        "Passive reconnaissance techniques",
+                        "Google dorking mastery",
+                        "Subdomain enumeration (subfinder, assetfinder, amass)",
+                        "WHOIS, DNS, and email harvesting",
+                        "Social media intelligence (LinkedIn, GitHub)",
+                        "Shodan and Censys for internet-wide scanning"
+                    ],
+                    resources: [
+                        { name: "OSINT Framework", url: "https://osintframework.com", type: "Tool Collection" },
+                        { name: "IntelTechniques", url: "https://inteltechniques.com/menu.html", type: "OSINT Tools" },
+                        { name: "OSINT Dojo", url: "https://www.osintdojo.com/resources/", type: "Learning Resources" },
+                        { name: "Awesome OSINT", url: "https://github.com/jivoi/awesome-osint", type: "GitHub Repository" }
+                    ],
+                    labs: ["Enumerate company infrastructure", "Create OSINT report", "Build reconnaissance automation script"],
+                    certificationPrep: "Recon for OSCP & PNPT"
                 },
                 {
-                    day: 16,
-                    title: "Port Scanning & Service Enumeration",
-                    topics: ["Nmap techniques", "Service fingerprinting", "Version detection", "NSE scripts"],
-                    resources: ["https://nmap.org/book/", "https://www.stationx.net/nmap-cheat-sheet/"],
-                    practice: "Scan 10 targets, write custom NSE script"
+                    week: 14,
+                    title: "Scanning & Enumeration",
+                    focus: "Active Reconnaissance",
+                    topics: [
+                        "Nmap mastery (timing, scripts, output)",
+                        "Service version detection",
+                        "NSE script development",
+                        "Vulnerability scanning (Nessus, OpenVAS)",
+                        "SMB enumeration (enum4linux, smbclient)",
+                        "SNMP enumeration"
+                    ],
+                    resources: [
+                        { name: "Nmap Official Guide", url: "https://nmap.org/book/", type: "Book" },
+                        { name: "Nmap NSE Scripts", url: "https://nmap.org/nsedoc/", type: "Documentation" },
+                        { name: "Hack The Box Machines", url: "https://www.hackthebox.com", type: "Practice" },
+                        { name: "Nmap Cheat Sheet", url: "https://www.stationx.net/nmap-cheat-sheet/", type: "Reference" }
+                    ],
+                    labs: ["Scan 20 HTB machines", "Write custom NSE script", "Create scanning methodology"],
+                    certificationPrep: "Enumeration for OSCP"
                 },
                 {
-                    day: 17,
-                    title: "Vulnerability Scanning",
-                    topics: ["Nessus/OpenVAS", "Nikto", "CVE databases", "Severity scoring"],
-                    resources: ["https://www.tenable.com/products/nessus", "https://cve.mitre.org"],
-                    practice: "Scan systems, analyze results, prioritize findings"
+                    week: 15,
+                    title: "Exploitation Fundamentals",
+                    focus: "Getting Initial Access",
+                    topics: [
+                        "Metasploit Framework mastery",
+                        "Exploit-DB and CVE research",
+                        "Manual exploitation techniques",
+                        "Reverse shells (netcat, bash, Python)",
+                        "Bind shells vs reverse shells",
+                        "Stabilizing shells"
+                    ],
+                    resources: [
+                        { name: "Metasploit Unleashed", url: "https://www.offensive-security.com/metasploit-unleashed/", type: "Free Course" },
+                        { name: "Exploit Database", url: "https://www.exploit-db.com", type: "Exploit Repository" },
+                        { name: "GTFOBins", url: "https://gtfobins.github.io", type: "Unix Binaries" },
+                        { name: "PayloadsAllTheThings", url: "https://github.com/swisskyrepo/PayloadsAllTheThings", type: "Cheat Sheet" }
+                    ],
+                    labs: ["Exploit 10 vulnerable services", "Practice different shell types", "Complete Metasploitable"],
+                    certificationPrep: "Exploitation for eJPT"
                 },
                 {
-                    day: 18,
-                    title: "Exploitation Basics",
-                    topics: ["Metasploit Framework", "Exploit-DB", "Manual exploitation", "Post-exploitation"],
-                    resources: ["https://www.offensive-security.com/metasploit-unleashed/", "https://www.exploit-db.com"],
-                    practice: "Exploit vulnerable services, establish shells"
-                },
-                {
-                    day: 19,
-                    title: "Wireless Security",
-                    topics: ["Wi-Fi protocols", "WPA/WPA2 cracking", "Evil twin attacks", "Aircrack-ng suite"],
-                    resources: ["https://www.aircrack-ng.org/doku.php", "https://www.hackingarticles.in/wireless-penetration-testing/"],
-                    practice: "Capture handshakes, crack Wi-Fi passwords (lab only)"
-                },
-                {
-                    day: 20,
-                    title: "Man-in-the-Middle Attacks",
-                    topics: ["ARP spoofing", "SSL stripping", "DNS poisoning", "Ettercap/Bettercap"],
-                    resources: ["https://www.bettercap.org/intro/", "https://github.com/bettercap/bettercap"],
-                    practice: "Perform MITM in controlled lab environment"
-                },
-                {
-                    day: 21,
-                    title: "Week 3 Red Team Exercise",
-                    topics: ["Full network penetration test"],
-                    resources: ["Custom lab setup"],
-                    practice: "Complete reconnaissance to exploitation on practice network"
+                    week: 16,
+                    title: "Post-Exploitation & Privilege Escalation",
+                    focus: "Maintaining Access & Escalating",
+                    topics: [
+                        "Linux privilege escalation (SUID, sudo, kernel exploits)",
+                        "Windows privilege escalation (services, registry, tokens)",
+                        "Lateral movement techniques",
+                        "Credential harvesting (mimikatz, hashdump)",
+                        "Persistence mechanisms",
+                        "Pivoting and tunneling (chisel, proxychains)"
+                    ],
+                    resources: [
+                        { name: "Linux PrivEsc", url: "https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Linux%20-%20Privilege%20Escalation.md", type: "Cheat Sheet" },
+                        { name: "Windows PrivEsc", url: "https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md", type: "Cheat Sheet" },
+                        { name: "TryHackMe Priv Esc Rooms", url: "https://tryhackme.com", type: "Practice Rooms" },
+                        { name: "HackTricks", url: "https://book.hacktricks.xyz", type: "Comprehensive Guide" }
+                    ],
+                    labs: ["Root 15 machines on HTB/THM", "Practice all PrivEsc vectors", "Build PrivEsc checklist"],
+                    certificationPrep: "PrivEsc for OSCP (critical skill)"
                 }
             ]
         },
         {
-            week: 4,
-            theme: "Advanced Topics & Real-World Practice",
-            days: [
+            month: 5,
+            title: "Advanced Topics & Specializations",
+            theme: "Deep Dive into Complex Attacks",
+            weeks: [
                 {
-                    day: 22,
-                    title: "Active Directory Attacks",
-                    topics: ["Kerberoasting", "Pass-the-Hash", "BloodHound", "Domain privilege escalation"],
-                    resources: ["https://adsecurity.org", "https://github.com/BloodHoundAD/BloodHound"],
-                    practice: "Exploit AD misconfigurations, map domain trust"
+                    week: 17,
+                    title: "Active Directory Exploitation",
+                    focus: "Enterprise Network Attacks",
+                    topics: [
+                        "AD enumeration (BloodHound, PowerView)",
+                        "Kerberoasting",
+                        "AS-REP Roasting",
+                        "Pass-the-Hash & Pass-the-Ticket",
+                        "Domain privilege escalation",
+                        "DCSync attack and Golden Ticket"
+                    ],
+                    resources: [
+                        { name: "AD Security Blog", url: "https://adsecurity.org", type: "Blog" },
+                        { name: "BloodHound Documentation", url: "https://bloodhound.readthedocs.io", type: "Tool Guide" },
+                        { name: "TryHackMe AD Rooms", url: "https://tryhackme.com/room/attacktivedirectory", type: "Practice" },
+                        { name: "PentestPartners AD Guide", url: "https://www.pentestpartners.com/security-blog/", type: "Blog" }
+                    ],
+                    labs: ["Set up AD lab", "Complete THM AD pathway", "Exploit 5 AD misconfigurations"],
+                    certificationPrep: "AD attacks for PNPT & CRTP"
                 },
                 {
-                    day: 23,
-                    title: "Cloud Security (AWS/Azure)",
-                    topics: ["S3 bucket misconfigs", "IAM vulnerabilities", "SSRF to metadata", "Cloud pentesting tools"],
-                    resources: ["https://github.com/toniblyx/prowler", "https://cloudsplaining.readthedocs.io"],
-                    practice: "Audit cloud infrastructure, find misconfigurations"
+                    week: 18,
+                    title: "Cloud Security (AWS/Azure/GCP)",
+                    focus: "Cloud Penetration Testing",
+                    topics: [
+                        "Cloud misconfigurations (S3 buckets, IAM)",
+                        "SSRF to cloud metadata service",
+                        "AWS enumeration (Prowler, ScoutSuite)",
+                        "Azure AD exploitation",
+                        "Container security basics",
+                        "Serverless security considerations"
+                    ],
+                    resources: [
+                        { name: "Hacking The Cloud", url: "https://hackingthe.cloud", type: "Knowledge Base" },
+                        { name: "CloudGoat", url: "https://github.com/RhinoSecurityLabs/cloudgoat", type: "Vulnerable Cloud Environment" },
+                        { name: "Prowler Tool", url: "https://github.com/prowler-cloud/prowler", type: "AWS Security Assessment" },
+                        { name: "Kubernetes Goat", url: "https://github.com/madhuakula/kubernetes-goat", type: "K8s Practice" }
+                    ],
+                    labs: ["Audit AWS account with Prowler", "Exploit S3 misconfigurations", "Complete CloudGoat scenarios"],
+                    certificationPrep: "Cloud security awareness"
                 },
                 {
-                    day: 24,
+                    week: 19,
                     title: "API Security Testing",
-                    topics: ["REST API attacks", "GraphQL exploitation", "JWT attacks", "Rate limiting bypass"],
-                    resources: ["https://github.com/OWASP/API-Security", "https://apisecurity.io"],
-                    practice: "Test APIs with Postman/Burp, exploit vulnerabilities"
+                    focus: "Modern Application Architecture",
+                    topics: [
+                        "REST API testing methodology",
+                        "GraphQL vulnerabilities",
+                        "API authentication attacks",
+                        "BOLA/IDOR in APIs",
+                        "Mass assignment vulnerabilities",
+                        "API rate limiting bypasses"
+                    ],
+                    resources: [
+                        { name: "OWASP API Security Top 10", url: "https://owasp.org/www-project-api-security/", type: "Standard" },
+                        { name: "API Security University", url: "https://university.apisec.ai", type: "Free Courses" },
+                        { name: "Damn Vulnerable GraphQL", url: "https://github.com/dolevf/Damn-Vulnerable-GraphQL-Application", type: "Practice" },
+                        { name: "API Security Tools", url: "https://github.com/arainho/awesome-api-security", type: "Tool Collection" }
+                    ],
+                    labs: ["Test 10 public APIs", "Exploit GraphQL", "Build API security testing methodology"],
+                    certificationPrep: "Modern app security"
                 },
                 {
-                    day: 25,
-                    title: "Mobile Security Basics",
-                    topics: ["Android app analysis", "SSL pinning bypass", "Frida framework", "Static analysis"],
-                    resources: ["https://github.com/OWASP/owasp-mstg", "https://frida.re"],
-                    practice: "Decompile APK, bypass security controls"
-                },
+                    week: 20,
+                    title: "Wireless Security & IoT",
+                    focus: "Physical Layer Attacks",
+                    topics: [
+                        "Wi-Fi protocols (WPA2, WPA3)",
+                        "Handshake capture and cracking",
+                        "Evil twin and rogue AP attacks",
+                        "Bluetooth attacks",
+                        "IoT device exploitation",
+                        "SDR (Software Defined Radio) basics"
+                    ],
+                    resources: [
+                        { name: "Aircrack-ng Tutorial", url: "https://www.aircrack-ng.org/doku.php", type: "Documentation" },
+                        { name: "WiFi Pineapple", url: "https://shop.hak5.org/products/wifi-pineapple", type: "Hardware Platform" },
+                        { name: "IoT Security 101", url: "https://github.com/V33RU/IoTSecurity101", type: "Guide" },
+                        { name: "RTL-SDR Blog", url: "https://www.rtl-sdr.com", type: "Blog" }
+                    ],
+                    labs: ["Crack WPA2 handshake (lab only)", "Perform evil twin attack", "Analyze IoT device"],
+                    certificationPrep: "Wireless security for specialized roles"
+                }
+            ]
+        },
+        {
+            month: 6,
+            title: "Real-World Practice & Career Development",
+            theme: "Apply Your Skills & Build Your Career",
+            weeks: [
                 {
-                    day: 26,
-                    title: "Report Writing & Communication",
-                    topics: ["Executive summaries", "Technical findings", "Risk ratings", "Remediation advice"],
-                    resources: ["https://github.com/hmaverickadams/TCM-Security-Sample-Pentest-Report"],
-                    practice: "Write professional pentest report from previous week's work"
-                },
-                {
-                    day: 27,
-                    title: "Automation & Tool Development",
-                    topics: ["Python automation", "Bash scripting", "Custom exploits", "CI/CD security"],
-                    resources: ["https://automatetheboringstuff.com", "GitHub Actions"],
-                    practice: "Automate recon pipeline, create custom tool"
-                },
-                {
-                    day: 28,
+                    week: 21,
                     title: "Bug Bounty Hunting",
-                    topics: ["Platform selection", "Recon methodology", "Low-hanging fruit", "Submission tips"],
-                    resources: ["https://www.bugcrowd.com/hackers/bugcrowd-university/", "https://hackerone.com/resources/"],
-                    practice: "Set up bug bounty workflow, start recon on program"
+                    focus: "Real-World Vulnerabilities",
+                    topics: [
+                        "Choosing bug bounty programs",
+                        "Advanced reconnaissance for bug bounties",
+                        "Low-hanging fruit strategies",
+                        "Report writing for bug bounties",
+                        "Automation for scalability",
+                        "Building reputation and networking"
+                    ],
+                    resources: [
+                        { name: "Bug Bounty Bootcamp Book", url: "https://nostarch.com/bug-bounty-bootcamp", type: "Book" },
+                        { name: "HackerOne Hacktivity", url: "https://hackerone.com/hacktivity", type: "Public Reports" },
+                        { name: "Bugcrowd University", url: "https://www.bugcrowd.com/hackers/bugcrowd-university/", type: "Free Courses" },
+                        { name: "Jason Haddix's Methodology", url: "https://www.youtube.com/watch?v=p4JgIu1mceI", type: "Video" }
+                    ],
+                    labs: ["Choose 5 programs", "Do recon for 1 week", "Submit first reports"],
+                    certificationPrep: "Real-world application of skills"
                 },
                 {
-                    day: 29,
-                    title: "Certifications & Career Path",
-                    topics: ["OSCP overview", "eJPT, CEH, PNPT", "Building portfolio", "Networking in infosec"],
-                    resources: ["https://www.offensive-security.com/pwk-oscp/", "InfoSec communities"],
-                    practice: "Plan certification path, update LinkedIn/GitHub"
+                    week: 22,
+                    title: "CTF Competitions & Practice",
+                    focus: "Competitive Hacking",
+                    topics: [
+                        "CTF categories (web, crypto, forensics, pwn)",
+                        "CTF tools and frameworks",
+                        "Team collaboration",
+                        "Time management in CTFs",
+                        "Write-up creation",
+                        "CTF platform navigation"
+                    ],
+                    resources: [
+                        { name: "CTFtime", url: "https://ctftime.org", type: "Competition Calendar" },
+                        { name: "PicoCTF", url: "https://picoctf.org", type: "Beginner CTF" },
+                        { name: "OverTheWire", url: "https://overthewire.org", type: "Wargames" },
+                        { name: "CTF Field Guide", url: "https://trailofbits.github.io/ctf/", type: "Guide" }
+                    ],
+                    labs: ["Participate in 2 CTFs", "Complete 50 challenges", "Write 5 CTF write-ups"],
+                    certificationPrep: "Skill validation"
                 },
                 {
-                    day: 30,
-                    title: "Capstone Project",
-                    topics: ["Full penetration test", "Professional report", "GitHub portfolio update"],
-                    resources: ["Personal project compilation"],
-                    practice: "Complete end-to-end pentest, document everything, showcase work"
+                    week: 23,
+                    title: "Professional Skills & Certification Prep",
+                    focus: "Career Preparation",
+                    topics: [
+                        "Penetration testing report writing",
+                        "Executive vs technical communication",
+                        "Risk assessment and CVSS scoring",
+                        "Certification roadmap (eJPT → OSCP)",
+                        "Building portfolio and resume",
+                        "LinkedIn and networking strategies"
+                    ],
+                    resources: [
+                        { name: "TCM Security Report", url: "https://github.com/hmaverickadams/TCM-Security-Sample-Pentest-Report", type: "Sample Report" },
+                        { name: "OSCP Certification Guide", url: "https://www.offensive-security.com/pwk-oscp/", type: "Official Info" },
+                        { name: "Cybersecurity Resume Guide", url: "https://www.cybersecurityeducation.org/careers/resume/", type: "Guide" },
+                        { name: "InfoSec Prep Discord", url: "https://discord.gg/infosec", type: "Community" }
+                    ],
+                    labs: ["Write 3 professional reports", "Update all profiles", "Plan certification path"],
+                    certificationPrep: "Career planning"
+                },
+                {
+                    week: 24,
+                    title: "Capstone Project & Portfolio",
+                    focus: "Showcase Your Skills",
+                    topics: [
+                        "Capstone penetration test project",
+                        "Comprehensive documentation",
+                        "GitHub portfolio creation",
+                        "Blog/YouTube channel setup",
+                        "Contributing to open-source security tools",
+                        "Continuous learning plan"
+                    ],
+                    resources: [
+                        { name: "GitHub Profile README", url: "https://github.com/abhisheknaiidu/awesome-github-profile-readme", type: "Examples" },
+                        { name: "Jekyll for Blogging", url: "https://jekyllrb.com", type: "Static Site Generator" },
+                        { name: "Awesome Security", url: "https://github.com/sbilly/awesome-security", type: "Open Source Projects" },
+                        { name: "InfoSec Career Roadmap", url: "https://pauljerimy.com/security-certification-roadmap/", type: "Certification Path" }
+                    ],
+                    labs: ["Complete capstone project", "Launch portfolio site", "Share first blog post/video"],
+                    certificationPrep: "Job application readiness"
                 }
             ]
         }
@@ -462,7 +778,7 @@ const LearningHub = () => {
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-3 mt-6">
-                        <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">30-Day Roadmap</Badge>
+                        <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">6-Month Professional Roadmap</Badge>
                         <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">Git Mastery</Badge>
                         <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">Career Guidance</Badge>
                         <Badge className="bg-white/20 text-white border-white/30 text-sm px-3 py-1">Certifications</Badge>
@@ -501,45 +817,47 @@ const LearningHub = () => {
                 </div>
             </section>
 
-            {/* 30-Day Roadmap */}
+            {/* 6-Month Roadmap */}
             <section>
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2">
                         <Calendar className="h-6 w-6 text-red-600" />
-                        30-Day Intensive Roadmap
+                        6-Month Professional Roadmap
                     </h2>
                     <div className="flex items-center gap-3">
                         <span className="text-sm text-muted-foreground">
-                            Progress: {completedDays.length}/30 days
+                            Progress: {completedWeeks.length}/{totalWeeks} weeks
                         </span>
-                        <Progress value={(completedDays.length / 30) * 100} className="w-32" />
+                        <Progress value={progressPercentage} className="w-32" />
                     </div>
                 </div>
 
-                <Tabs defaultValue="week1" className="space-y-6">
-                    <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full">
-                        {thirtyDayRoadmap.map((week) => (
-                            <TabsTrigger key={week.week} value={`week${week.week}`}>
-                                Week {week.week}
+                <Tabs defaultValue="month1" className="space-y-6">
+                    <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full">
+                        {sixMonthRoadmap.map((monthData) => (
+                            <TabsTrigger key={monthData.month} value={`month${monthData.month}`}>
+                                Month {monthData.month}
                             </TabsTrigger>
                         ))}
                     </TabsList>
 
-                    {thirtyDayRoadmap.map((week) => (
-                        <TabsContent key={week.week} value={`week${week.week}`} className="space-y-4">
+                    {sixMonthRoadmap.map((monthData) => (
+                        <TabsContent key={monthData.month} value={`month${monthData.month}`} className="space-y-4">
                             <Card className="bg-gradient-to-r from-red-600/10 to-orange-600/10 border-red-600/20">
                                 <CardHeader>
-                                    <CardTitle className="text-xl">Week {week.week}: {week.theme}</CardTitle>
+                                    <div className="space-y-2">
+                                        <CardTitle className="text-2xl">Month {monthData.month}: {monthData.title}</CardTitle>
+                                        <p className="text-muted-foreground italic">🎯 {monthData.theme}</p>
+                                    </div>
                                 </CardHeader>
                             </Card>
 
                             <Accordion type="single" collapsible className="space-y-3">
-                                {week.days.map((day) => {
-                                    const dayNumber = (week.week - 1) * 7 + day.day - ((week.week - 1) * 7);
-                                    const isCompleted = completedDays.includes(dayNumber);
+                                {monthData.weeks.map((weekData) => {
+                                    const isCompleted = completedWeeks.includes(weekData.week);
 
                                     return (
-                                        <AccordionItem key={day.day} value={`day-${day.day}`} className="border rounded-lg px-4 bg-card">
+                                        <AccordionItem key={weekData.week} value={`week-${weekData.week}`} className="border rounded-lg px-4 bg-card">
                                             <AccordionTrigger className="hover:no-underline">
                                                 <div className="flex items-center gap-3 w-full">
                                                     <Button
@@ -548,48 +866,52 @@ const LearningHub = () => {
                                                         className={isCompleted ? "bg-green-600 hover:bg-green-700" : ""}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            toggleDayCompletion(dayNumber);
+                                                            toggleWeekCompletion(weekData.week);
                                                         }}
                                                     >
                                                         {isCompleted ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
                                                     </Button>
                                                     <div className="flex-1 text-left">
-                                                        <div className="font-semibold">Day {day.day}: {day.title}</div>
+                                                        <div className="font-semibold">Week {weekData.week}: {weekData.title}</div>
                                                         <div className="text-sm text-muted-foreground">
-                                                            {day.topics.length} topics • {day.resources.length} resources
+                                                            {weekData.focus} • {weekData.topics.length} topics
                                                         </div>
                                                     </div>
                                                 </div>
                                             </AccordionTrigger>
                                             <AccordionContent className="pt-4 space-y-4">
                                                 <div>
-                                                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                                    <h4 className="font-semibold mb-3 flex items-center gap-2">
                                                         <BookOpen className="h-4 w-4 text-red-600" />
-                                                        Topics to Learn
+                                                        Topics to Master
                                                     </h4>
-                                                    <ul className="space-y-1 ml-6">
-                                                        {day.topics.map((topic, idx) => (
-                                                            <li key={idx} className="text-sm list-disc">{topic}</li>
+                                                    <ul className="space-y-2">
+                                                        {weekData.topics.map((topic, idx) => (
+                                                            <li key={idx} className="flex items-start gap-2 text-sm">
+                                                                <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                                                {topic}
+                                                            </li>
                                                         ))}
                                                     </ul>
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                                                    <h4 className="font-semibold mb-3 flex items-center gap-2">
                                                         <Globe className="h-4 w-4 text-orange-600" />
                                                         Learning Resources
                                                     </h4>
                                                     <ul className="space-y-2">
-                                                        {day.resources.map((resource, idx) => (
-                                                            <li key={idx}>
+                                                        {weekData.resources.map((resource, idx) => (
+                                                            <li key={idx} className="bg-muted/30 p-3 rounded-lg">
                                                                 <a
-                                                                    href={resource}
+                                                                    href={resource.url}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="text-sm text-red-600 hover:underline flex items-center gap-2"
+                                                                    className="text-sm text-red-600 hover:underline flex items-center gap-2 font-medium"
                                                                 >
                                                                     <ExternalLink className="h-3 w-3" />
-                                                                    {resource}
+                                                                    {resource.name}
                                                                 </a>
+                                                                <p className="text-xs text-muted-foreground mt-1">{resource.type}</p>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -597,9 +919,20 @@ const LearningHub = () => {
                                                 <div>
                                                     <h4 className="font-semibold mb-2 flex items-center gap-2">
                                                         <Terminal className="h-4 w-4 text-green-600" />
-                                                        Hands-on Practice
+                                                        Hands-on Labs
                                                     </h4>
-                                                    <p className="text-sm bg-muted/50 p-3 rounded-lg">{day.practice}</p>
+                                                    <ul className="space-y-2">
+                                                        {weekData.labs.map((lab, idx) => (
+                                                            <li key={idx} className="text-sm bg-green-600/10 border-l-2 border-green-600 p-3 rounded">
+                                                                ⚡ {lab}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-blue-600/10 border border-blue-600/20 p-3 rounded-lg">
+                                                    <p className="text-sm text-blue-600 font-medium">
+                                                        📚 Certification Prep: {weekData.certificationPrep}
+                                                    </p>
                                                 </div>
                                             </AccordionContent>
                                         </AccordionItem>
@@ -857,8 +1190,8 @@ const LearningHub = () => {
                                 <Flame className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <div className="text-3xl font-bold text-green-600">{completedDays.length}</div>
-                                <div className="text-sm text-muted-foreground">Days Completed</div>
+                                <div className="text-3xl font-bold text-green-600">{completedWeeks.length}</div>
+                                <div className="text-sm text-muted-foreground">Weeks Completed</div>
                             </div>
                         </div>
                     </CardContent>
@@ -871,7 +1204,7 @@ const LearningHub = () => {
                                 <TrendingUp className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <div className="text-3xl font-bold text-orange-600">{Math.round((completedDays.length / 30) * 100)}%</div>
+                                <div className="text-3xl font-bold text-orange-600">{progressPercentage}%</div>
                                 <div className="text-sm text-muted-foreground">Progress</div>
                             </div>
                         </div>
@@ -885,8 +1218,8 @@ const LearningHub = () => {
                                 <Trophy className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <div className="text-3xl font-bold text-purple-600">{Math.floor(completedDays.length / 7)}</div>
-                                <div className="text-sm text-muted-foreground">Weeks Finished</div>
+                                <div className="text-3xl font-bold text-purple-600">{Math.floor(completedWeeks.length / 4)}</div>
+                                <div className="text-sm text-muted-foreground">Months Finished</div>
                             </div>
                         </div>
                     </CardContent>
@@ -899,8 +1232,8 @@ const LearningHub = () => {
                                 <Star className="h-6 w-6 text-white" />
                             </div>
                             <div>
-                                <div className="text-3xl font-bold text-blue-600">{30 - completedDays.length}</div>
-                                <div className="text-sm text-muted-foreground">Days Remaining</div>
+                                <div className="text-3xl font-bold text-blue-600">{totalWeeks - completedWeeks.length}</div>
+                                <div className="text-sm text-muted-foreground">Weeks Remaining</div>
                             </div>
                         </div>
                     </CardContent>

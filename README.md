@@ -43,9 +43,15 @@ This project now includes a **fully functional backend API** that provides:
 - **Threat Intel**: IP/Domain reputation and malware scanning
 
 ### 📚 Learning Hub
-- 30-day structured cybersecurity roadmap
+- **6-month professional cybersecurity roadmap** with weekly learning objectives
+- Comprehensive curriculum covering Foundations → Intermediate → Advanced topics
+- Month 1-2: Linux, Networking, Python, Web Development
+- Month 3-4: Web Security (OWASP Top 10), Network Pentesting, Active Directory
+- Month 5-6: Cloud Security, API Testing, Bug Bounty, Certification Prep
 - Git mastery training (20+ commands, workflows, exercises)
-- YouTube channels, podcasts, books, courses
+- 100+ curated resources per month (courses, labs, documentation)
+- Career guidance with certification roadmap (eJPT → OSCP)
+- YouTube channels, podcasts, books, and community resources
 - OWASP Top 10 interactive lab
 - Security fundamentals (CIA Triad, VAPT methodology)
 
