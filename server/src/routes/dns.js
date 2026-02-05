@@ -101,6 +101,7 @@ router.get('/reverse', async (req, res) => {
 /**
  * GET /api/dns/whois
  * Perform WHOIS lookup (basic - works on Linux/Mac with whois installed)
+ * SECURITY: Uses spawn instead of exec to prevent command injection
  */
 router.get('/whois', async (req, res) => {
     try {
@@ -110,11 +111,63 @@ router.get('/whois', async (req, res) => {
             return res.status(400).json({ error: 'Domain is required' });
         }
 
-        const cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+        // SECURITY: Strict validation to prevent command injection
+        const cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0].split(':')[0].toLowerCase().trim();
+
+        // Validate domain format - prevent command injection
+        const domainRegex = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/i;
+        if (!domainRegex.test(cleanDomain)) {
+            return res.status(400).json({
+                error: 'Invalid domain format',
+                message: 'Domain contains invalid characters'
+            });
+        }
+
+        // Additional security: Check for command injection attempts
+        const dangerousChars = /[;&|`$(){}[\]<>'"\\]/;
+        if (dangerousChars.test(cleanDomain)) {
+            return res.status(400).json({
+                error: 'Invalid domain format',
+                message: 'Domain contains forbidden characters'
+            });
+        }
 
         // Try to use system whois command (if available)
+        // SECURITY: Using spawn with array args instead of shell command
         try {
-            const { stdout } = await execAsync(`whois ${cleanDomain}`, { timeout: 10000 });
+            const { spawn } = await import('child_process');
+
+            const whoisProcess = spawn('whois', [cleanDomain], {
+                timeout: 10000,
+                shell: false // CRITICAL: Disable shell to prevent injection
+            });
+
+            let stdout = '';
+            let stderr = '';
+
+            whoisProcess.stdout.on('data', (data) => {
+                stdout += data.toString();
+            });
+
+            whoisProcess.stderr.on('data', (data) => {
+                stderr += data.toString();
+            });
+
+            await new Promise((resolve, reject) => {
+                whoisProcess.on('close', (code) => {
+                    if (code === 0) resolve();
+                    else reject(new Error(stderr || 'WHOIS command failed'));
+                });
+
+                whoisProcess.on('error', (error) => {
+                    reject(error);
+                });
+
+                setTimeout(() => {
+                    whoisProcess.kill();
+                    reject(new Error('WHOIS timeout'));
+                }, 10000);
+            });
 
             // Parse basic info
             const registrar = stdout.match(/Registrar:\s*(.+)/i)?.[1]?.trim();
@@ -135,7 +188,8 @@ router.get('/whois', async (req, res) => {
             res.json({
                 domain: cleanDomain,
                 error: 'WHOIS command not available on this system',
-                suggestion: 'Use web-based WHOIS services like whois.domaintools.com'
+                suggestion: 'Use web-based WHOIS services like whois.domaintools.com',
+                note: 'WHOIS requires the system whois command to be installed'
             });
         }
 
@@ -143,7 +197,7 @@ router.get('/whois', async (req, res) => {
         console.error('WHOIS lookup error:', error.message);
         res.status(500).json({
             error: 'WHOIS lookup failed',
-            details: error.message
+            message: error.message
         });
     }
 });

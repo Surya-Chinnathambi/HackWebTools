@@ -18,19 +18,20 @@
     "author": "HackWebTools",
     "license": "MIT",
     "dependencies": {
-        "express": "^4.18.2",
-        "cors": "^2.8.5",
-        "dotenv": "^16.3.1",
-        "mongoose": "^8.0.3",
         "axios": "^1.6.2",
         "bcryptjs": "^2.4.3",
-        "jsonwebtoken": "^9.0.2",
+        "cheerio": "^1.0.0-rc.12",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
         "express-rate-limit": "^7.1.5",
         "helmet": "^7.1.0",
-        "ws": "^8.16.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.0.3",
         "node-fetch": "^3.3.2",
         "ssl-checker": "^2.0.9",
-        "cheerio": "^1.0.0-rc.12"
+        "validator": "^13.15.26",
+        "ws": "^8.16.0"
     },
     "devDependencies": {
         "nodemon": "^3.0.2"
