@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     MessageSquare,
     CheckCircle2,
@@ -17,7 +19,18 @@ import {
     Lock,
     Users,
     AlertTriangle,
-    BookOpen
+    BookOpen,
+    Search,
+    Star,
+    Brain,
+    Award,
+    Clock,
+    Filter,
+    ChevronDown,
+    ChevronUp,
+    Bookmark,
+    Share2,
+    Copy
 } from "lucide-react";
 
 interface InterviewQuestion {
@@ -461,6 +474,296 @@ const interviewQuestions: InterviewQuestion[] = [
             "Include recent example of applying new knowledge"
         ],
         relatedTopics: ["Continuous Learning", "Security Research", "CVEs", "Community Engagement"]
+    },
+
+    // Cryptography Questions
+    {
+        id: "crypto-01",
+        category: "Technical",
+        difficulty: "Mid-Level",
+        question: "Explain the difference between encryption and hashing. When would you use each?",
+        badAnswer: "Encryption scrambles data, hashing makes it secure. Both are for security.",
+        badReasons: [
+            "Imprecise definitions",
+            "No mention of reversibility",
+            "Missing use cases",
+            "Doesn't explain fundamental difference"
+        ],
+        goodAnswer: "**Encryption** is reversible - you can get the original data back with the correct key. It's two-way: plaintext → ciphertext → plaintext. Use for: protecting data in transit (HTTPS/TLS), data at rest (encrypted drives), secure messaging. Examples: AES-256 for file encryption, RSA for key exchange. **Hashing** is one-way - you cannot reverse it to get original data. Same input always produces same output (deterministic), but even tiny changes create completely different hash. Use for: password storage (never store passwords, only hashes), file integrity verification (checksums), digital signatures, blockchain. Examples: SHA-256 for file verification, bcrypt/Argon2 for passwords. Key Difference: If you need the data back, use encryption. If you only need to verify/compare, use hashing. Real-world example: Password login: Hash the entered password and compare to stored hash. Credit card storage: Encrypt card numbers so payment processor can decrypt them. Common mistake: Using MD5 or SHA-1 for passwords (too fast, vulnerable to rainbow tables) - always use purpose-built password hashing algorithms with salt and high work factors.",
+        goodReasons: [
+            "Clear distinction: reversible vs one-way",
+            "Specific use cases for each",
+            "Named algorithms with purposes",
+            "Explains common mistakes",
+            "Real-world examples (login, payment)",
+            "Mentions salt and work factors for passwords"
+        ],
+        tips: [
+            "Emphasize reversibility as the key difference",
+            "Use concrete examples for both",
+            "Mention common misuse (MD5 for passwords)",
+            "Know when to use each"
+        ],
+        relatedTopics: ["Cryptography", "Hashing", "Encryption", "Password Security"]
+    },
+    {
+        id: "crypto-02",
+        category: "Scenario",
+        difficulty: "Senior",
+        question: "A company asks you to review their encryption strategy. They're using AES-128 for file encryption, MD5 for file integrity, and storing encrypted files with keys in the same database. What would you recommend?",
+        badAnswer: "Switch to AES-256 and use SHA-256 instead of MD5.",
+        badReasons: [
+            "Misses the critical vulnerability (key storage)",
+            "Doesn't prioritize issues by severity",
+            "AES-128 is actually fine for most use cases",
+            "No explanation of why recommendations matter"
+        ],
+        goodAnswer: "**Critical Issue (Fix Immediately)**: Keys stored with encrypted data. This is like locking your door but leaving the key in the lock. If an attacker breaches the database, they get both ciphertext and keys - encryption is useless. **Recommendation**: Implement proper key management: Use HSM (Hardware Security Module) for production, Key Management Service (AWS KMS, Azure Key Vault, Google KMS) for cloud, At minimum: store keys on separate server with strict access controls. Never commit keys to Git. **High Priority**: MD5 for integrity is broken (collision attacks since 2008). Attacker can create modified file with same MD5 hash. **Recommendation**: Switch to SHA-256 minimum, SHA-3 preferred. Use HMAC for authenticated integrity. **Low Priority**: AES-128 is actually sufficient for most commercial use (not broken, 2^128 combinations). AES-256 is better but not urgent. **Recommendation**: Plan migration to AES-256 during next security refresh, not immediate. **Additional Recommendations**: 1) Implement key rotation policy (90 days for sensitive data), 2) Use authenticated encryption (AES-GCM instead of AES-CBC alone - prevents tampering), 3) Document encryption key recovery process for disasters, 4) Audit who has access to encryption keys (principle of least privilege). **Priority Order**: Key storage (critical vulnerability) → Hash algorithm (broken security) → AES key size (future-proofing). Fix severity: 10/10 → 8/10 → 4/10.",
+        goodReasons: [
+            "Identifies the critical vulnerability first (key storage)",
+            "Prioritizes by severity, not just listing issues",
+            "Explains why each issue matters",
+            "Provides specific, actionable recommendations",
+            "Includes both immediate fixes and long-term improvements",
+            "Mentions key rotation and access control",
+            "Shows senior-level strategic thinking"
+        ],
+        tips: [
+            "Always prioritize by severity/urgency",
+            "Key management is often the weakest point",
+            "Explain business impact, not just technical flaws",
+            "Provide both quick wins and long-term roadmap",
+            "Senior questions need comprehensive answers"
+        ],
+        relatedTopics: ["Cryptography", "Key Management", "AES", "Hash Functions", "Security Architecture"]
+    },
+
+    // Web Application Security - Advanced
+    {
+        id: "webapp-01",
+        category: "Technical",
+        difficulty: "Mid-Level",
+        question: "Explain CSRF (Cross-Site Request Forgery) and how anti-CSRF tokens prevent it.",
+        badAnswer: "CSRF is when an attacker makes requests on behalf of a user. Tokens prevent this.",
+        badReasons: [
+            "Doesn't explain how the attack works",
+            "No example attack scenario",
+            "Doesn't explain why tokens are effective",
+            "Missing alternative defenses"
+        ],
+        goodAnswer: "**CSRF Attack Mechanics**: A victim is logged into site A (bank.com). Attacker tricks victim into visiting attacker's site (evil.com). Evil.com contains hidden form: `<form action='https://bank.com/transfer' method='POST'><input name='to' value='attacker'/><input name='amount' value='10000'/></form>` with auto-submit JavaScript. Victim's browser automatically includes their bank.com cookies (session token) with the request - browser can't tell it's a cross-site attack. Bank.com processes legitimate-looking request because session is valid. Result: Money transferred without victim's knowledge. **Why Tokens Work**: Server generates unique, unpredictable token per session/request. Token stored in hidden form field AND session. On submission, server compares: form token === session token. Attacker's site can't read victim's bank.com token (Same-Origin Policy blocks this), so forged requests fail validation. **Implementation**: Generate: cryptographically random token (128+ bits), Store: server-side session + hidden form field, Validate: every state-changing request (POST, PUT, DELETE), Reject: if token missing or mismatched. **Alternative Defenses**: SameSite cookie attribute (blocks cross-site requests), Double-submit cookies (token in cookie + form), Check Referer header (weak, easily bypassed), Re-authentication for sensitive actions. **Example**: Django uses {% csrf_token %} template tag, generates new token per session. **Common Mistake**: Only protecting POST requests - GET should never change state (REST principle), but many apps violate this.",
+        goodReasons: [
+            "Step-by-step attack scenario with HTML",
+            "Explains browser cookie behavior",
+            "Details why tokens work (Same-Origin Policy)",
+            "Implementation specifics (generation, storage, validation)",
+            "Lists multiple defense options",
+            "Mentions common mistakes",
+            "Framework example (Django)"
+        ],
+        tips: [
+            "Walk through a concrete attack scenario",
+            "Explain why defenses work, not just what they are",
+            "Mention SameSite cookies (modern approach)",
+            "Know at least one framework's CSRF protection"
+        ],
+        relatedTopics: ["CSRF", "OWASP Top 10", "Session Management", "Same-Origin Policy"]
+    },
+    {
+        id: "webapp-02",
+        category: "Scenario",
+        difficulty: "Senior",
+        question: "You're building a SaaS platform where users can upload files. Design a secure file upload system considering all attack vectors.",
+        badAnswer: "Validate file type by extension, check file size, scan for viruses.",
+        badReasons: [
+            "Extension validation is easily bypassed",
+            "Doesn't consider multiple attack vectors",
+            "Missing storage security",
+            "No defense-in-depth approach",
+            "Incomplete threat model"
+        ],
+        goodAnswer: "**Threat Model First**: File upload attacks include: RCE via malicious files, XSS via SVG/HTML files, path traversal, DoS via large files, malware distribution, SSRF via XML/Office docs. **Defense-in-Depth Strategy**: **1) Input Validation**: Whitelist allowed MIME types (check actual bytes, not extension - file signature/magic bytes), Limit file size (per file + per user quota), Generate unique, random filenames (prevent directory traversal, collisions), Sanitize original filename if displayed (prevent XSS). **2) Storage Security**: Store outside webroot (files not directly accessible via URL), Separate domain for user content (user-content.example.com prevents cookie theft), Use object storage (S3, Azure Blob) with IAM controls, Implement signed URLs with expiration (temporary access), Never execute uploaded files (serve with headers: Content-Disposition: attachment). **3) Content Security**: Scan with antivirus (ClamAV) before storage, For images: re-encode with ImageMagick/Pillow (strips EXIF, prevents polyglot attacks), For documents: use sandboxed preview service, Validate SVG/XML: disable external entities (XXE prevention), Set CSP headers: `Content-Security-Policy: default-src 'none'; sandbox`. **4) Access Control**: Validate user permissions before upload and download, Check quotas and rate limits, Log all uploads with user, IP, file hash. **5) Monitoring**: Alert on: suspicious file types (.exe, .sh), high upload volume (abuse), failed virus scans, unusual access patterns. **Architecture**: Upload flow: Client → API Gateway (size check) → Lambda (validation) → S3 (storage) → Async virus scan → Database (metadata). Download: Signed URL generation → CloudFront (CDN) → S3. **Additional**: Implement file versioning (recover from ransomware), Encrypt at rest (S3 SSE-KMS), Regular security audits of uploaded files, Incident response plan for malicious uploads.",
+        goodReasons: [
+            "Starts with threat model (shows strategic thinking)",
+            "Defense-in-depth across multiple layers",
+            "Specific technical implementations",
+            "Considers storage, access, and content security",
+            "Includes monitoring and incident response",
+            "Provides architecture diagram in text",
+            "Covers advanced attacks (XXE, polyglot, SSRF)",
+            "Senior-level comprehensive answer"
+        ],
+        tips: [
+            "Senior questions need architecture-level thinking",
+            "Always threat model first",
+            "Defense-in-depth: input, storage, access, monitoring",
+            "Mention specific technologies and services",
+            "Include both prevention and detection"
+        ],
+        relatedTopics: ["File Upload Security", "Defense in Depth", "Cloud Security", "XXE", "Path Traversal"]
+    },
+
+    // Cloud Security
+    {
+        id: "cloud-01",
+        category: "Technical",
+        difficulty: "Mid-Level",
+        question: "What are the most common misconfigurations in cloud environments (AWS, Azure, GCP)?",
+        badAnswer: "Leaving S3 buckets public and using weak passwords.",
+        badReasons: [
+            "Only mentions two issues",
+            "Too surface-level for mid-level",
+            "No mention of IAM, networking, or logging",
+            "Doesn't explain impact or detection"
+        ],
+        goodAnswer: "**IAM Misconfigurations (Most Critical)**: Overly permissive IAM policies (FullAccess instead of least privilege), Long-lived access keys (should rotate every 90 days), Root account usage (should be MFA-protected and rarely used), Missing MFA on privileged accounts, Inline policies instead of managed policies (harder to audit), Cross-account role trust issues. **Storage Misconfigurations**: Public S3 buckets (50% of breaches involve exposed storage), Missing encryption at rest, Public snapshots/AMIs containing sensitive data, Object ACLs overriding bucket policies. **Network Misconfigurations**: Overly permissive security groups (0.0.0.0/0 on port 22/3389), Default VPC usage (should use custom VPC with private subnets), Missing VPC flow logs (blind to network traffic), Public RDS/database instances (should be in private subnets), Disabled network ACLs. **Logging & Monitoring**: CloudTrail/Azure Monitor disabled (no audit trail), No log aggregation to SIEM, S3 bucket logging disabled, Missing alerts on suspicious API calls (GuardDuty), No file integrity monitoring. **Compute Misconfigurations**: Unpatched instances, Instance metadata service v1 (vulnerable to SSRF), Missing security agents (AV, EDR), Weak SSH keys or password auth enabled. **Detection**: Use Cloud Security Posture Management (CSPM) tools: AWS Security Hub, Azure Security Center, Prisma Cloud, ScoutSuite (open-source), Manual: AWS Access Analyzer, IAM Policy Simulator. **Real Breach**: Capital One (2019) - SSRF via misconfigured WAF led to 100M credit applications stolen. Root cause: Overly permissive IAM role + metadata service exposure.",
+        goodReasons: [
+            "Comprehensive coverage of all major areas",
+            "Organized by category (IAM, storage, network, etc.)",
+            "Specific examples for each issue",
+            "Mentions detection tools",
+            "Real-world breach example with root cause",
+            "Shows depth expected at mid-level"
+        ],
+        tips: [
+            "Organize by category (IAM, network, storage, logging)",
+            "IAM misconfigurations are most critical",
+            "Mention specific tools (Security Hub, ScoutSuite)",
+            "Include a recent breach example",
+            "Know at least one CSPM tool"
+        ],
+        relatedTopics: ["Cloud Security", "AWS", "IAM", "Misconfiguration", "CSPM"]
+    },
+    {
+        id: "cloud-02",
+        category: "Scenario",
+        difficulty: "Senior",
+        question: "Design a zero-trust architecture for a company migrating from on-premise to AWS. What components and principles would you implement?",
+        badAnswer: "Use VPC, IAM roles, and MFA. Implement least privilege.",
+        badReasons: [
+            "Generic buzzwords, no architecture",
+            "Doesn't explain zero-trust principles",
+            "Missing identity, data, and application layers",
+            "No mention of continuous verification",
+            "Lacks specific AWS services and integration"
+        ],
+        goodAnswer: "**Zero-Trust Principles**: 1) Never trust, always verify (no implicit trust based on network location), 2) Assume breach (segment and limit blast radius), 3) Verify explicitly (authenticate and authorize every request), 4) Least privilege access (JIT, time-bound). **Architecture Components**: **Identity Layer**: AWS IAM Identity Center (SSO) as identity provider, MFA mandatory (U2F/WebAuthn for admins, TOTP for users), Just-in-time access with AWS Systems Manager Session Manager, Conditional access: geolocation, device compliance checks, Identity federation with Azure AD/Okta. **Network Layer**: Micro-segmentation with Security Groups (default deny all), VPC endpoints for AWS service access (no internet gateway for production), AWS PrivateLink for third-party SaaS, Transit Gateway with route inspection, No VPN - use AWS Client VPN with certificate auth, Network traffic inspection: AWS Network Firewall or Palo Alto VM-Series. **Application Layer**: API Gateway with AWS WAF (OWASP rules), Application Load Balancer with authentication (ALB + Cognito/OIDC), Service mesh (AWS App Mesh or Istio) for microservices with mTLS, Container security: Fargate (serverless), EKS with network policies. **Data Layer**: All data encrypted at rest (KMS customer-managed keys), Field-level encryption for sensitive data, S3 Block Public Access enabled organization-wide, Secrets Manager for credentials (no hardcoded secrets), Database access through IAM authentication (RDS Proxy), DLP scanning on S3 with Macie. **Monitoring & Response**: CloudTrail + EventBridge for all API calls, GuardDuty for threat detection, Security Hub as centralized view, SIEM integration (Splunk/Sumo Logic), Real-time anomaly detection (User Behavior Analytics), Automated response: Lambda functions to revoke access, isolate instances. **Continuous Verification**: Every request evaluated: identity (who), device (health), location (where), time (when), behavior (anomaly), Policy engine: Cedar or Open Policy Agent, Re-authentication for sensitive operations, Session timeout: 4 hours for users, 15 minutes for tokens. **Migration Strategy**: Phase 1: Identity (SSO, MFA), Phase 2: Network (segmentation, private access), Phase 3: Applications (service mesh, mTLS), Phase 4: Data (encryption, DLP), Phase 5: Monitoring (SIEM, automated response). **Key Metrics**: Mean time to detect (MTTD), Mean time to respond (MTTR), % of access with MFA, % of traffic encrypted, Policy violations per month.",
+        goodReasons: [
+            "Comprehensive architecture across all layers",
+            "Specific AWS services for each component",
+            "Explains zero-trust principles first",
+            "Includes identity, network, app, data, monitoring",
+            "Migration phasing strategy",
+            "Measurable success metrics",
+            "Senior-level strategic and technical depth"
+        ],
+        tips: [
+            "Senior architecture questions need end-to-end design",
+            "Organize by layers (identity, network, app, data)",
+            "Name specific services and tools",
+            "Include monitoring and incident response",
+            "Show phased migration thinking",
+            "Metrics demonstrate business maturity"
+        ],
+        relatedTopics: ["Zero Trust", "Cloud Architecture", "AWS", "Defense in Depth", "Identity Management"]
+    },
+
+    // Malware Analysis & Reverse Engineering
+    {
+        id: "malware-01",
+        category: "Technical",
+        difficulty: "Mid-Level",
+        question: "Walk me through your process for analyzing an unknown executable suspected to be malware.",
+        badAnswer: "Run it in a sandbox and see what it does.",
+        badReasons: [
+            "No static analysis mentioned",
+            "Dangerous approach (should analyze safely first)",
+            "Missing OSINT and indicator extraction",
+            "No structured methodology",
+            "Doesn't mention reporting or IOC sharing"
+        ],
+        goodAnswer: "**Phase 1: Static Analysis (Safe, No Execution)**: File metadata: hash (SHA-256), size, file type, timestamps, OSINT: Check VirusTotal, Any.run, Hybrid Analysis - see if already analyzed, Strings analysis: `strings malware.exe | grep -i 'http\|.dll\|registry'` - look for URLs, IPs, domains, suspicious strings, PE analysis (Windows): imports (what DLLs?), exports, sections, entry point, Packing detection: UPX, Themida, custom packers (high entropy = packed), Signature scanning: YARA rules for known malware families. **Phase 2: Dynamic Analysis (Controlled Execution)**: Environment: Isolated VM (no network initially), Cuckoo Sandbox or REMnux VM, Network: Monitor DNS (fakeDNS), HTTP (INetSim), Packet capture (Wireshark), Tools: Process Monitor (file/registry/network activity), Process Hacker (memory, threads), Regshot (registry changes before/after), API Monitor (function calls). Execute and observe: What files created/modified?, Registry keys changed?, Network connections attempted?, New processes spawned?, Persistence mechanisms (startup, scheduled tasks)?. **Phase 3: Advanced Analysis (If Needed)**: Debugger: x64dbg or OllyDbg to step through code, Disassembler: IDA Pro or Ghidra for static code analysis, Memory dump analysis: Extract strings, decrypt configs, find C2 domains, Anti-analysis evasion: Detect VM detection, debugger checks, sandbox evasion. **Phase 4: Documentation**: IOCs (Indicators of Compromise): File hashes, IPs, domains, URLs, Registry keys, Mutex names, MITRE ATT&CK mapping: tactics and techniques used, Malware family classification: Ransomware? Trojan? RAT?, Severity assessment: CVSS score, potential impact. **Phase 5: Sharing**: Submit IOCs to threat intel platforms (MISP, AlienVault OTX), Update SIEM/EDR detection rules, Write YARA signatures for detection, Blog post or internal report. **Safety First**: Always use isolated environment, Never run on production network, Snapshot VM before execution, Keep detailed notes with timestamps.",
+        goodReasons: [
+            "Structured methodology (static → dynamic → advanced)",
+            "Safety emphasized throughout",
+            "Specific tools named for each phase",
+            "Explains what to look for at each step",
+            "Includes IOC extraction and sharing",
+            "MITRE ATT&CK framework mentioned",
+            "Comprehensive professional approach"
+        ],
+        tips: [
+            "Always static before dynamic (safety)",
+            "Name specific tools (shows experience)",
+            "Mention OSINT first (don't reinvent wheel)",
+            "Include IOC sharing (community contribution)",
+            "Safety and isolation are paramount"
+        ],
+        relatedTopics: ["Malware Analysis", "Reverse Engineering", "YARA", "Sandbox", "IOC"]
+    },
+
+    // API Security
+    {
+        id: "api-01",
+        category: "Technical",
+        difficulty: "Mid-Level",
+        question: "What are the OWASP API Security Top 10, and how do they differ from the OWASP Top 10 for web applications?",
+        badAnswer: "They're similar but for APIs instead of websites.",
+        badReasons: [
+            "No specific API vulnerabilities listed",
+            "Doesn't explain unique API risks",
+            "Missing examples",
+            "Shows lack of familiarity with API security"
+        ],
+        goodAnswer: "**OWASP API Security Top 10 (2023)**: **API1: Broken Object Level Authorization (BOLA/IDOR)**: Most common API vuln. API exposes object IDs (user_id=123) without checking if requester owns that object. Example: GET /api/users/123/profile returns ANY user's profile. Fix: Server-side authorization checks on every request. **API2: Broken Authentication**: Weak auth mechanisms, token exposure, no rate limiting on auth endpoints. Example: JWT tokens never expire, predictable API keys. **API3: Broken Object Property Level Authorization**: Mass assignment vulnerabilities - API accepts more fields than intended. Example: POST /api/users with {\"is_admin\": true} escalates privileges. **API4: Unrestricted Resource Consumption**: No rate limiting, allows DoS or resource exhaustion. Example: Downloading millions of records via pagination bypass. **API5: Broken Function Level Authorization**: Missing access controls on admin functions. Example: Regular user can call DELETE /api/admin/users. **API6: Unrestricted Access to Sensitive Business Flows**: Abuse of legitimate functionality (scalping, automated account creation). Example: Bot buys all limited-edition items. **API7: Server Side Request Forgery (SSRF)**: API fetches URL provided by user without validation. Example: GET /api/avatar?url= leads to internal network scanning. **API8: Security Misconfiguration**: CORS misconfig, verbose errors, missing security headers. **API9: Improper Inventory Management**: Shadow APIs, old API versions still active, zombie endpoints. **API10: Unsafe Consumption of APIs**: Blindly trusting third-party APIs. **How They Differ from Web Top 10**: APIs are stateless (different session handling), Focus on authorization over authentication (API1, API3, API5), API-specific issues: rate limiting, mass assignment, inventory, Web focus: XSS, CSRF (less relevant for JSON APIs), APIs often machine-to-machine (different threat model). **Testing Tip**: Use tools like Burp Suite, Postman, or specialized API security scanners (Astra, APIsec).",
+        goodReasons: [
+            "Lists all 10 with clear explanations",
+            "Provides concrete examples for each",
+            "Explains differences from web app security",
+            "Includes fixes and testing tools",
+            "Shows deep API security knowledge"
+        ],
+        tips: [
+            "Know the top 3-5 API vulnerabilities cold",
+            "BOLA/IDOR is #1 for APIs (not web apps)",
+            "Provide examples showing understanding",
+            "Explain why APIs have unique risks"
+        ],
+        relatedTopics: ["API Security", "OWASP", "BOLA", "IDOR", "Authorization"]
+    },
+
+    // Social Engineering & Physical Security
+    {
+        id: "social-01",
+        category: "Scenario",
+        difficulty: "Mid-Level",
+        question: "You're conducting a social engineering assessment. A receptionist asks to see your authorization letter before letting you into the building. How do you respond?",
+        badAnswer: "Tell them you forgot it and try to convince them to let you in anyway. That's the test.",
+        badReasons: [
+            "Unethical - exceeding authorization",
+            "Could lead to legal issues",
+            "Damages client relationship",
+            "Not how professional pentesting works",
+            "Puts receptionist in impossible position"
+        ],
+        goodAnswer: "**Stop immediately and comply**. The correct response: \"You're absolutely right to ask. Let me contact the security team who authorized this assessment and have them verify my authorization with you directly. Can I use your phone to call [authorized contact name]?\" **Why This Is Correct**: The receptionist is doing their job correctly, You're testing security controls, not manipulating good employees, Your authorization covers simulating social engineering, not actually compromising security through it, The company will see: receptionist followed policy (positive finding), your professionalism and ethics (builds trust for future work). **Documentation**: Note this as a POSITIVE security control in your report, Praise the receptionist's diligence, Recommend they maintain this policy, If many employees fail but receptionist passes, they should be recognized. **After Assessment**: Debrief includes: What would have happened if receptionist let you in (demonstrate risk), Validate that their response was correct and model behavior, Suggest: Visitor badges, escort policy, visitor log, panic button. **What NOT to Do**: Manipulate or pressure employees who follow policy, Damage property, impersonate law enforcement, Enter without authorization (trespassing), Exceed scope defined in Rules of Engagement. **Key Principle**: You're testing security controls, not exploiting human nature maliciously. Professional social engineering assessments are about identifying weaknesses to fix them, not 'winning' at any cost. This approach has led to: return clients for future engagements, expanded scope to other departments, referrals to peer companies. Trust and ethics matter more than demonstration of skills.",
+        goodReasons: [
+            "Emphasizes ethics and authorization boundaries",
+            "Explains why complying is correct",
+            "Turns 'failure' into positive finding",
+            "Documents appropriate follow-up",
+            "Shows professional maturity",
+            "Contrasts with wrong approaches",
+            "Long-term relationship focus"
+        ],
+        tips: [
+            "Social engineering tests have strict ethical boundaries",
+            "Never exceed authorization, even if you could",
+            "Security-aware employees are successes, not failures",
+            "This question tests ethics as much as technical skill",
+            "Professional reputation > single engagement success"
+        ],
+        relatedTopics: ["Social Engineering", "Ethics", "Physical Security", "Professional Conduct"]
     }
 ];
 
@@ -468,6 +771,11 @@ const InterviewPrep = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>("All");
     const [selectedDifficulty, setSelectedDifficulty] = useState<string>("All");
     const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<string>>(new Set());
+    const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
+    const [showFilters, setShowFilters] = useState<boolean>(true);
+    const [sortBy, setSortBy] = useState<"difficulty" | "category" | "recent">("difficulty");
 
     const categories = ["All", "Technical", "Behavioral", "Scenario", "Explaining Concepts"];
     const difficulties = ["All", "Junior", "Mid-Level", "Senior"];
@@ -475,8 +783,54 @@ const InterviewPrep = () => {
     const filteredQuestions = interviewQuestions.filter(q => {
         const matchesCategory = selectedCategory === "All" || q.category === selectedCategory;
         const matchesDifficulty = selectedDifficulty === "All" || q.difficulty === selectedDifficulty;
-        return matchesCategory && matchesDifficulty;
+        const matchesSearch = searchQuery === "" ||
+            q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            q.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            q.relatedTopics.some(topic => topic.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesDifficulty && matchesSearch;
     });
+
+    // Sort questions
+    const sortedQuestions = [...filteredQuestions].sort((a, b) => {
+        if (sortBy === "difficulty") {
+            const order = { "Junior": 1, "Mid-Level": 2, "Senior": 3 };
+            return order[a.difficulty] - order[b.difficulty];
+        } else if (sortBy === "category") {
+            return a.category.localeCompare(b.category);
+        }
+        return 0;
+    });
+
+    const toggleBookmark = (questionId: string) => {
+        setBookmarkedQuestions(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(questionId)) {
+                newSet.delete(questionId);
+            } else {
+                newSet.add(questionId);
+            }
+            return newSet;
+        });
+    };
+
+    const markAsCompleted = (questionId: string) => {
+        setCompletedQuestions(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(questionId)) {
+                newSet.delete(questionId);
+            } else {
+                newSet.add(questionId);
+            }
+            return newSet;
+        });
+    };
+
+    const copyQuestion = (question: InterviewQuestion) => {
+        const text = `Question: ${question.question}\n\nGood Answer: ${question.goodAnswer}\n\nRelated Topics: ${question.relatedTopics.join(", ")}`;
+        navigator.clipboard.writeText(text);
+    };
+
+    const progressPercentage = Math.round((completedQuestions.size / interviewQuestions.length) * 100);
 
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
@@ -503,221 +857,499 @@ const InterviewPrep = () => {
 
     return (
         <div className="container mx-auto py-8 space-y-6">
-            {/* Header */}
-            <div>
+            {/* Header with Animation */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <div className="flex items-center gap-3 mb-2">
-                    <MessageSquare className="h-8 w-8 text-primary" />
+                    <motion.div
+                        animate={{
+                            rotate: [0, -10, 10, 0],
+                            scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                    >
+                        <Brain className="h-8 w-8 text-primary" />
+                    </motion.div>
                     <h1 className="text-4xl font-bold">Interview Q&A Bank</h1>
                 </div>
                 <p className="text-muted-foreground text-lg">
-                    Master cybersecurity interviews with good vs bad answer examples
+                    Master cybersecurity interviews with {interviewQuestions.length}+ good vs bad answer examples
                 </p>
-            </div>
+            </motion.div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
+            {/* Progress Tracking */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+            >
+                <Card className="bg-gradient-to-br from-primary/10 to-orange-500/10 border-2 border-primary/20">
                     <CardHeader className="pb-3">
-                        <CardDescription>Total Questions</CardDescription>
-                        <CardTitle className="text-3xl">{interviewQuestions.length}</CardTitle>
-                    </CardHeader>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Technical</CardDescription>
-                        <CardTitle className="text-3xl text-blue-600">
-                            {interviewQuestions.filter(q => q.category === "Technical").length}
-                        </CardTitle>
-                    </CardHeader>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Behavioral</CardDescription>
-                        <CardTitle className="text-3xl text-purple-600">
-                            {interviewQuestions.filter(q => q.category === "Behavioral").length}
-                        </CardTitle>
-                    </CardHeader>
-                </Card>
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardDescription>Scenario</CardDescription>
-                        <CardTitle className="text-3xl text-orange-600">
-                            {interviewQuestions.filter(q => q.category === "Scenario").length}
-                        </CardTitle>
-                    </CardHeader>
-                </Card>
-            </div>
-
-            {/* Filters */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Filter Questions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <span className="text-sm font-medium mb-2 block">Category</span>
-                        <div className="flex flex-wrap gap-2">
-                            {categories.map((category) => (
-                                <Button
-                                    key={category}
-                                    variant={selectedCategory === category ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setSelectedCategory(category)}
-                                >
-                                    {category}
-                                </Button>
-                            ))}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Award className="h-5 w-5 text-primary" />
+                                <CardTitle className="text-lg">Your Progress</CardTitle>
+                            </div>
+                            <Badge variant="secondary" className="text-lg px-3 py-1">
+                                {completedQuestions.size} / {interviewQuestions.length}
+                            </Badge>
                         </div>
-                    </div>
-                    <div>
-                        <span className="text-sm font-medium mb-2 block">Experience Level</span>
-                        <div className="flex flex-wrap gap-2">
-                            {difficulties.map((difficulty) => (
-                                <Button
-                                    key={difficulty}
-                                    variant={selectedDifficulty === difficulty ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setSelectedDifficulty(difficulty)}
-                                >
-                                    {difficulty}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                        Showing {filteredQuestions.length} questions
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Questions List */}
-            <div className="space-y-4">
-                {filteredQuestions.map((question) => {
-                    const Icon = getCategoryIcon(question.category);
-                    const isExpanded = expandedQuestionId === question.id;
-
-                    return (
-                        <Card key={question.id} className="hover:shadow-lg transition-shadow">
-                            <CardHeader>
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Badge className={getDifficultyColor(question.difficulty)}>
-                                                {question.difficulty}
-                                            </Badge>
-                                            <Badge variant="outline">
-                                                <Icon className="h-3 w-3 mr-1" />
-                                                {question.category}
-                                            </Badge>
-                                        </div>
-                                        <CardTitle className="text-lg">{question.question}</CardTitle>
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => setExpandedQuestionId(isExpanded ? null : question.id)}
-                                    >
-                                        {isExpanded ? "Hide Answer" : "Show Answer"}
-                                    </Button>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Questions Completed</span>
+                                <span className="font-bold">{progressPercentage}%</span>
+                            </div>
+                            <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
+                                <motion.div
+                                    className="bg-gradient-to-r from-primary to-orange-500 h-full rounded-full"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${progressPercentage}%` }}
+                                    transition={{ duration: 1, ease: "easeOut" }}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+                                <div className="flex items-center gap-1">
+                                    <Bookmark className="h-3 w-3" />
+                                    <span>{bookmarkedQuestions.size} Bookmarked</span>
                                 </div>
-                            </CardHeader>
-
-                            {isExpanded && (
-                                <CardContent className="space-y-6">
-                                    {/* Bad Answer */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <XCircle className="h-5 w-5 text-red-600" />
-                                            <h4 className="font-semibold text-lg">❌ Bad Answer</h4>
-                                        </div>
-                                        <Alert className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900">
-                                            <AlertDescription className="text-sm">
-                                                "{question.badAnswer}"
-                                            </AlertDescription>
-                                        </Alert>
-                                        <div className="space-y-2">
-                                            <span className="text-sm font-medium text-red-800 dark:text-red-200">Why this answer fails:</span>
-                                            <ul className="space-y-1">
-                                                {question.badReasons.map((reason, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
-                                                        <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                        <span>{reason}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    {/* Good Answer */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                            <h4 className="font-semibold text-lg">✅ Good Answer</h4>
-                                        </div>
-                                        <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900">
-                                            <AlertDescription className="text-sm leading-relaxed whitespace-pre-line">
-                                                "{question.goodAnswer}"
-                                            </AlertDescription>
-                                        </Alert>
-                                        <div className="space-y-2">
-                                            <span className="text-sm font-medium text-green-800 dark:text-green-200">Why this answer works:</span>
-                                            <ul className="space-y-1">
-                                                {question.goodReasons.map((reason, idx) => (
-                                                    <li key={idx} className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300">
-                                                        <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                        <span>{reason}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    {/* Tips */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <Lightbulb className="h-5 w-5 text-amber-600" />
-                                            <h4 className="font-semibold text-lg">💡 Pro Tips</h4>
-                                        </div>
-                                        <ul className="space-y-2">
-                                            {question.tips.map((tip, idx) => (
-                                                <li key={idx} className="flex items-start gap-2 text-sm p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-900">
-                                                    <TrendingUp className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                                                    <span>{tip}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    {/* Related Topics */}
-                                    {question.relatedTopics && question.relatedTopics.length > 0 && (
-                                        <div>
-                                            <span className="text-sm font-medium mr-2">Related Topics:</span>
-                                            <div className="inline-flex flex-wrap gap-1 mt-2">
-                                                {question.relatedTopics.map((topic, idx) => (
-                                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                                        {topic}
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            )}
-                        </Card>
-                    );
-                })}
-            </div>
-
-            {filteredQuestions.length === 0 && (
-                <Card>
-                    <CardContent className="py-12 text-center">
-                        <AlertTriangle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No questions found</h3>
-                        <p className="text-muted-foreground">
-                            Try adjusting your filters
-                        </p>
+                                <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 fill-current" />
+                                    <span>{completedQuestions.size} Mastered</span>
+                                </div>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
+            </motion.div>
+
+            {/* Enhanced Stats */}
+            <motion.div
+                className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+            >
+                {[
+                    { label: "Total Questions", value: interviewQuestions.length, icon: MessageSquare, color: "text-blue-600" },
+                    { label: "Technical", value: interviewQuestions.filter(q => q.category === "Technical").length, icon: Code, color: "text-green-600" },
+                    { label: "Behavioral", value: interviewQuestions.filter(q => q.category === "Behavioral").length, icon: Users, color: "text-purple-600" },
+                    { label: "Scenario", value: interviewQuestions.filter(q => q.category === "Scenario").length, icon: Target, color: "text-orange-600" }
+                ].map((stat, index) => {
+                    const Icon = stat.icon;
+                    return (
+                        <motion.div
+                            key={stat.label}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.4 + index * 0.1 }}
+                            whileHover={{ scale: 1.05, y: -5 }}
+                        >
+                            <Card className="hover:shadow-lg transition-all duration-300">
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <Icon className={`h-4 w-4 ${stat.color}`} />
+                                        <CardDescription className="text-xs">{stat.label}</CardDescription>
+                                    </div>
+                                    <CardTitle className={`text-3xl ${stat.color}`}>{stat.value}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                        </motion.div>
+                    );
+                })}
+            </motion.div>
+
+            {/* Search and Filters */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+            >
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="flex items-center gap-2">
+                                <Filter className="h-5 w-5" />
+                                Search & Filter
+                            </CardTitle>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowFilters(!showFilters)}
+                            >
+                                {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <AnimatePresence>
+                        {showFilters && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <CardContent className="space-y-4">
+                                    {/* Search Bar */}
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            placeholder="Search questions, categories, or topics..."
+                                            className="pl-10"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Category Filter */}
+                                    <div>
+                                        <span className="text-sm font-medium mb-2 block">Category</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {categories.map((category) => {
+                                                const Icon = getCategoryIcon(category);
+                                                return (
+                                                    <motion.div key={category} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                        <Button
+                                                            variant={selectedCategory === category ? "default" : "outline"}
+                                                            size="sm"
+                                                            onClick={() => setSelectedCategory(category)}
+                                                            className="gap-1"
+                                                        >
+                                                            <Icon className="h-3 w-3" />
+                                                            {category}
+                                                        </Button>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Difficulty Filter */}
+                                    <div>
+                                        <span className="text-sm font-medium mb-2 block">Experience Level</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {difficulties.map((difficulty) => (
+                                                <motion.div key={difficulty} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                    <Button
+                                                        variant={selectedDifficulty === difficulty ? "default" : "outline"}
+                                                        size="sm"
+                                                        onClick={() => setSelectedDifficulty(difficulty)}
+                                                    >
+                                                        {difficulty}
+                                                    </Button>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Sort Options */}
+                                    <div className="flex items-center justify-between pt-2 border-t">
+                                        <span className="text-sm font-medium">Sort By:</span>
+                                        <div className="flex gap-2">
+                                            {[
+                                                { value: "difficulty", label: "Difficulty" },
+                                                { value: "category", label: "Category" }
+                                            ].map((sort) => (
+                                                <Button
+                                                    key={sort.value}
+                                                    variant={sortBy === sort.value ? "default" : "ghost"}
+                                                    size="sm"
+                                                    onClick={() => setSortBy(sort.value as any)}
+                                                >
+                                                    {sort.label}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                        <Clock className="h-4 w-4" />
+                                        Showing {sortedQuestions.length} questions
+                                    </div>
+                                </CardContent>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </Card>
+            </motion.div>
+
+            {/* Questions List with Enhanced Features */}
+            <div className="space-y-4">
+                <AnimatePresence mode="popLayout">
+                    {sortedQuestions.map((question, index) => {
+                        const Icon = getCategoryIcon(question.category);
+                        const isExpanded = expandedQuestionId === question.id;
+                        const isBookmarked = bookmarkedQuestions.has(question.id);
+                        const isCompleted = completedQuestions.has(question.id);
+
+                        return (
+                            <motion.div
+                                key={question.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ delay: index * 0.05 }}
+                                layout
+                            >
+                                <Card className={`hover:shadow-xl transition-all duration-300 ${isCompleted ? 'border-green-500/50 bg-green-50/50 dark:bg-green-950/20' : ''} ${isBookmarked ? 'border-yellow-500/50' : ''}`}>
+                                    <CardHeader>
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                                    <Badge className={getDifficultyColor(question.difficulty)}>
+                                                        {question.difficulty}
+                                                    </Badge>
+                                                    <Badge variant="outline">
+                                                        <Icon className="h-3 w-3 mr-1" />
+                                                        {question.category}
+                                                    </Badge>
+                                                    {isCompleted && (
+                                                        <Badge className="bg-green-600 text-white">
+                                                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                                                            Mastered
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <CardTitle className="text-lg">{question.question}</CardTitle>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => toggleBookmark(question.id)}
+                                                        className={isBookmarked ? "text-yellow-600" : ""}
+                                                    >
+                                                        <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                                                    </Button>
+                                                </motion.div>
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => copyQuestion(question)}
+                                                        title="Copy question"
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                </motion.div>
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                    <Button
+                                                        variant={isExpanded ? "default" : "outline"}
+                                                        size="sm"
+                                                        onClick={() => setExpandedQuestionId(isExpanded ? null : question.id)}
+                                                    >
+                                                        {isExpanded ? "Hide" : "Show"} Answer
+                                                    </Button>
+                                                </motion.div>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+
+                                    <AnimatePresence>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                            >
+                                                <CardContent className="space-y-6">
+                                                    {/* Bad Answer */}
+                                                    <motion.div
+                                                        className="space-y-3"
+                                                        initial={{ x: -20, opacity: 0 }}
+                                                        animate={{ x: 0, opacity: 1 }}
+                                                        transition={{ delay: 0.1 }}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <XCircle className="h-5 w-5 text-red-600" />
+                                                            <h4 className="font-semibold text-lg">❌ Bad Answer</h4>
+                                                        </div>
+                                                        <Alert className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900">
+                                                            <AlertDescription className="text-sm">
+                                                                "{question.badAnswer}"
+                                                            </AlertDescription>
+                                                        </Alert>
+                                                        <div className="space-y-2">
+                                                            <span className="text-sm font-medium text-red-800 dark:text-red-200">Why this answer fails:</span>
+                                                            <ul className="space-y-1">
+                                                                {question.badReasons.map((reason, idx) => (
+                                                                    <motion.li
+                                                                        key={idx}
+                                                                        initial={{ x: -10, opacity: 0 }}
+                                                                        animate={{ x: 0, opacity: 1 }}
+                                                                        transition={{ delay: 0.1 + idx * 0.05 }}
+                                                                        className="flex items-start gap-2 text-sm text-red-700 dark:text-red-300"
+                                                                    >
+                                                                        <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                                                        <span>{reason}</span>
+                                                                    </motion.li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </motion.div>
+
+                                                    {/* Good Answer */}
+                                                    <motion.div
+                                                        className="space-y-3"
+                                                        initial={{ x: -20, opacity: 0 }}
+                                                        animate={{ x: 0, opacity: 1 }}
+                                                        transition={{ delay: 0.2 }}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                                            <h4 className="font-semibold text-lg">✅ Good Answer</h4>
+                                                        </div>
+                                                        <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900">
+                                                            <AlertDescription className="text-sm leading-relaxed whitespace-pre-line">
+                                                                "{question.goodAnswer}"
+                                                            </AlertDescription>
+                                                        </Alert>
+                                                        <div className="space-y-2">
+                                                            <span className="text-sm font-medium text-green-800 dark:text-green-200">Why this answer works:</span>
+                                                            <ul className="space-y-1">
+                                                                {question.goodReasons.map((reason, idx) => (
+                                                                    <motion.li
+                                                                        key={idx}
+                                                                        initial={{ x: -10, opacity: 0 }}
+                                                                        animate={{ x: 0, opacity: 1 }}
+                                                                        transition={{ delay: 0.2 + idx * 0.05 }}
+                                                                        className="flex items-start gap-2 text-sm text-green-700 dark:text-green-300"
+                                                                    >
+                                                                        <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                                                        <span>{reason}</span>
+                                                                    </motion.li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </motion.div>
+
+                                                    {/* Tips */}
+                                                    <motion.div
+                                                        className="space-y-3"
+                                                        initial={{ x: -20, opacity: 0 }}
+                                                        animate={{ x: 0, opacity: 1 }}
+                                                        transition={{ delay: 0.3 }}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Lightbulb className="h-5 w-5 text-amber-600" />
+                                                            <h4 className="font-semibold text-lg">💡 Pro Tips</h4>
+                                                        </div>
+                                                        <ul className="space-y-2">
+                                                            {question.tips.map((tip, idx) => (
+                                                                <motion.li
+                                                                    key={idx}
+                                                                    initial={{ x: -10, opacity: 0 }}
+                                                                    animate={{ x: 0, opacity: 1 }}
+                                                                    transition={{ delay: 0.3 + idx * 0.05 }}
+                                                                    className="flex items-start gap-2 text-sm p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-900"
+                                                                >
+                                                                    <TrendingUp className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                                                                    <span>{tip}</span>
+                                                                </motion.li>
+                                                            ))}
+                                                        </ul>
+                                                    </motion.div>
+
+                                                    {/* Related Topics */}
+                                                    {question.relatedTopics && question.relatedTopics.length > 0 && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            transition={{ delay: 0.4 }}
+                                                        >
+                                                            <span className="text-sm font-medium mr-2">Related Topics:</span>
+                                                            <div className="inline-flex flex-wrap gap-1 mt-2">
+                                                                {question.relatedTopics.map((topic, idx) => (
+                                                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                                                        {topic}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+
+                                                    {/* Mark as Completed */}
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ delay: 0.5 }}
+                                                        className="pt-4 border-t"
+                                                    >
+                                                        <Button
+                                                            variant={isCompleted ? "outline" : "default"}
+                                                            className="w-full"
+                                                            onClick={() => markAsCompleted(question.id)}
+                                                        >
+                                                            {isCompleted ? (
+                                                                <>
+                                                                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                                                                    Marked as Mastered
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Star className="h-4 w-4 mr-2" />
+                                                                    Mark as Mastered
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </motion.div>
+                                                </CardContent>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </Card>
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
+            </div>
+
+            {sortedQuestions.length === 0 && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                >
+                    <Card>
+                        <CardContent className="py-12 text-center">
+                            <motion.div
+                                animate={{
+                                    rotate: [0, 10, -10, 0],
+                                    scale: [1, 1.1, 1],
+                                }}
+                                transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                            >
+                                <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                            </motion.div>
+                            <h3 className="text-lg font-medium mb-2">No questions found</h3>
+                            <p className="text-muted-foreground mb-4">
+                                Try adjusting your filters or search query
+                            </p>
+                            <Button
+                                onClick={() => {
+                                    setSearchQuery("");
+                                    setSelectedCategory("All");
+                                    setSelectedDifficulty("All");
+                                }}
+                            >
+                                Clear All Filters
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </motion.div>
             )}
         </div>
     );
