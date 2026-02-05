@@ -267,7 +267,13 @@ const Header = () => {
         {/* Mobile menu button */}
         <div className="flex lg:hidden items-center gap-3">
           <ThemeToggle />
-          <button onClick={toggleMenu} className="p-2 transition-transform hover:scale-110">
+          <button
+            onClick={toggleMenu}
+            className="p-2 transition-transform hover:scale-110"
+            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+          >
             {isMenuOpen ? (
               <X className="h-6 w-6 animate-fade-in" />
             ) : (
@@ -277,12 +283,26 @@ const Header = () => {
         </div>
       </div>
 
+      {/* Mobile menu backdrop overlay */}
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+          onClick={() => setIsMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* Mobile menu with animation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t animate-fade-in">
-          <div className="container py-4 flex flex-col gap-4">
+        <div 
+          id="mobile-navigation"
+          className="md:hidden border-t animate-fade-in relative z-50 bg-background shadow-lg"
+          role="navigation"
+          aria-label="Mobile navigation"
+        >
+          <div className="container py-6 flex flex-col gap-3">
             <SearchBar />
-            <nav className="flex flex-col space-y-4">
+            <nav className="flex flex-col space-y-3">
               <Link
                 to="/"
                 className="text-base font-medium transition-colors hover:text-primary"

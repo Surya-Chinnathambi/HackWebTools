@@ -20,7 +20,7 @@
     --secondary-foreground: 0 5% 10%;
 
     --muted: 0 40% 96%;
-    --muted-foreground: 0 5% 45%;
+    --muted-foreground: 0 5% 50%;
 
     --accent: 25 95% 53%;
     --accent-foreground: 0 0% 10%;
@@ -148,7 +148,8 @@
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md;
+    @apply duration-300 ease-out hover:-translate-y-1 hover:shadow-md;
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   }
 
   .nav-link {
@@ -173,6 +174,19 @@
 
   .animate-float {
     animation: float 4s ease-in-out infinite;
+  }
+
+  /* Accessibility: Proper focus indicators */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary ring-0;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
   }
 }
 
