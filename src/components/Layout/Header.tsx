@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3, Key } from "lucide-react";
+import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3 } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
 import SearchBar from "../Search/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -90,13 +90,6 @@ const Header = () => {
                 <Link to="/dashboard" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 text-sm font-medium transition-all hover:shadow-lg hover:scale-105 focus:outline-none">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Dashboard
-                </Link>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <Link to="/api-settings" className="group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-                  <Key className="mr-2 h-4 w-4" />
-                  API Settings
                 </Link>
               </NavigationMenuItem>
 
@@ -429,13 +422,6 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 📊 Dashboard
-              </Link>
-              <Link
-                to="/api-settings"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                🔑 API Settings
               </Link>
               <Link
                 to="/tools"

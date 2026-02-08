@@ -112,7 +112,6 @@ const App = () => (
                 <Route path="/glossary" element={<Glossary />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
                 <Route path="/blue-team" element={<BlueTeam />} />
-                <Route path="/api-settings" element={<APISettings />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
