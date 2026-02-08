@@ -144,19 +144,39 @@ const APISettings = () => {
                 : `http://localhost:5000/api/integrations/test/${key}`;
 
             const response = await fetch(url);
-            const result = await response.json();
+            
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            let result;
+            try {
+                result = await response.json();
+            } catch (parseError) {
+                throw new Error("Invalid JSON response from server");
+            }
 
-            setTestResults(prev => ({ ...prev, [key]: result }));
+            // Ensure result has required fields
+            const safeResult: APIStatus = {
+                success: result?.success ?? false,
+                message: result?.message ?? "Unknown response",
+                service: result?.service ?? API_CONFIGS.find(c => c.key === key)?.name ?? key,
+                data: result?.data ?? null,
+                error: result?.error ?? undefined
+            };
+
+            setTestResults(prev => ({ ...prev, [key]: safeResult }));
 
             toast({
-                title: result.success ? "Connection Successful" : "Connection Failed",
-                description: result.message,
-                variant: result.success ? "default" : "destructive",
+                title: safeResult.success ? "Connection Successful" : "Connection Failed",
+                description: safeResult.message ?? "No message",
+                variant: safeResult.success ? "default" : "destructive",
             });
         } catch (error) {
-            const errorResult = {
+            const errorResult: APIStatus = {
                 success: false,
-                message: error instanceof Error ? error.message : "Network error",
+                message: error instanceof Error ? error.message : "Network error occurred",
                 service: API_CONFIGS.find(c => c.key === key)?.name || key
             };
             
@@ -177,27 +197,52 @@ const APISettings = () => {
         
         try {
             const response = await fetch('http://localhost:5000/api/integrations/test/all');
-            const data = await response.json();
+            
+            // Check if response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                throw new Error("Invalid JSON response from server");
+            }
+
+            // Ensure data has required structure
+            if (!data || !Array.isArray(data.results)) {
+                throw new Error("Invalid response format from server");
+            }
 
             const resultsMap: Record<string, APIStatus> = {};
-            data.results.forEach((result: APIStatus) => {
-                const config = API_CONFIGS.find(c => c.name === result.service);
+            data.results.forEach((result: any) => {
+                const config = API_CONFIGS.find(c => c.name === result?.service);
                 if (config) {
-                    resultsMap[config.key] = result;
+                    resultsMap[config.key] = {
+                        success: result?.success ?? false,
+                        message: result?.message ?? "Unknown response",
+                        service: result?.service ?? config.name,
+                        data: result?.data ?? null,
+                        error: result?.error ?? undefined
+                    };
                 }
             });
 
             setTestResults(resultsMap);
 
+            const connected = data.connected ?? 0;
+            const total = data.total ?? data.results.length ?? 0;
+
             toast({
                 title: "API Tests Complete",
-                description: `${data.connected}/${data.total} APIs connected successfully`,
-                variant: data.connected === data.total ? "default" : "destructive",
+                description: `${connected}/${total} APIs connected successfully`,
+                variant: connected === total ? "default" : "destructive",
             });
         } catch (error) {
             toast({
                 title: "Test Failed",
-                description: error instanceof Error ? error.message : "Network error",
+                description: error instanceof Error ? error.message : "Network error occurred",
                 variant: "destructive",
             });
         } finally {
@@ -359,12 +404,23 @@ const APISettings = () => {
                                                 }`}
                                             >
                                                 <p className={`font-medium ${result.success ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
-                                                    {result.message}
+                                                    {result.message || "No message available"}
                                                 </p>
-                                                {result.data && (
-                                                    <pre className="mt-2 text-xs opacity-70 overflow-auto">
-                                                        {JSON.stringify(result.data, null, 2)}
+                                                {result.data && typeof result.data === 'object' && (
+                                                    <pre className="mt-2 text-xs opacity-70 overflow-auto max-h-40">
+                                                        {(() => {
+                                                            try {
+                                                                return JSON.stringify(result.data, null, 2);
+                                                            } catch (e) {
+                                                                return "Unable to display data";
+                                                            }
+                                                        })()}
                                                     </pre>
+                                                )}
+                                                {result.error && (
+                                                    <p className="mt-2 text-xs opacity-70">
+                                                        Error Code: {result.error}
+                                                    </p>
                                                 )}
                                             </motion.div>
                                         )}

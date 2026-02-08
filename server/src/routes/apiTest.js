@@ -20,16 +20,20 @@ router.get('/test/all', async (req, res) => {
         
         const summary = {
             total: results.length,
-            connected: results.filter(r => r.success).length,
-            failed: results.filter(r => !r.success).length,
-            results
+            connected: results.filter(r => r && r.success).length,
+            failed: results.filter(r => !r || !r.success).length,
+            results: results || []
         };
 
         res.json(summary);
     } catch (error) {
         res.status(500).json({ 
-            success: false, 
-            error: error.message 
+            success: false,
+            total: 0,
+            connected: 0,
+            failed: 0,
+            results: [],
+            error: error.message || 'Unknown error occurred'
         });
     }
 });
@@ -38,45 +42,70 @@ router.get('/test/all', async (req, res) => {
 router.get('/test/gemini', async (req, res) => {
     try {
         const result = await testGeminiAPI(req.query.apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response', service: 'Gemini AI' });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message || 'Unknown error',
+            service: 'Gemini AI',
+            error: 'SERVER_ERROR'
+        });
     }
 });
 
 router.get('/test/shodan', async (req, res) => {
     try {
         const result = await testShodanAPI(req.query.apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response', service: 'Shodan' });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message || 'Unknown error',
+            service: 'Shodan',
+            error: 'SERVER_ERROR'
+        });
     }
 });
 
 router.get('/test/nvd', async (req, res) => {
     try {
         const result = await testNVDAPI(req.query.apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response', service: 'NVD' });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message || 'Unknown error',
+            service: 'NVD',
+            error: 'SERVER_ERROR'
+        });
     }
 });
 
 router.get('/test/github', async (req, res) => {
     try {
         const result = await testGitHubAPI(req.query.token);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response', service: 'GitHub' });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message || 'Unknown error',
+            service: 'GitHub',
+            error: 'SERVER_ERROR'
+        });
     }
 });
 
 router.get('/test/abuseipdb', async (req, res) => {
     try {
         const result = await testAbuseIPDBAPI(req.query.apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response', service: 'AbuseIPDB' });
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: error.message || 'Unknown error',
+            service: 'AbuseIPDB',
+            error: 'SERVER_ERROR'
+        });
     }
 });
 
@@ -88,16 +117,18 @@ router.post('/gemini/analyze', async (req, res) => {
         if (!prompt) {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Prompt is required' 
+                message: 'Prompt is required',
+                error: 'MISSING_PROMPT'
             });
         }
 
         const result = await analyzeWithGemini(prompt, apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No response from Gemini' });
     } catch (error) {
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            message: error.message || 'Analysis failed',
+            error: 'SERVER_ERROR'
         });
     }
 });
@@ -110,16 +141,18 @@ router.get('/shodan/search', async (req, res) => {
         if (!query) {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Query is required' 
+                message: 'Query is required',
+                error: 'MISSING_QUERY'
             });
         }
 
         const result = await queryShodan(query, apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No results from Shodan' });
     } catch (error) {
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            message: error.message || 'Search failed',
+            error: 'SERVER_ERROR'
         });
     }
 });
@@ -132,16 +165,18 @@ router.get('/abuseipdb/check', async (req, res) => {
         if (!ip) {
             return res.status(400).json({ 
                 success: false, 
-                error: 'IP address is required' 
+                message: 'IP address is required',
+                error: 'MISSING_IP'
             });
         }
 
         const result = await checkIPReputation(ip, apiKey);
-        res.json(result);
+        res.json(result || { success: false, message: 'No results from AbuseIPDB' });
     } catch (error) {
         res.status(500).json({ 
             success: false, 
-            error: error.message 
+            message: error.message || 'IP check failed',
+            error: 'SERVER_ERROR'
         });
     }
 });
