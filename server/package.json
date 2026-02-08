@@ -18,7 +18,7 @@
     "author": "HackWebTools",
     "license": "MIT",
     "dependencies": {
-        "axios": "^1.6.2",
+        "axios": "^1.13.5",
         "bcryptjs": "^2.4.3",
         "cheerio": "^1.0.0-rc.12",
         "cors": "^2.8.5",

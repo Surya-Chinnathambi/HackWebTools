@@ -21,6 +21,7 @@ import threatRoutes from './routes/threat.js';
 import authRoutes from './routes/auth.js';
 import reportRoutes from './routes/report.js';
 import subdomainRoutes from './routes/subdomain.js';
+import apiTestRoutes from './routes/apiTest.js';
 
 dotenv.config();
 // MongoDB is now optional - see .env file
@@ -120,6 +121,7 @@ app.use('/api/threat', threatRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/api/subdomain', subdomainRoutes);
+app.use('/api/integrations', apiTestRoutes);
 
 // 404 handler
 app.use('*', notFoundHandler);
