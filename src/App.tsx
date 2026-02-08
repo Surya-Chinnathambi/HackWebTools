@@ -34,6 +34,7 @@ import Progress from "./pages/Progress";
 import Glossary from "./pages/Glossary";
 import InterviewPrep from "./pages/InterviewPrep";
 import BlueTeam from "./pages/BlueTeam";
+import APISettings from "./pages/APISettings";
 import KeyboardShortcuts from "./components/KeyboardShortcuts";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -110,8 +111,7 @@ const App = () => (
                 <Route path="/progress" element={<Progress />} />
                 <Route path="/glossary" element={<Glossary />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
-                <Route path="/blue-team" element={<BlueTeam />} />
-                <Route path="*" element={<NotFound />} />
+                <Route path="/blue-team" element={<BlueTeam />} />              <Route path="/api-settings" element={<APISettings />} />                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />
