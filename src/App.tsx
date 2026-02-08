@@ -111,7 +111,9 @@ const App = () => (
                 <Route path="/progress" element={<Progress />} />
                 <Route path="/glossary" element={<Glossary />} />
                 <Route path="/interview-prep" element={<InterviewPrep />} />
-                <Route path="/blue-team" element={<BlueTeam />} />              <Route path="/api-settings" element={<APISettings />} />                <Route path="*" element={<NotFound />} />
+                <Route path="/blue-team" element={<BlueTeam />} />
+                <Route path="/api-settings" element={<APISettings />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />
@@ -121,3 +123,6 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
+);
+
+export default App;
