@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Brain, TrendingUp, AlertTriangle, Target, Activity, Cpu, Globe, Eye, Shield, Zap, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/hooks/use-toast";
-import { realDataService } from "@/services/RealDataService";
+import { realTimeThreatService } from "@/services/RealTimeThreatService";
 
 interface ThreatPattern {
     id: string;
@@ -49,6 +49,32 @@ const ThreatIntelligence = () => {
     const [anomalies, setAnomalies] = useState<AnomalyDetection[]>([]);
     const [networkBehavior, setNetworkBehavior] = useState<NetworkBehavior[]>([]);
     const [realTimeMonitoring, setRealTimeMonitoring] = useState(false);
+
+    // Real-time monitoring effect
+    useEffect(() => {
+        if (realTimeMonitoring) {
+            // Start real-time monitoring
+            realTimeThreatService.startRealTimeMonitoring((data) => {
+                setThreats(data.threats || []);
+                setNetworkBehavior(data.networkBehavior || []);
+                setAnomalies(realTimeThreatService.generateAnomalies(6));
+                
+                toast({
+                    title: "🔄 Threat Data Updated",
+                    description: `Updated with ${data.threats?.length || 0} CVEs from NIST`,
+                });
+            }, 30000); // Update every 30 seconds
+
+            // Initial load
+            simulateMLAnalysis();
+
+            return () => {
+                realTimeThreatService.stopRealTimeMonitoring();
+            };
+        } else {
+            realTimeThreatService.stopRealTimeMonitoring();
+        }
+    }, [realTimeMonitoring]);
 
     const threatDatabase: ThreatPattern[] = [
         {
@@ -160,9 +186,9 @@ const ThreatIntelligence = () => {
             "⚠️ Fetching real CVE data from NIST",
             "🧠 Anomaly detection (Isolation Forest)",
             "🔮 Pattern matching (Deep Learning)",
-            "🌐 Network behavior analysis",
+            "🌐 Network behavior analysis with AbuseIPDB",
             "📈 Threat correlation",
-            "✅ Generating insights"
+            "✅ Generating AI-powered insights"
         ];
 
         let totalProgress = 0;
@@ -176,95 +202,32 @@ const ThreatIntelligence = () => {
                 setProgress(totalProgress);
             }
 
-            // Phase 4: Fetch REAL CVE data
-            const realCVEs = await realDataService.fetchRecentCVEs(8);
-            totalProgress += increment;
-            setProgress(totalProgress);
-
-            // Convert real CVEs to threat patterns
-            const detectedThreats: ThreatPattern[] = realCVEs.map((cve, index) => {
-                const severityMap: { [key: string]: "critical" | "high" | "medium" | "low" } = {
-                    'CRITICAL': 'critical',
-                    'HIGH': 'high',
-                    'MEDIUM': 'medium',
-                    'LOW': 'low'
-                };
-
-                return {
-                    id: `real_threat_${index}`,
-                    type: cve.id,
-                    severity: severityMap[cve.severity?.toUpperCase() || 'MEDIUM'] || 'medium',
-                    confidence: 0.85 + (Math.random() * 0.15),
-                    description: cve.description.substring(0, 150) + '...',
-                    indicators: cve.cwe.slice(0, 4),
-                    mitre: cve.cwe[0] || 'Unknown',
-                    techniques: cve.references.slice(0, 2)
-                };
-            });
-
+            // Phase 4: Fetch REAL CVE threats from NIST
+            const detectedThreats = await realTimeThreatService.fetchCVEThreats(10);
             setThreats(detectedThreats);
             totalProgress += increment;
             setProgress(totalProgress);
 
-            // Phase 5-6: ML Analysis
+            // Phase 5-6: ML Analysis & Anomaly Detection
             await new Promise(resolve => setTimeout(resolve, 800));
-            totalProgress += increment;
-            setProgress(totalProgress);
-
-            // Generate anomalies
-            const detectedAnomalies: AnomalyDetection[] = Array.from({ length: 6 }, (_, i) => {
-                const types = ["Traffic Spike", "Error Rate Anomaly", "Response Time Deviation", "Request Pattern Anomaly", "Authentication Anomaly", "Resource Usage Spike"];
-                const baseline = Math.random() * 1000 + 100;
-                const deviation = (Math.random() * 0.5 + 0.3);
-                const actual = baseline * (1 + deviation);
-
-                return {
-                    timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-                    anomalyType: types[i],
-                    score: Math.random() * 40 + 60,
-                    baseline: Math.round(baseline),
-                    actual: Math.round(actual),
-                    deviation: Math.round(deviation * 100),
-                    mlModel: mlModels[Math.floor(Math.random() * mlModels.length)]
-                };
-            });
-
+            const detectedAnomalies = realTimeThreatService.generateAnomalies(6);
             setAnomalies(detectedAnomalies);
-            totalProgress += increment;
+            totalProgress += increment * 2;
             setProgress(totalProgress);
 
-            // Phase 7: Network behavior with real IP data
+            // Phase 7: Network behavior with REAL IP reputation data
             const ipAddresses = [
                 "8.8.8.8", "1.1.1.1", "45.33.32.156",
                 "192.168.1.100", "10.0.0.5"
             ];
 
-            const behaviors: NetworkBehavior[] = await Promise.all(
-                ipAddresses.map(async (ip) => {
-                    try {
-                        const ipData = await realDataService.checkIPReputation(ip);
+            toast({
+                title: "🔍 Checking IP Reputation",
+                description: "Querying AbuseIPDB for real-time threat data...",
+            });
 
-                        return {
-                            ip: ip,
-                            country: ipData.country,
-                            requestCount: Math.floor(Math.random() * 5000) + 100,
-                            errorRate: Math.random() * 30,
-                            avgResponseTime: Math.random() * 2000 + 100,
-                            suspiciousPatterns: ipData.isp.toLowerCase().includes("tor") ? ["Tor exit node"] : ipData.isp.toLowerCase().includes("vpn") ? ["VPN detected"] : ["Normal traffic"],
-                            threatScore: ipData.abuseScore || Math.random() * 100
-                        };
-                    } catch (error) {
-                        return {
-                            ip: ip,
-                            country: "Unknown",
-                            requestCount: Math.floor(Math.random() * 500),
-                            errorRate: Math.random() * 10,
-                            avgResponseTime: Math.random() * 1000,
-                            suspiciousPatterns: ["Analysis pending"],
-                            threatScore: Math.random() * 50
-                        };
-                    }
-                })
+            const behaviors = await Promise.all(
+                ipAddresses.map(ip => realTimeThreatService.checkIPReputation(ip))
             );
 
             setNetworkBehavior(behaviors.sort((a, b) => b.threatScore - a.threatScore));
@@ -276,9 +239,13 @@ const ThreatIntelligence = () => {
             setProgress(100);
 
             setAnalyzing(false);
+            
+            const criticalCount = detectedThreats.filter(t => t.severity === 'critical').length;
+            const highCount = detectedThreats.filter(t => t.severity === 'high').length;
+
             toast({
-                title: "✅ AI Analysis Complete",
-                description: `Detected ${detectedThreats.length} real threats from NIST CVE Database and ${detectedAnomalies.length} anomalies`,
+                title: "✅ AI Analysis completed using real NIST CVE Database & IP reputation services",
+                description: `🔴 ${criticalCount} Critical CVEs · 🟠 ${highCount} High Severity · 🌐 ${behaviors.length} IPs analyzed`,
                 variant: "default"
             });
 
@@ -287,7 +254,7 @@ const ThreatIntelligence = () => {
             setAnalyzing(false);
             toast({
                 title: "Error",
-                description: "Failed to complete AI analysis. Check console for details.",
+                description: "Failed to complete AI analysis. Check your API keys in Settings.",
                 variant: "destructive"
             });
         }
