@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3 } from "lucide-react";
+import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3, Award } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
 import SearchBar from "../Search/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -255,6 +255,19 @@ const Header = () => {
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
+                        <Link to="/learning-paths" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-blue-950/20 to-purple-950/20 border border-blue-500/20">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            🎓 <span>Learning Paths</span>
+                            <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Structured curriculum: Beginner → Advanced
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
                         <Link to="/labs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-red-950/20 to-orange-950/20 border border-red-500/20">
                           <div className="text-sm font-medium leading-none flex items-center gap-1">
                             <Target className="h-4 w-4 text-red-500" />
@@ -269,10 +282,37 @@ const Header = () => {
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
+                        <Link to="/certificates" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-yellow-950/20 to-orange-950/20 border border-yellow-500/20">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            <Award className="h-4 w-4 text-yellow-500" />
+                            <span>Certificates</span>
+                            <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Earn & verify professional certificates
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
                         <Link to="/progress" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">Progress Tracker</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Skills, achievements & certificates
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link to="/quizzes" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-green-950/20 to-emerald-950/20 border border-green-500/20">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            🎯 <span>Quiz Arena</span>
+                            <span className="text-xs bg-green-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Test knowledge & compete on leaderboards
                           </p>
                         </Link>
                       </NavigationMenuLink>
@@ -520,6 +560,20 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 📚 Learning Hub
+              </Link>
+              <Link
+                to="/learning-paths"
+                className="text-base font-medium transition-colors hover:text-primary bg-gradient-to-r from-blue-600/10 to-purple-600/10 px-3 py-2 rounded-md border border-blue-500/20"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                🎓 Learning Paths <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full ml-1">NEW</span>
+              </Link>
+              <Link
+                to="/certificates"
+                className="text-base font-medium transition-colors hover:text-primary bg-gradient-to-r from-yellow-600/10 to-orange-600/10 px-3 py-2 rounded-md border border-yellow-500/20"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                🏆 Certificates <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded-full ml-1">NEW</span>
               </Link>
               <Link
                 to="/owasp-lab"

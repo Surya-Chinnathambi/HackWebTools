@@ -22,6 +22,8 @@ import authRoutes from './routes/auth.js';
 import reportRoutes from './routes/report.js';
 import subdomainRoutes from './routes/subdomain.js';
 import apiTestRoutes from './routes/apiTest.js';
+import paymentRoutes from './routes/payments.js';
+import analyticsRoutes from './routes/analytics.js';
 
 dotenv.config();
 // MongoDB is now optional - see .env file
@@ -122,6 +124,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/report', reportRoutes);
 app.use('/api/subdomain', subdomainRoutes);
 app.use('/api/integrations', apiTestRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler
 app.use('*', notFoundHandler);

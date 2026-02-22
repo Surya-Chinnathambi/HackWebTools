@@ -1,0 +1,43 @@
+# FastAPI Backend for HackWebTools
+# Python 3.9+
+
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+motor==3.3.2  # Async MongoDB driver
+pymongo==4.6.1
+mongoengine==0.27.0  # ODM for MongoDB
+
+# Authentication
+python-jose[cryptography]==3.3.0  # JWT tokens
+passlib[bcrypt]==1.7.4  # Password hashing
+bcrypt==4.1.2
+google-auth==2.27.0  # Google OAuth
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+
+# Email
+sendgrid==6.11.0
+python-decouple==3.8  # Environment variables
+
+# Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# CORS & Security
+python-cors==1.0.0
+python-dotenv==1.0.0
+
+# Stripe (already using)
+stripe==8.0.0
+
+# Razorpay (Indian payment gateway)
+razorpay==1.4.1
+
+# Utils
+aiofiles==23.2.1
+python-dateutil==2.8.2
