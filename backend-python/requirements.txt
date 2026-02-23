@@ -41,3 +41,8 @@ razorpay==1.4.1
 # Utils
 aiofiles==23.2.1
 python-dateutil==2.8.2
+
+# Security Tools APIs
+httpx==0.26.0  # HTTP client for external APIs
+dnspython==2.5.0  # DNS lookups
+certifi==2024.2.2  # SSL certificate verification

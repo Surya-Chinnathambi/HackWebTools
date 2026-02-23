@@ -3,7 +3,10 @@ API v1 Router - Aggregates all route modules
 """
 
 from fastapi import APIRouter
-from app.api.v1.routes import auth, users, payments, learning_paths, quizzes, labs, certificates, razorpay, affiliates
+from app.api.v1.routes import (
+    auth, users, payments, learning_paths, quizzes, 
+    labs, certificates, razorpay, affiliates, tools
+)
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -17,3 +20,4 @@ api_router.include_router(labs.router)
 api_router.include_router(certificates.router)
 api_router.include_router(razorpay.router)
 api_router.include_router(affiliates.router)
+api_router.include_router(tools.router)
