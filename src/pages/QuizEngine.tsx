@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 interface QuizQuestion {
     id: string;
     question: string;
@@ -53,7 +56,7 @@ const QuizEngine: React.FC = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('/api/v1/quizzes/categories');
+            const response = await fetch(`${API_BASE_URL}/api/v1/quizzes/categories`);
             const data = await response.json();
             setCategories(data.categories);
         } catch (error) {
@@ -63,7 +66,7 @@ const QuizEngine: React.FC = () => {
 
     const startQuiz = async (category: string) => {
         try {
-            const response = await fetch(`/api/v1/quizzes/generate/${category}`, {
+            const response = await fetch(`${API_BASE_URL}/api/v1/quizzes/generate/${category}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 }
@@ -88,7 +91,7 @@ const QuizEngine: React.FC = () => {
 
     const fetchLeaderboard = async (category: string) => {
         try {
-            const response = await fetch(`/api/v1/quizzes/leaderboard/${category}`);
+            const response = await fetch(`${API_BASE_URL}/api/v1/quizzes/leaderboard/${category}`);
             const data = await response.json();
             setLeaderboard(data);
         } catch (error) {
@@ -107,7 +110,7 @@ const QuizEngine: React.FC = () => {
         const timeTaken = startTime - timeLeft;
 
         try {
-            const response = await fetch('/api/v1/quizzes/submit', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/quizzes/submit`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

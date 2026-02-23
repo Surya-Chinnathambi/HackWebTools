@@ -6,6 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 interface PathModule {
     id: string;
     title: string;
@@ -62,7 +65,7 @@ const LearningPaths: React.FC = () => {
 
     const fetchPaths = async () => {
         try {
-            const response = await fetch('/api/v1/learning-paths', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/learning-paths`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 }
@@ -81,7 +84,7 @@ const LearningPaths: React.FC = () => {
 
     const enrollInPath = async (pathId: string) => {
         try {
-            const response = await fetch('/api/v1/learning-paths/enroll', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/learning-paths/enroll`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -276,7 +279,7 @@ const PathDetailsModal: React.FC<{
 
     const completeModule = async (moduleId: string) => {
         try {
-            const response = await fetch('/api/v1/learning-paths/complete-module', {
+            const response = await fetch(`${API_BASE_URL}/api/v1/learning-paths/complete-module`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
