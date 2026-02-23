@@ -11,7 +11,7 @@ class AnalyticsService {
     private isEnabled: boolean;
 
     constructor() {
-        this.apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        this.apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
         this.isEnabled = import.meta.env.PROD; // Only track in production
     }
 
@@ -34,7 +34,7 @@ class AnalyticsService {
             };
 
             // Send to backend
-            await fetch(`${this.apiUrl}/api/analytics/track`, {
+            await fetch(`${this.apiUrl}/api/v1/analytics/track`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),

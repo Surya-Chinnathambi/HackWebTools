@@ -65,12 +65,12 @@ const AdminDashboard: React.FC = () => {
             setIsLoading(true);
 
             // Fetch metrics
-            const metricsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/summary`);
+            const metricsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/summary`);
             const metricsData = await metricsRes.json();
             setMetrics(metricsData);
 
             // Fetch funnel
-            const funnelRes = await fetch(`${import.meta.env.VITE_API_URL}/api/analytics/funnel`);
+            const funnelRes = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/analytics/funnel`);
             const funnelData = await funnelRes.json();
             setFunnel(funnelData);
         } catch (error) {

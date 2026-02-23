@@ -1,6 +1,6 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:5000/ws';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
 
 // API Client
 class APIClient {
@@ -37,67 +37,67 @@ class APIClient {
 
     // CVE Endpoints
     async searchCVEs(keyword, page = 0, limit = 20) {
-        return this.request(`/cve/search?keyword=${encodeURIComponent(keyword)}&startIndex=${page * limit}&resultsPerPage=${limit}`);
+        return this.request(`/tools/cve/search?keyword=${encodeURIComponent(keyword)}&startIndex=${page * limit}&resultsPerPage=${limit}`);
     }
 
     async getRecentCVEs(days = 7) {
-        return this.request(`/cve/recent?days=${days}`);
+        return this.request(`/tools/cve/recent?days=${days}`);
     }
 
     async getCVEDetails(cveId) {
-        return this.request(`/cve/${cveId}`);
+        return this.request(`/tools/cve/${cveId}`);
     }
 
     // Exploit Endpoints
     async searchExploits(query, page = 1, limit = 20) {
-        return this.request(`/exploits/search?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
+        return this.request(`/tools/exploits/search?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
     }
 
     async getExploitsForCVE(cveId) {
-        return this.request(`/exploits/cve/${cveId}`);
+        return this.request(`/tools/exploits/cve/${cveId}`);
     }
 
     async getTrendingExploits(timeframe = 'week') {
-        return this.request(`/exploits/trending?timeframe=${timeframe}`);
+        return this.request(`/tools/exploits/trending?timeframe=${timeframe}`);
     }
 
     // SSL/TLS Endpoints
     async checkSSL(hostname, port = 443) {
-        return this.request(`/ssl/check?hostname=${encodeURIComponent(hostname)}&port=${port}`);
+        return this.request(`/tools/ssl/check?hostname=${encodeURIComponent(hostname)}&port=${port}`);
     }
 
     async analyzeSSL(hostname) {
-        return this.request(`/ssl/analyze?hostname=${encodeURIComponent(hostname)}`);
+        return this.request(`/tools/ssl/analyze?hostname=${encodeURIComponent(hostname)}`);
     }
 
     async getCertificates(domain) {
-        return this.request(`/ssl/certs?domain=${encodeURIComponent(domain)}`);
+        return this.request(`/tools/ssl/certs?domain=${encodeURIComponent(domain)}`);
     }
 
     // DNS Endpoints
     async dnsLookup(domain, type = 'A') {
-        return this.request(`/dns/lookup?domain=${encodeURIComponent(domain)}&type=${type}`);
+        return this.request(`/tools/dns/lookup?domain=${encodeURIComponent(domain)}&record_type=${type}`);
     }
 
     async reverseDNS(ip) {
-        return this.request(`/dns/reverse?ip=${encodeURIComponent(ip)}`);
+        return this.request(`/tools/dns/reverse?ip=${encodeURIComponent(ip)}`);
     }
 
     async whoisLookup(domain) {
-        return this.request(`/dns/whois?domain=${encodeURIComponent(domain)}`);
+        return this.request(`/tools/dns/whois?domain=${encodeURIComponent(domain)}`);
     }
 
     async comprehensiveDNS(domain) {
-        return this.request(`/dns/comprehensive?domain=${encodeURIComponent(domain)}`);
+        return this.request(`/tools/dns/comprehensive?domain=${encodeURIComponent(domain)}`);
     }
 
     // Subdomain Endpoints
     async enumerateSubdomains(domain, sources = 'crtsh,hackertarget') {
-        return this.request(`/subdomain/enumerate?domain=${encodeURIComponent(domain)}&sources=${sources}`);
+        return this.request(`/tools/subdomain/enumerate?domain=${encodeURIComponent(domain)}&sources=${sources}`);
     }
 
     async bruteforceSubdomains(domain) {
-        return this.request('/subdomain/bruteforce', {
+        return this.request('/tools/subdomain/bruteforce', {
             method: 'POST',
             body: JSON.stringify({ domain }),
         });
@@ -105,14 +105,14 @@ class APIClient {
 
     // Scanning Endpoints
     async scanHeaders(url) {
-        return this.request('/scan/headers', {
+        return this.request('/tools/scan/headers', {
             method: 'POST',
             body: JSON.stringify({ url }),
         });
     }
 
     async scanXSS(url, payloads) {
-        return this.request('/scan/xss', {
+        return this.request('/tools/scan/xss', {
             method: 'POST',
             body: JSON.stringify({ url, payloads }),
         });
@@ -120,33 +120,33 @@ class APIClient {
 
     // Threat Intelligence Endpoints
     async checkIPReputation(ip) {
-        return this.request('/threat/ip', {
+        return this.request('/tools/threat/ip', {
             method: 'POST',
             body: JSON.stringify({ ip }),
         });
     }
 
     async checkDomainReputation(domain) {
-        return this.request('/threat/domain', {
+        return this.request('/tools/threat/domain', {
             method: 'POST',
             body: JSON.stringify({ domain }),
         });
     }
 
     async scanURL(url) {
-        return this.request('/threat/url', {
+        return this.request('/tools/threat/url', {
             method: 'POST',
             body: JSON.stringify({ url }),
         });
     }
 
     async getShodanInfo(ip) {
-        return this.request(`/threat/shodan/${ip}`);
+        return this.request(`/tools/threat/shodan/${ip}`);
     }
 
     // Report Endpoints
     async generateReport(reportData) {
-        return this.request('/report/generate', {
+        return this.request('/tools/report/generate', {
             method: 'POST',
             body: JSON.stringify(reportData),
         });

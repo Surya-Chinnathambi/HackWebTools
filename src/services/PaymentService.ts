@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface CheckoutSessionResponse {
     sessionId: string;
@@ -20,7 +20,7 @@ export class PaymentService {
         email: string
     ): Promise<CheckoutSessionResponse> {
         try {
-            const response = await fetch(`${API_URL}/api/payments/create-checkout-session`, {
+            const response = await fetch(`${API_URL}/api/v1/payments/create-checkout-session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export class PaymentService {
      */
     static async createPortalSession(customerId: string): Promise<PortalSessionResponse> {
         try {
-            const response = await fetch(`${API_URL}/api/payments/create-portal-session`, {
+            const response = await fetch(`${API_URL}/api/v1/payments/create-portal-session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export class PaymentService {
     static async getSubscriptionDetails(subscriptionId: string) {
         try {
             const response = await fetch(
-                `${API_URL}/api/payments/subscription/${subscriptionId}`
+                `${API_URL}/api/v1/payments/subscription/${subscriptionId}`
             );
 
             if (!response.ok) {
@@ -128,7 +128,7 @@ export class PaymentService {
      */
     static async cancelSubscription(subscriptionId: string) {
         try {
-            const response = await fetch(`${API_URL}/api/payments/cancel-subscription`, {
+            const response = await fetch(`${API_URL}/api/v1/payments/cancel-subscription`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
