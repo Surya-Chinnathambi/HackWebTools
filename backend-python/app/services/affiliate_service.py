@@ -5,7 +5,7 @@ from bson import ObjectId
 import secrets
 import string
 
-from models.affiliate import (
+from app.models.affiliate import (
     Affiliate, AffiliateClick, Commission, Payout,
     AffiliateStatus, CommissionStatus, CommissionTier,
     COMMISSION_RATES, COMMISSION_THRESHOLDS,

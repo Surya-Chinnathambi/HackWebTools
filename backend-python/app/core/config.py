@@ -3,7 +3,7 @@ Application Configuration
 """
 
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Union
 from functools import lru_cache
 
 
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     
     # URLs
     FRONTEND_URL: str = "http://localhost:5173"
-    CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    CORS_ORIGINS: Union[str, List[str]] = "http://localhost:5173"
     
     # MongoDB
     MONGODB_URI: str
@@ -47,6 +47,11 @@ class Settings(BaseSettings):
     STRIPE_PRO_PRICE_ID: str = ""  # Monthly Pro price ID from Stripe
     STRIPE_ENTERPRISE_PRICE_ID: str = ""  # Monthly Enterprise price ID from Stripe
     
+    # Razorpay (Indian Payment Gateway)
+    RAZORPAY_KEY_ID: str = ""
+    RAZORPAY_KEY_SECRET: str = ""
+    RAZORPAY_WEBHOOK_SECRET: str = ""
+    
     # Rate Limiting
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_PER_MINUTE: int = 60
@@ -57,6 +62,15 @@ class Settings(BaseSettings):
     
     # Session
     SESSION_SECRET: str
+    
+    # Security Tools API Keys (Optional)
+    NVD_API_KEY: str = ""
+    GITHUB_TOKEN: str = ""
+    ABUSEIPDB_API_KEY: str = ""
+    VIRUSTOTAL_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    SHODAN_API_KEY: str = ""
+    SECURITYTRAILS_API_KEY: str = ""
     
     class Config:
         env_file = ".env"

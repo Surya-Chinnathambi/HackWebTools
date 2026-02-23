@@ -3,27 +3,32 @@ User Model and Database Schemas
 """
 
 from datetime import datetime
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, EmailStr, Field, validator
+from typing import Optional, List, Dict, Any, Annotated
+from pydantic import BaseModel, EmailStr, Field, field_validator, BeforeValidator, ConfigDict
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import core_schema
 from bson import ObjectId
+from enum import Enum
 
 
-class PyObjectId(ObjectId):
-    """Custom ObjectId type for Pydantic"""
-    
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-    
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
+def validate_object_id(v: Any) -> ObjectId:
+    """Validate ObjectId"""
+    if isinstance(v, ObjectId):
+        return v
+    if ObjectId.is_valid(v):
         return ObjectId(v)
-    
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
+    raise ValueError("Invalid ObjectId")
+
+
+# Type annotation for ObjectId fields
+PyObjectId = Annotated[ObjectId, BeforeValidator(validate_object_id)]
+
+
+class UserSubscriptionType(str, Enum):
+    """User subscription tier types"""
+    FREE = "free"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
 
 
 class UserProgress(BaseModel):
@@ -104,18 +109,20 @@ class User(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     last_login: Optional[datetime] = None
     
-    class Config:
-        populate_by_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
     
-    @validator('email')
+    @field_validator('email', mode='before')
+    @classmethod
     def email_lowercase(cls, v):
         return v.lower() if v else v
     
-    def dict(self, **kwargs):
-        """Override dict to handle ObjectId"""
-        d = super().dict(**kwargs)
+    def model_dump(self, **kwargs):
+        """Override model_dump to handle ObjectId"""
+        d = super().model_dump(**kwargs)
         if '_id' in d and d['_id']:
             d['_id'] = str(d['_id'])
         return d
@@ -132,11 +139,13 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=8)
     full_name: Optional[str] = None
     
-    @validator('email')
+    @field_validator('email', mode='before')
+    @classmethod
     def email_lowercase(cls, v):
         return v.lower()
     
-    @validator('password')
+    @field_validator('password')
+    @classmethod
     def password_strength(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters')
@@ -154,7 +163,8 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
     
-    @validator('email')
+    @field_validator('email', mode='before')
+    @classmethod
     def email_lowercase(cls, v):
         return v.lower()
 

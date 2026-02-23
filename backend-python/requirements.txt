@@ -24,19 +24,18 @@ sendgrid==6.11.0
 python-decouple==3.8  # Environment variables
 
 # Validation
-pydantic==2.5.3
-pydantic-settings==2.1.0
-email-validator==2.1.0
+pydantic>=2.5.3
+pydantic-settings>=2.1.0
+email-validator>=2.1.0
 
 # CORS & Security
-python-cors==1.0.0
 python-dotenv==1.0.0
 
 # Stripe (already using)
 stripe==8.0.0
 
 # Razorpay (Indian payment gateway)
-razorpay==1.4.1
+razorpay>=2.0.0
 
 # Utils
 aiofiles==23.2.1

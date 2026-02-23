@@ -7,13 +7,13 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from bson import ObjectId
 import secrets
 
-from models.razorpay import (
+from app.models.razorpay import (
     RazorpaySubscription, RazorpayPayment, RazorpayPlanType,
     RazorpaySubscriptionStatus, RazorpayPaymentStatus, Currency,
     RAZORPAY_PRICING, CreateSubscriptionRequest, VerifyPaymentRequest,
     CancelSubscriptionRequest, UpdateSubscriptionRequest, SubscriptionStats
 )
-from models.user import UserSubscriptionType
+from app.models.user import UserSubscriptionType
 
 class RazorpayService:
     def __init__(self, db: AsyncIOMotorDatabase, razorpay_key_id: str, razorpay_key_secret: str):
