@@ -42,6 +42,13 @@ class DomainThreatRequest(BaseModel):
     domain: str
 
 
+class ReportGenerateRequest(BaseModel):
+    projectName: str
+    findings: List[Dict[str, Any]] = []
+    executiveSummary: Optional[str] = None
+    scope: Optional[str] = None
+
+
 # ========== CVE ENDPOINTS ==========
 
 @router.get("/cve/search")
@@ -668,3 +675,233 @@ async def check_domain_threat(request: DomainThreatRequest):
         raise HTTPException(status_code=500, detail=f"VirusTotal API error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Domain threat check failed: {str(e)}")
+
+
+# ========== SUBDOMAIN ENUMERATION ENDPOINTS ==========
+
+@router.get("/subdomain/enumerate")
+async def enumerate_subdomains(
+    domain: str = Query(..., description="Domain to enumerate"),
+    sources: str = Query("crtsh,hackertarget", description="Comma-separated sources")
+):
+    """
+    Enumerate subdomains using multiple free sources
+    
+    - **domain**: Target domain (e.g., example.com)
+    - **sources**: crtsh, hackertarget, securitytrails (comma-separated)
+    
+    Sources:
+    - crt.sh: Certificate Transparency Logs (always free)
+    - HackerTarget: Free API (limited)
+    - SecurityTrails: Requires API key (SECURITYTRAILS_API_KEY)
+    """
+    try:
+        # Clean domain
+        clean_domain = domain.replace("https://", "").replace("http://", "")
+        clean_domain = clean_domain.split("/")[0].split(":")[0]
+        
+        requested_sources = [s.strip() for s in sources.split(",")]
+        all_subdomains = set()
+        source_results = {}
+        
+        # Source 1: crt.sh (Certificate Transparency Logs)
+        if "crtsh" in requested_sources:
+            try:
+                crtsh_subs = await get_crtsh_subdomains(clean_domain)
+                all_subdomains.update(crtsh_subs)
+                source_results["crtsh"] = {
+                    "count": len(crtsh_subs),
+                    "subdomains": sorted(list(crtsh_subs))[:20]  # First 20 for preview
+                }
+            except Exception as e:
+                source_results["crtsh"] = {"error": str(e)}
+        
+        # Source 2: HackerTarget
+        if "hackertarget" in requested_sources:
+            try:
+                hackertarget_subs = await get_hackertarget_subdomains(clean_domain)
+                all_subdomains.update(hackertarget_subs)
+                source_results["hackertarget"] = {
+                    "count": len(hackertarget_subs),
+                    "subdomains": sorted(list(hackertarget_subs))[:20]
+                }
+            except Exception as e:
+                source_results["hackertarget"] = {"error": str(e)}
+        
+        # Source 3: SecurityTrails (requires API key)
+        if "securitytrails" in requested_sources:
+            if os.getenv("SECURITYTRAILS_API_KEY"):
+                try:
+                    securitytrails_subs = await get_securitytrails_subdomains(clean_domain)
+                    all_subdomains.update(securitytrails_subs)
+                    source_results["securitytrails"] = {
+                        "count": len(securitytrails_subs),
+                        "subdomains": sorted(list(securitytrails_subs))
+                    }
+                except Exception as e:
+                    source_results["securitytrails"] = {"error": str(e)}
+            else:
+                source_results["securitytrails"] = {
+                    "error": "SECURITYTRAILS_API_KEY not configured"
+                }
+        
+        unique_subdomains = sorted(list(all_subdomains))
+        
+        return {
+            "domain": clean_domain,
+            "totalSubdomains": len(unique_subdomains),
+            "subdomains": unique_subdomains,
+            "sources": source_results,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Subdomain enumeration failed: {str(e)}")
+
+
+async def get_crtsh_subdomains(domain: str) -> set:
+    """Get subdomains from crt.sh Certificate Transparency Logs"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                "https://crt.sh/",
+                params={"q": f"%.{domain}", "output": "json"}
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        subdomains = set()
+        for cert in data:
+            names = cert.get("name_value", "").split("\n")
+            for name in names:
+                cleaned = name.strip().lower()
+                if cleaned.endswith(domain) and "*" not in cleaned:
+                    subdomains.add(cleaned)
+        
+        return subdomains
+    
+    except Exception as e:
+        print(f"crt.sh error: {e}")
+        return set()
+
+
+async def get_hackertarget_subdomains(domain: str) -> set:
+    """Get subdomains from HackerTarget API"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"https://api.hackertarget.com/hostsearch/?q={domain}"
+            )
+            response.raise_for_status()
+            text = response.text
+        
+        if "error" in text.lower():
+            raise Exception("HackerTarget API error or rate limit")
+        
+        subdomains = set()
+        for line in text.split("\n"):
+            if "," in line:
+                subdomain = line.split(",")[0].strip().lower()
+                if subdomain and subdomain.endswith(domain):
+                    subdomains.add(subdomain)
+        
+        return subdomains
+    
+    except Exception as e:
+        print(f"HackerTarget error: {e}")
+        return set()
+
+
+async def get_securitytrails_subdomains(domain: str) -> set:
+    """Get subdomains from SecurityTrails API"""
+    try:
+        api_key = os.getenv("SECURITYTRAILS_API_KEY")
+        if not api_key:
+            return set()
+        
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                f"https://api.securitytrails.com/v1/domain/{domain}/subdomains",
+                headers={"APIKEY": api_key}
+            )
+            response.raise_for_status()
+            data = response.json()
+        
+        subdomains = set()
+        for sub in data.get("subdomains", []):
+            subdomains.add(f"{sub}.{domain}")
+        
+        return subdomains
+    
+    except Exception as e:
+        print(f"SecurityTrails error: {e}")
+        return set()
+
+
+# ========== REPORT GENERATION ENDPOINTS ==========
+
+@router.post("/report/generate")
+async def generate_report(request: ReportGenerateRequest):
+    """
+    Generate security assessment report
+    
+    - **projectName**: Name of the security assessment project
+    - **findings**: List of security findings
+    - **executiveSummary**: Optional executive summary
+    - **scope**: Optional scope description
+    """
+    try:
+        findings = request.findings or []
+        
+        # Calculate statistics
+        stats = {
+            "critical": len([f for f in findings if f.get("severity") == "critical"]),
+            "high": len([f for f in findings if f.get("severity") == "high"]),
+            "medium": len([f for f in findings if f.get("severity") == "medium"]),
+            "low": len([f for f in findings if f.get("severity") == "low"]),
+            "total": len(findings)
+        }
+        
+        # Add IDs to findings
+        findings_with_ids = [
+            {"id": idx + 1, **finding}
+            for idx, finding in enumerate(findings)
+        ]
+        
+        report = {
+            "metadata": {
+                "projectName": request.projectName,
+                "generatedAt": datetime.utcnow().isoformat(),
+                "version": "1.0"
+            },
+            "executiveSummary": request.executiveSummary or "Security assessment completed",
+            "scope": request.scope or "Full application security testing",
+            "statistics": stats,
+            "findings": findings_with_ids,
+            "recommendations": [
+                "Address all critical and high severity findings immediately",
+                "Implement security headers",
+                "Enable HTTPS with strong TLS configuration",
+                "Regular security testing and code reviews",
+                "Keep all dependencies up to date"
+            ]
+        }
+        
+        return report
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Report generation failed: {str(e)}")
+
+
+@router.post("/report/pdf")
+async def generate_pdf_report():
+    """
+    Generate PDF report (placeholder for future implementation)
+    
+    Note: Implement with reportlab or weasyprint for actual PDF generation
+    """
+    return {
+        "message": "PDF export endpoint",
+        "note": "Implement with reportlab or weasyprint library",
+        "recommendation": "Use reportlab for server-side PDF generation"
+    }
