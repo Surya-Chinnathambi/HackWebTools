@@ -1,12 +1,20 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3, Award } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3, Award, UserCircle, LogOut, CreditCard, Settings, User } from "lucide-react";
 import ThemeToggle from "../ui/ThemeToggle";
 import SearchBar from "../Search/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,11 +24,15 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const { scrollY } = useScroll();
   const headerOpacity = useTransform(scrollY, [0, 50], [0.95, 1]);
@@ -90,6 +102,13 @@ const Header = () => {
                 <Link to="/dashboard" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 text-sm font-medium transition-all hover:shadow-lg hover:scale-105 focus:outline-none">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   Dashboard
+                </Link>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <Link to="/pricing" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Pricing
                 </Link>
               </NavigationMenuItem>
 
@@ -255,6 +274,18 @@ const Header = () => {
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
+                        <Link to="/courses" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none flex items-center gap-1">
+                            📚 <span>Courses</span>
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            In-depth video courses and tutorials
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
                         <Link to="/learning-paths" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-blue-950/20 to-purple-950/20 border border-blue-500/20">
                           <div className="text-sm font-medium leading-none flex items-center gap-1">
                             🎓 <span>Learning Paths</span>
@@ -406,6 +437,54 @@ const Header = () => {
               </a>
             </Button>
 
+            {/* Authentication Buttons/Menu */}
+            {user ? (
+              // Logged in - Show user menu
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="hidden lg:flex gap-2">
+                    <UserCircle className="h-5 w-5" />
+                    <span className="max-w-[100px] truncate">{user.name || user.email}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/progress')}>
+                    <Target className="mr-2 h-4 w-4" />
+                    My Progress
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/certificates')}>
+                    <Award className="mr-2 h-4 w-4" />
+                    Certificates
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/pricing')}>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Pricing & Plans
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              // Not logged in - Show Login/Sign Up buttons
+              <div className="hidden lg:flex items-center gap-2">
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Log In</Link>
+                </Button>
+                <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Link to="/login?signup=true">Sign Up</Link>
+                </Button>
+              </div>
+            )}
+
             <ThemeToggle />
           </div>
         </nav>
@@ -417,7 +496,7 @@ const Header = () => {
             onClick={toggleMenu}
             className="p-2 transition-transform hover:scale-110"
             aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isMenuOpen ? "true" : "false"}
+            aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
           >
             {isMenuOpen ? (
@@ -605,6 +684,64 @@ const Header = () => {
               >
                 <Github size={16} /> GitHub Repository
               </a>
+
+              {/* Mobile Authentication */}
+              <div className="pt-4 mt-4 border-t border-border space-y-3">
+                {user ? (
+                  <>
+                    <div className="text-sm text-muted-foreground px-2">
+                      Logged in as <span className="font-medium text-foreground">{user.name || user.email}</span>
+                    </div>
+                    <Link
+                      to="/progress"
+                      className="text-base font-medium transition-colors hover:text-primary flex items-center gap-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Target size={16} /> My Progress
+                    </Link>
+                    <Link
+                      to="/pricing"
+                      className="text-base font-medium transition-colors hover:text-primary flex items-center gap-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <CreditCard size={16} /> Pricing & Plans
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-left text-base font-medium text-red-600 hover:text-red-700 flex items-center gap-2"
+                    >
+                      <LogOut size={16} /> Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="block text-center text-base font-medium transition-colors hover:text-primary border border-border rounded-md py-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      to="/login?signup=true"
+                      className="block text-center text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-md py-2 transition-all hover:shadow-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                    <Link
+                      to="/pricing"
+                      className="block text-center text-base font-medium transition-colors hover:text-primary"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      View Pricing
+                    </Link>
+                  </>
+                )}
+              </div>
             </nav>
           </div>
         </div>
