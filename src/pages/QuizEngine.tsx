@@ -322,14 +322,14 @@ const QuizEngine: React.FC = () => {
                                 key={idx}
                                 onClick={() => handleAnswerSelect(currentQuestion.id, idx.toString())}
                                 className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${answers[currentQuestion.id] === idx.toString()
-                                        ? 'border-primary bg-primary/10'
-                                        : 'border-muted hover:border-primary/50'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-muted hover:border-primary/50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${answers[currentQuestion.id] === idx.toString()
-                                            ? 'border-primary bg-primary text-primary-foreground'
-                                            : 'border-muted'
+                                        ? 'border-primary bg-primary text-primary-foreground'
+                                        : 'border-muted'
                                         }`}>
                                         {answers[currentQuestion.id] === idx.toString() && '✓'}
                                     </div>
