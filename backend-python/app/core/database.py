@@ -45,7 +45,7 @@ class MongoDB:
     
     def get_database(self) -> AsyncIOMotorDatabase:
         """Get database instance"""
-        if not self.db:
+        if self.db is None:
             raise Exception("Database not initialized. Call connect() first.")
         return self.db
 
