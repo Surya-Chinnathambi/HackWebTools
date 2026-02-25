@@ -2,7 +2,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import SearchBar from "@/components/Search/SearchBar";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -116,10 +115,6 @@ export const HeroSection = () => {
               Professional documentation for penetration testing tools and security utilities.
               Find detailed documentation, usage examples, and advanced commands.
             </motion.p>
-          </motion.div>
-
-          <motion.div className="w-full max-w-sm" variants={itemVariants}>
-            <SearchBar />
           </motion.div>
 
           <motion.div className="flex flex-wrap justify-center gap-4" variants={itemVariants}>

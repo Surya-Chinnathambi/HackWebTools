@@ -1,12 +1,46 @@
-
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Github, Search as SearchIcon, ChevronDown, Shield, Code, Zap, BookOpen, Target, BarChart3, Award, UserCircle, LogOut, CreditCard, Settings, User } from "lucide-react";
-import ThemeToggle from "../ui/ThemeToggle";
-import SearchBar from "../Search/SearchBar";
-import { Button } from "@/components/ui/button";
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Menu,
+  X,
+  Shield,
+  Code,
+  Zap,
+  BookOpen,
+  Target,
+  BarChart3,
+  Award,
+  Search as SearchIcon,
+  LogOut,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  GraduationCap,
+  Gamepad2,
+  Home,
+  Crown,
+  Terminal,
+  Key,
+  Globe,
+  TrendingUp,
+  Wifi,
+  Bug,
+  Hash,
+  FileCode,
+  Braces,
+  Activity,
+  BookMarked,
+  Brain,
+  Lock,
+  Database,
+  Bell,
+  Sparkles,
+  ArrowRight,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,740 +48,810 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/AuthContext';
+import ThemeToggle from '../ui/ThemeToggle';
+import { getAllTools } from '@/utils/toolsData';
+import { cn } from '@/lib/utils';
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+interface NavLink {
+  label: string;
+  href: string;
+  icon: any;
+  color: string;
+  badge?: {
+    text: string;
+    variant: 'new' | 'live';
+  };
+  highlight?: boolean;
+}
+
+const toolsLinks: NavLink[] = [
+  { label: 'All Tools', href: '/tools', icon: Code, color: 'text-blue-500' },
+  { label: 'Port Scanner', href: '/port-scanner', icon: Wifi, color: 'text-cyan-500' },
+  { label: 'Vuln Scanner', href: '/advanced-vuln-scanner', icon: Bug, color: 'text-red-500' },
+  { label: 'XSS Tester', href: '/xss-tester', icon: Braces, color: 'text-yellow-500' },
+  { label: 'API Tester', href: '/api-security-tester', icon: Globe, color: 'text-green-500' },
+  {
+    label: 'Threat Intel',
+    href: '/threat-intelligence',
+    icon: Activity,
+    color: 'text-purple-500',
+    badge: { text: 'LIVE', variant: 'live' },
+  },
+];
+
+const utilitiesLinks: NavLink[] = [
+  { label: 'Payloads', href: '/payloads', icon: Target, color: 'text-orange-500' },
+  { label: 'Encoder/Decoder', href: '/encoder-decoder', icon: Key, color: 'text-purple-500' },
+  { label: 'Hash Cracker', href: '/hash-cracker', icon: Hash, color: 'text-blue-500' },
+  { label: 'Reverse Shells', href: '/reverse-shell', icon: Terminal, color: 'text-green-500' },
+  { label: 'Wordlist Gen', href: '/wordlist-generator', icon: FileText, color: 'text-indigo-500' },
+  { label: 'Command Gen', href: '/command-generator', icon: FileCode, color: 'text-cyan-500' },
+  { label: 'Report Gen', href: '/report-generator', icon: FileText, color: 'text-pink-500' },
+  { label: 'Exploit DB', href: '/exploit-db', icon: Database, color: 'text-red-500' },
+];
+
+const learnLinks: NavLink[] = [
+  { label: 'Learning Hub', href: '/learning-hub', icon: BookOpen, color: 'text-blue-500' },
+  { label: 'Courses', href: '/courses', icon: GraduationCap, color: 'text-purple-500' },
+  { label: 'Learning Paths', href: '/learning-paths', icon: BookMarked, color: 'text-indigo-500' },
+  {
+    label: 'Hands-On Labs',
+    href: '/labs',
+    icon: Target,
+    color: 'text-red-500',
+    badge: { text: 'NEW', variant: 'new' },
+    highlight: true,
+  },
+  { label: 'OWASP Lab', href: '/owasp-lab', icon: Lock, color: 'text-orange-500' },
+  { label: 'Quiz Arena', href: '/quizzes', icon: Gamepad2, color: 'text-green-500' },
+  { label: 'Interview Prep', href: '/interview-prep', icon: Brain, color: 'text-cyan-500' },
+  { label: 'Glossary', href: '/glossary', icon: FileText, color: 'text-yellow-500' },
+  { label: 'Blue Team', href: '/blue-team', icon: Shield, color: 'text-blue-600' },
+];
+
+export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-
-  const { user, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDesktopMenu, setOpenDesktopMenu] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const navigate = useNavigate();
-
-  const { scrollY } = useScroll();
-  const headerOpacity = useTransform(scrollY, [0, 50], [0.95, 1]);
-  const headerBlur = useTransform(scrollY, [0, 50], [12, 20]);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        setSearchResults([]);
+      }
+      if (isSearchOpen && searchResults.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSelectedResultIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : 0));
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSelectedResultIndex((prev) => (prev > 0 ? prev - 1 : searchResults.length - 1));
+        }
+        if (e.key === 'Enter' && searchResults[selectedResultIndex]) {
+          e.preventDefault();
+          navigate(`/tools/${searchResults[selectedResultIndex].id}`);
+          setIsSearchOpen(false);
+          setSearchQuery('');
+          setSearchResults([]);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen, searchResults, selectedResultIndex, navigate]);
 
-  const toggleSearch = () => {
-    setSearchOpen(!searchOpen);
+  // Click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        setSearchResults([]);
+      }
+    };
+    if (isSearchOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isSearchOpen]);
+
+  // Search functionality
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const timer = setTimeout(() => {
+      const allTools = getAllTools();
+      const filtered = allTools.filter((tool) =>
+        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tool.tags && tool.tags.some((tag: string) =>
+          tag.toLowerCase().includes(searchQuery.toLowerCase())
+        ))
+      ).slice(0, 8);
+      setSearchResults(filtered);
+      setSelectedResultIndex(0);
+      setIsSearching(false);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setOpenDesktopMenu(null);
+  }, [location.pathname]);
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
     <motion.header
-      className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ${isScrolled ? "shadow-lg" : ""
-        }`}
-      role="banner"
-      style={{
-        opacity: headerOpacity,
-        backdropFilter: useTransform(headerBlur, (blur) => `blur(${blur}px)`),
-      }}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className={cn(
+        'sticky top-0 z-50 w-full border-b transition-all duration-300',
+        isScrolled
+          ? 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-lg'
+          : 'bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30'
+      )}
     >
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <motion.div
-            className="bg-primary rounded-full p-1"
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            <code className="text-primary-foreground text-sm font-bold">SP</code>
-          </motion.div>
-          <motion.span
-            className="font-bold text-lg hidden md:inline-block"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            whileHover={{ x: 4 }}
-          >
-            SecurePulse
-          </motion.span>
-        </Link>
+      <div className="container mx-auto px-4">
+        {/* FIX: Use grid layout for precise 3-column alignment: logo | nav | actions */}
+        <div className="grid grid-cols-[auto_1fr_auto] h-16 items-center gap-4">
 
-        <nav className="hidden lg:flex items-center gap-4" aria-label="Primary navigation">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <Link to="/" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Home
-                </Link>
-              </NavigationMenuItem>
+          {/* Logo — left column, fixed width */}
+          <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+            >
+              <Shield className="h-8 w-8 text-red-500 group-hover:text-red-600 transition-colors" />
+            </motion.div>
+            <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent whitespace-nowrap">
+              HackWebTools
+            </span>
+          </Link>
 
-              <NavigationMenuItem>
-                <Link to="/dashboard" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 text-sm font-medium transition-all hover:shadow-lg hover:scale-105 focus:outline-none">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Link>
-              </NavigationMenuItem>
+          {/* Desktop Navigation — center column, perfectly centered */}
+          <nav className="hidden lg:flex items-center justify-center gap-1">
 
-              <NavigationMenuItem>
-                <Link to="/pricing" className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Pricing
-                </Link>
-              </NavigationMenuItem>
+            {/* Home */}
+            <Link to="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 h-9 px-3 text-sm font-medium',
+                  isActive('/') && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <Home className="h-4 w-4" />
+                Home
+              </Button>
+            </Link>
 
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-sm">
-                  <Zap className="mr-2 h-4 w-4" />
-                  Security Tools
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/tools" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">All Tools</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Browse complete toolkit
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/advanced-vuln-scanner" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">VAPT Scanner</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Real CVE vulnerability detection
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/threat-intelligence" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">AI Threat Intel</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            ML-powered threat detection
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/api-security-tester" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">API Security</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            REST/GraphQL testing
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-sm">
-                  <Code className="mr-2 h-4 w-4" />
-                  Utilities
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/payloads" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Payloads</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            XSS, SQLi, fuzzing wordlists
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/encoder-decoder" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Encoder/Decoder</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Base64, URL, Hex encoding
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/reverse-shell" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Reverse Shells</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Multi-language shell generator
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/command-generator" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Commands</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Pentest command templates
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-sm">
-                  <Target className="mr-2 h-4 w-4" />
-                  Testing
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/xss-tester" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">XSS Tester</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Cross-site scripting analysis
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/owasp-lab" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">OWASP Lab</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Interactive vulnerability training
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/report-generator" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Report Generator</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Professional pentest reports
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="text-sm">
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Learn
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/learning-hub" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Learning Hub</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            6-month professional roadmap & career guidance
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/courses" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            📚 <span>Courses</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            In-depth video courses and tutorials
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/learning-paths" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-blue-950/20 to-purple-950/20 border border-blue-500/20">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            🎓 <span>Learning Paths</span>
-                            <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Structured curriculum: Beginner → Advanced
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/labs" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-red-950/20 to-orange-950/20 border border-red-500/20">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            <Target className="h-4 w-4 text-red-500" />
-                            <span>Hands-On Labs</span>
-                            <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            SQL injection, XSS, and more challenges
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/certificates" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-yellow-950/20 to-orange-950/20 border border-yellow-500/20">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            <Award className="h-4 w-4 text-yellow-500" />
-                            <span>Certificates</span>
-                            <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Earn & verify professional certificates
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/progress" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Progress Tracker</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Skills, achievements & certificates
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/quizzes" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-green-950/20 to-emerald-950/20 border border-green-500/20">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            🎯 <span>Quiz Arena</span>
-                            <span className="text-xs bg-green-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Test knowledge & compete on leaderboards
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/owasp-lab" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">OWASP Lab</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Interactive vulnerability training
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/glossary" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Glossary</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            200+ cybersecurity terms & definitions
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/interview-prep" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Interview Prep</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            50+ interview questions with good vs bad answers
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link to="/blue-team" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-gradient-to-r from-blue-950/20 to-cyan-950/20 border border-blue-500/20">
-                          <div className="text-sm font-medium leading-none flex items-center gap-1">
-                            <Shield className="h-4 w-4 text-blue-500" />
-                            <span>Blue Team / SOC</span>
-                            <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Defensive security playbooks & secure coding
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden xl:block w-[250px]">
-              <Popover open={searchOpen} onOpenChange={setSearchOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-sm text-muted-foreground"
-                    onClick={toggleSearch}
-                    aria-label="Open search"
+            {/* Tools Mega Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => setOpenDesktopMenu('tools')}
+              onMouseLeave={() => setOpenDesktopMenu(null)}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 h-9 px-3 text-sm font-medium',
+                  openDesktopMenu === 'tools' && 'bg-accent'
+                )}
+              >
+                <Code className="h-4 w-4" />
+                Tools
+                <ChevronDown className={cn(
+                  'h-3 w-3 transition-transform duration-200',
+                  openDesktopMenu === 'tools' && 'rotate-180'
+                )} />
+              </Button>
+              <AnimatePresence>
+                {openDesktopMenu === 'tools' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full pt-2 z-50"
                   >
-                    <SearchIcon className="mr-2 h-4 w-4" aria-hidden="true" />
-                    <span>Search...</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-[300px] lg:w-[400px]" align="end">
-                  <Command>
-                    <CommandInput placeholder="Search tools..." />
-                    <CommandList>
-                      <CommandEmpty>No results found.</CommandEmpty>
-                      <CommandGroup>
-                        <SearchBar />
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                    <div className="w-[560px] rounded-xl border bg-popover p-5 shadow-2xl">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {toolsLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            to={link.href}
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg p-2.5 transition-colors hover:bg-accent group',
+                              isActive(link.href) && 'bg-accent/50'
+                            )}
+                          >
+                            <link.icon className={cn('h-4 w-4 flex-shrink-0 group-hover:scale-110 transition-transform', link.color)} />
+                            <span className="font-medium text-sm flex-1">{link.label}</span>
+                            {link.badge && (
+                              <Badge
+                                variant={link.badge.variant === 'live' ? 'destructive' : 'default'}
+                                className="text-[10px] px-1.5 py-0 h-4"
+                              >
+                                {link.badge.text}
+                              </Badge>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <Button variant="ghost" size="icon" asChild className="hidden lg:flex">
-              <a
-                href="https://github.com/Surya-Chinnathambi/HackWebTools"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="View project on GitHub (opens in new tab)"
+            {/* Utilities Mega Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => setOpenDesktopMenu('utilities')}
+              onMouseLeave={() => setOpenDesktopMenu(null)}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 h-9 px-3 text-sm font-medium',
+                  openDesktopMenu === 'utilities' && 'bg-accent'
+                )}
               >
-                <Github className="h-5 w-5" aria-hidden="true" />
-              </a>
+                <Zap className="h-4 w-4" />
+                Utilities
+                <ChevronDown className={cn(
+                  'h-3 w-3 transition-transform duration-200',
+                  openDesktopMenu === 'utilities' && 'rotate-180'
+                )} />
+              </Button>
+              <AnimatePresence>
+                {openDesktopMenu === 'utilities' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full pt-2 z-50"
+                  >
+                    <div className="w-[560px] rounded-xl border bg-popover p-5 shadow-2xl">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {utilitiesLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            to={link.href}
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg p-2.5 transition-colors hover:bg-accent group',
+                              isActive(link.href) && 'bg-accent/50'
+                            )}
+                          >
+                            <link.icon className={cn('h-4 w-4 flex-shrink-0 group-hover:scale-110 transition-transform', link.color)} />
+                            <span className="font-medium text-sm">{link.label}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Learn Mega Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => setOpenDesktopMenu('learn')}
+              onMouseLeave={() => setOpenDesktopMenu(null)}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 h-9 px-3 text-sm font-medium',
+                  openDesktopMenu === 'learn' && 'bg-accent'
+                )}
+              >
+                <BookOpen className="h-4 w-4" />
+                Learn
+                <ChevronDown className={cn(
+                  'h-3 w-3 transition-transform duration-200',
+                  openDesktopMenu === 'learn' && 'rotate-180'
+                )} />
+              </Button>
+              <AnimatePresence>
+                {openDesktopMenu === 'learn' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full pt-2 z-50"
+                  >
+                    <div className="w-[560px] rounded-xl border bg-popover p-5 shadow-2xl">
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {learnLinks.map((link) => (
+                          <Link
+                            key={link.href}
+                            to={link.href}
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg p-2.5 transition-colors hover:bg-accent group',
+                              isActive(link.href) && 'bg-accent/50',
+                              link.highlight && 'bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20'
+                            )}
+                          >
+                            <link.icon className={cn('h-4 w-4 flex-shrink-0 group-hover:scale-110 transition-transform', link.color)} />
+                            <span className="font-medium text-sm flex-1">{link.label}</span>
+                            {link.badge && (
+                              <Badge
+                                variant={link.badge.variant === 'new' ? 'default' : 'destructive'}
+                                className="text-[10px] px-1.5 py-0 h-4"
+                              >
+                                {link.badge.text}
+                              </Badge>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Progress */}
+            <Link to="/progress">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 h-9 px-3 text-sm font-medium',
+                  isActive('/progress') && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                Progress
+              </Button>
+            </Link>
+
+            {/* Dashboard CTA */}
+            <Link to="/dashboard">
+              <Button
+                size="sm"
+                className="gap-1.5 h-9 px-4 text-sm font-medium bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 border-0"
+              >
+                <Sparkles className="h-4 w-4" />
+                Dashboard
+              </Button>
+            </Link>
+          </nav>
+
+          {/* Right Actions — right column, fixed width, no wrap */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+
+            {/* Premium Search Bar */}
+            <div ref={searchContainerRef} className="relative hidden md:flex items-center">
+              {!isSearchOpen ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setTimeout(() => searchInputRef.current?.focus(), 100);
+                  }}
+                  className="gap-2 h-9 px-3 text-muted-foreground hover:text-foreground border border-transparent hover:border-border hover:bg-accent/80 transition-all"
+                >
+                  <SearchIcon className="h-4 w-4" />
+                  <span className="text-sm hidden xl:inline-block">Search</span>
+                  <kbd className="pointer-events-none hidden xl:flex h-5 select-none items-center gap-0.5 rounded border border-border bg-muted/50 px-1.5 font-mono text-[10px] font-semibold">
+                    <span>⌘K</span>
+                  </kbd>
+                </Button>
+              ) : (
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 380, opacity: 1 }}
+                  exit={{ width: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  className="relative"
+                >
+                  {/* Search Input */}
+                  <div className="relative bg-background rounded-xl border-2 border-primary/50 shadow-lg shadow-primary/10 transition-all group">
+                    <div className="flex items-center gap-2 px-3 py-2">
+                      <SearchIcon className="h-4 w-4 text-primary flex-shrink-0" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Search tools, resources..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/60 focus:outline-none min-w-0"
+                        autoComplete="off"
+                        spellCheck="false"
+                      />
+                      {isSearching && (
+                        <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse flex-shrink-0" />
+                      )}
+                      {searchQuery && !isSearching && (
+                        <button
+                          onClick={() => { setSearchQuery(''); setSearchResults([]); searchInputRef.current?.focus(); }}
+                          className="h-5 w-5 rounded flex items-center justify-center hover:bg-muted flex-shrink-0"
+                        >
+                          <X className="h-3 w-3 text-muted-foreground" />
+                        </button>
+                      )}
+                      <div className="h-4 w-px bg-border flex-shrink-0" />
+                      <button
+                        onClick={() => { setIsSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
+                        className="text-[11px] text-muted-foreground hover:text-foreground font-semibold flex-shrink-0"
+                      >
+                        ESC
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Search Results Dropdown */}
+                  <AnimatePresence>
+                    {searchQuery && searchResults.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                        className="absolute top-full mt-2 w-full right-0 bg-background border-2 border-border rounded-xl shadow-2xl overflow-hidden z-50"
+                      >
+                        <div className="px-3 py-2 border-b bg-muted/30 flex items-center justify-between">
+                          <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
+                            {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                            <kbd className="px-1 py-0.5 rounded bg-background border font-mono">↑↓</kbd>
+                            <kbd className="px-1 py-0.5 rounded bg-background border font-mono">↵</kbd>
+                          </div>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {searchResults.map((result, index) => (
+                            <button
+                              key={result.id}
+                              onClick={() => { navigate(`/tools/${result.id}`); setIsSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}
+                              onMouseEnter={() => setSelectedResultIndex(index)}
+                              className={cn(
+                                'w-full flex items-start gap-3 px-3 py-3 text-left transition-all border-l-2',
+                                selectedResultIndex === index
+                                  ? 'bg-red-500/5 border-l-red-500'
+                                  : 'hover:bg-muted/40 border-l-transparent'
+                              )}
+                            >
+                              <div className={cn(
+                                'p-2 rounded-lg flex-shrink-0 transition-colors',
+                                selectedResultIndex === index
+                                  ? 'bg-gradient-to-br from-red-500 to-orange-500'
+                                  : 'bg-muted'
+                              )}>
+                                <Zap className={cn('h-3.5 w-3.5', selectedResultIndex === index ? 'text-white' : 'text-muted-foreground')} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <h4 className={cn('font-semibold text-sm truncate', selectedResultIndex === index && 'text-primary')}>
+                                    {result.name}
+                                  </h4>
+                                  {selectedResultIndex === index && <ArrowRight className="h-3.5 w-3.5 text-primary flex-shrink-0" />}
+                                </div>
+                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{result.description}</p>
+                                {result.tags?.length > 0 && (
+                                  <div className="flex gap-1 mt-1.5">
+                                    {result.tags.slice(0, 3).map((tag: string) => (
+                                      <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-normal">
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                    {searchQuery && !isSearching && searchResults.length === 0 && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute top-full mt-2 w-full bg-background border-2 border-border rounded-xl shadow-2xl z-50 py-8"
+                      >
+                        <div className="text-center space-y-2">
+                          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+                            <SearchIcon className="h-5 w-5 text-muted-foreground/50" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-sm">No results found</h3>
+                            <p className="text-xs text-muted-foreground mt-0.5">Try different keywords</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Mobile Search Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden h-9 w-9"
+              onClick={() => navigate('/search')}
+              aria-label="Search"
+            >
+              <SearchIcon className="h-4 w-4" />
             </Button>
 
-            {/* Authentication Buttons/Menu */}
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Notifications — Only if logged in */}
+            {user && (
+              <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                <Bell className="h-4 w-4" />
+                <span className="absolute top-1.5 right-1.5 h-3.5 w-3.5 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center leading-none">
+                  3
+                </span>
+              </Button>
+            )}
+
+            {/* User Menu or Auth Buttons */}
             {user ? (
-              // Logged in - Show user menu
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="hidden lg:flex gap-2">
-                    <UserCircle className="h-5 w-5" />
-                    <span className="max-w-[100px] truncate">{user.name || user.email}</span>
+                  <Button variant="ghost" size="sm" className="gap-2 h-9 px-2">
+                    <div className="h-7 w-7 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <span className="hidden xl:inline-block text-sm font-medium max-w-[80px] truncate">
+                      {user.name}
+                    </span>
+                    <ChevronDown className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                     <BarChart3 className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/progress')}>
-                    <Target className="mr-2 h-4 w-4" />
-                    My Progress
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    Progress
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/certificates')}>
                     <Award className="mr-2 h-4 w-4" />
                     Certificates
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/pricing')}>
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Pricing & Plans
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              // Not logged in - Show Login/Sign Up buttons
-              <div className="hidden lg:flex items-center gap-2">
-                <Button variant="ghost" asChild>
-                  <Link to="/login">Log In</Link>
-                </Button>
-                <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  <Link to="/login?signup=true">Sign Up</Link>
+              <div className="hidden lg:flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 px-4 text-sm border-primary/50 hover:bg-primary/10 hover:border-primary"
+                  onClick={() => navigate('/login')}
+                >
+                  Sign In
                 </Button>
               </div>
             )}
 
-            <ThemeToggle />
+            {/* Mobile Menu Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden h-9 w-9"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <X className="h-5 w-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <Menu className="h-5 w-5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Button>
           </div>
-        </nav>
-
-        {/* Mobile menu button */}
-        <div className="flex lg:hidden items-center gap-3">
-          <ThemeToggle />
-          <button
-            onClick={toggleMenu}
-            className="p-2 transition-transform hover:scale-110"
-            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-navigation"
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 animate-fade-in" />
-            ) : (
-              <Menu className="h-6 w-6 animate-fade-in" />
-            )}
-          </button>
         </div>
       </div>
 
-      {/* Mobile menu backdrop overlay */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden animate-fade-in"
-          onClick={() => setIsMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      {/* Gradient Accent Line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent" />
 
-      {/* Mobile menu with animation */}
-      {isMenuOpen && (
-        <div
-          id="mobile-navigation"
-          className="md:hidden border-t animate-fade-in relative z-50 bg-background shadow-lg"
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          <div className="container py-6 flex flex-col gap-3">
-            <SearchBar />
-            <nav className="flex flex-col space-y-3">
-              <Link
-                to="/"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                to="/dashboard"
-                className="text-base font-medium bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 py-2 rounded-md transition-all hover:shadow-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                📊 Dashboard
-              </Link>
-              <Link
-                to="/tools"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Tools
-              </Link>
-              <Link
-                to="/payloads"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Payloads
-              </Link>
-              <Link
-                to="/payload-history"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                History & Favorites
-              </Link>
-              <Link
-                to="/encoder-decoder"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Encoder/Decoder
-              </Link>
-              <Link
-                to="/reverse-shell"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Reverse Shell Generator
-              </Link>
-              <Link
-                to="/command-generator"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Command Generator
-              </Link>
-              <Link
-                to="/xss-tester"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                XSS Tester
-              </Link>
-              <Link
-                to="/report-generator"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Report Generator
-              </Link>
-              <Link
-                to="/exploit-db"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Exploit Database
-              </Link>
-              <Link
-                to="/wordlist-generator"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Wordlist Generator
-              </Link>
-              <Link
-                to="/api-security-tester"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                API Security Tester
-              </Link>
-              <Link
-                to="/port-scanner"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Port Scanner
-              </Link>
-              <Link
-                to="/hash-cracker"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Hash Cracker
-              </Link>
-              <Link
-                to="/learning-hub"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                📚 Learning Hub
-              </Link>
-              <Link
-                to="/learning-paths"
-                className="text-base font-medium transition-colors hover:text-primary bg-gradient-to-r from-blue-600/10 to-purple-600/10 px-3 py-2 rounded-md border border-blue-500/20"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                🎓 Learning Paths <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full ml-1">NEW</span>
-              </Link>
-              <Link
-                to="/certificates"
-                className="text-base font-medium transition-colors hover:text-primary bg-gradient-to-r from-yellow-600/10 to-orange-600/10 px-3 py-2 rounded-md border border-yellow-500/20"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                🏆 Certificates <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded-full ml-1">NEW</span>
-              </Link>
-              <Link
-                to="/owasp-lab"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                OWASP Top 10 Lab
-              </Link>
-              <Link
-                to="/advanced-vuln-scanner"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Advanced Vuln Scanner
-              </Link>
-              <Link
-                to="/threat-intelligence"
-                className="text-base font-medium transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                AI Threat Intelligence
-              </Link>
-              <a
-                href="https://github.com/Surya-Chinnathambi/HackWebTools"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-base font-medium flex items-center gap-2 transition-colors hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Github size={16} /> GitHub Repository
-              </a>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="lg:hidden border-t overflow-hidden"
+          >
+            <div className="container mx-auto px-4 py-5 space-y-5 max-h-[calc(100vh-4rem)] overflow-y-auto">
 
-              {/* Mobile Authentication */}
-              <div className="pt-4 mt-4 border-t border-border space-y-3">
-                {user ? (
-                  <>
-                    <div className="text-sm text-muted-foreground px-2">
-                      Logged in as <span className="font-medium text-foreground">{user.name || user.email}</span>
-                    </div>
-                    <Link
-                      to="/progress"
-                      className="text-base font-medium transition-colors hover:text-primary flex items-center gap-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Target size={16} /> My Progress
-                    </Link>
-                    <Link
-                      to="/pricing"
-                      className="text-base font-medium transition-colors hover:text-primary flex items-center gap-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <CreditCard size={16} /> Pricing & Plans
-                    </Link>
-                    <button
-                      onClick={() => {
-                        logout();
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full text-left text-base font-medium text-red-600 hover:text-red-700 flex items-center gap-2"
-                    >
-                      <LogOut size={16} /> Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="block text-center text-base font-medium transition-colors hover:text-primary border border-border rounded-md py-2"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Log In
-                    </Link>
-                    <Link
-                      to="/login?signup=true"
-                      className="block text-center text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-md py-2 transition-all hover:shadow-lg"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
-                    <Link
-                      to="/pricing"
-                      className="block text-center text-base font-medium transition-colors hover:text-primary"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      View Pricing
-                    </Link>
-                  </>
-                )}
+              {/* Security Tools */}
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-3 mb-2">
+                  Security Tools
+                </h3>
+                {toolsLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent',
+                      isActive(link.href) && 'bg-accent'
+                    )}
+                  >
+                    <link.icon className={cn('h-4 w-4 flex-shrink-0', link.color)} />
+                    <span className="flex-1 text-sm font-medium">{link.label}</span>
+                    {link.badge && (
+                      <Badge variant={link.badge.variant === 'live' ? 'destructive' : 'default'} className="text-[10px] px-1.5 py-0 h-4">
+                        {link.badge.text}
+                      </Badge>
+                    )}
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Link>
+                ))}
               </div>
-            </nav>
-          </div>
-        </div>
-      )}
+
+              {/* Utilities */}
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-3 mb-2">
+                  Utilities
+                </h3>
+                {utilitiesLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent',
+                      isActive(link.href) && 'bg-accent'
+                    )}
+                  >
+                    <link.icon className={cn('h-4 w-4 flex-shrink-0', link.color)} />
+                    <span className="flex-1 text-sm font-medium">{link.label}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Link>
+                ))}
+              </div>
+
+              {/* Learning */}
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-3 mb-2">
+                  Learning & Practice
+                </h3>
+                {learnLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent',
+                      isActive(link.href) && 'bg-accent',
+                      link.highlight && 'bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20'
+                    )}
+                  >
+                    <link.icon className={cn('h-4 w-4 flex-shrink-0', link.color)} />
+                    <span className="flex-1 text-sm font-medium">{link.label}</span>
+                    {link.badge && (
+                      <Badge variant={link.badge.variant === 'new' ? 'default' : 'destructive'} className="text-[10px] px-1.5 py-0 h-4">
+                        {link.badge.text}
+                      </Badge>
+                    )}
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Link>
+                ))}
+              </div>
+
+              {/* Bottom Links */}
+              <div className="space-y-1.5 pt-2 border-t">
+                <Link
+                  to="/progress"
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent',
+                    isActive('/progress') && 'bg-accent'
+                  )}
+                >
+                  <BarChart3 className="h-4 w-4 text-blue-500" />
+                  <span className="flex-1 text-sm font-medium">Progress</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span className="flex-1 text-sm">Dashboard</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+
+              {/* Auth */}
+              {!user && (
+                <div className="pt-2 border-t">
+                  <Button
+                    variant="outline"
+                    className="w-full h-10 text-sm border-primary/50 hover:bg-primary/10 hover:border-primary"
+                    onClick={() => navigate('/login')}
+                  >
+                    Sign In
+                  </Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
-};
-
-export default Header;
+}

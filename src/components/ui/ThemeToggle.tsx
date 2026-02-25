@@ -12,7 +12,7 @@ const ThemeToggle = () => {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    
+
     const initialTheme = storedTheme || (prefersDark ? "dark" : "light");
     setTheme(initialTheme);
     applyTheme(initialTheme);
@@ -29,7 +29,7 @@ const ThemeToggle = () => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     applyTheme(newTheme);
-    
+
     // Show toast notification
     toast({
       title: `${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)} theme activated`,
@@ -39,12 +39,12 @@ const ThemeToggle = () => {
   };
 
   return (
-    <Button 
-      variant="ghost" 
+    <Button
+      variant="ghost"
       size="icon"
       onClick={toggleTheme}
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-      className="relative"
+      className="relative h-9 w-9"
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme === "dark" ? (
